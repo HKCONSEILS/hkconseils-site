@@ -1,0 +1,32 @@
+name: release-gate
+
+# Porte de mise en ligne, à jouer AVANT de basculer le domaine vers Cloudflare
+# Pages. Distincte de `validate` à dessein :
+#
+#   · `validate` tourne à chaque push et doit rester vert — c'est le signal qui
+#     dit « le contenu est sain ». Le rendre rouge en permanence à cause d'un
+#     placeholder connu détruirait ce signal, et ne protégerait rien : Cloudflare
+#     Pages déploie sur son intégration Git sans consulter GitHub Actions.
+#   · `release-gate` répond à une seule question, au moment où elle se pose :
+#     « ce contenu peut-il être publié ? » Il échoue tant qu'un placeholder
+#     {{...}} subsiste dans public/.
+#
+# Ce qui protège réellement la production reste la bascule DNS : tant que l'apex
+# ne pointe pas vers Pages, le site n'existe que sur son URL *.pages.dev.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-gate:
+    name: Prêt pour la mise en ligne ?
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: check-leaks (RELEASE=1)
+        run: RELEASE=1 bash scripts/check-leaks.sh
+      - name: check-jsonld
+        run: python3 scripts/check-jsonld.py
