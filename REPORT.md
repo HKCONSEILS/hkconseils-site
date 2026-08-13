@@ -3,8 +3,8 @@
 - **Directive** : SITE-01 (Mini-ADR-01) · **Exécutant** : Claude Code · **Date** : 2026-08-13
 - **Dépôt** : `HKCONSEILS/hkconseils-site` (privé) · **Branche** : `main`
 - **Production** : `https://hkconseils.fr` — **en ligne**
-- **État** : livré et déployé. **Deux réglages Cloudflare restent à faire côté
-  tableau de bord** (§8), dont un qui annule l'objectif GEO tant qu'il tient.
+- **État** : livré, déployé, **8 AC sur 8 vérifiés par mesure**. Un reliquat
+  cosmétique (capture Editos) et une anomalie nouvelle à arbitrer (§8.3).
 
 ---
 
@@ -15,11 +15,11 @@
 | AC1 | Lighthouse mobile ≥ 95 × 4 | ✅ | **100 / 100 / 100 / 100** sur les trois pages (mobile, 3 runs par page, médiane — §5). Poids hors images : **98,9 Ko** pour une limite de 500 Ko. |
 | AC2 | HTML valide, 1 × H1, méta | ✅ | `html-validate` : 3 fichiers, zéro erreur. 1 seul H1 par page, hiérarchie sans saut, `alt` + `width`/`height` sur l'image, `lang="fr"`. Titre **54 car.**, description **155 car.** (limites 60 / 155), canonique, Open Graph et Twitter Card présents. |
 | AC3 | JSON-LD | ✅/⏳ | `check-jsonld.py` passe : @graph à 7 nœuds — ProfessionalService, Person, 3 × Service, Product, FAQPage — et les 5 Q/R FAQ sont identiques entre le DOM et le balisage. Test des résultats enrichis : à passer sur l'URL de production. |
-| AC4 | robots.txt | ✅ | Le « Managed robots.txt » de Cloudflare a été désactivé le 13/08. Le fichier servi est désormais celui du dépôt, sans aucun `Disallow`. **Mais l'accès des robots reste bloqué en amont, au niveau du pare-feu — voir §8.1, c'est le point le plus important du rapport.** |
+| AC4 | robots.txt | ✅ | « Managed robots.txt » désactivé : le fichier servi est identique à celui du dépôt (`diff` vide), zéro `Disallow`, zéro `Content-Signal`. Blocage pare-feu levé : **GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot, Googlebot, Bingbot et Applebot répondent tous 200**, mesuré sur la production. |
 | AC5 | Zéro fuite | ✅ | `check-leaks.sh` passe sur les 23 fichiers suivis. **Testé négativement** : les 6 familles de motifs se déclenchent sur un fichier piégé. |
-| AC6 | Mentions légales | ✅ | SASU HK CONSEILS, SIREN 100 332 816, siège réel (6 boulevard Édouard Herriot, 69800 Saint-Priest), directeur de la publication Hemerson Koffi, hébergeur Cloudflare Inc. avec adresse, politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
-| AC7 | HTTPS + www → apex | ⚠️ | `https://hkconseils.fr` sert le site, certificat valide (Google Trust Services, TLS 1.3), `http://` redirige en 301 vers `https://`, aucun contenu mixte. **Mais `www` répond 200 au lieu de rediriger** — §8.2. La balise canonique consolide vers l'apex, ce qui limite le préjudice sans satisfaire le critère. |
-| AC8 | Zéro cookie / tiers / analytics | ✅ | Vérifié sur le site en production : aucun `Set-Cookie`, aucun script, aucune ressource externe. Polices auto-hébergées. Une porte automatisée refuse toute ressource chargée depuis un domaine tiers. |
+| AC6 | Mentions légales | ✅ | Jeu LCEN + R.123-237 complet : dénomination, forme, **capital 100 €**, siège (6 boulevard Édouard Herriot, 69800 Saint-Priest), SIREN, **RCS de Lyon**, **TVA FR 88 100 332 816** (clé de contrôle recalculée et concordante), directeur de la publication, hébergeur avec adresse, contact. Politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
+| AC7 | HTTPS + www → apex | ✅ | `https://hkconseils.fr` sert le site, certificat valide (Google Trust Services, TLS 1.3), `http://` redirige en 301, aucun contenu mixte. `www` redirige en **301** vers l'apex, chemin **et** chaîne de requête préservés (`/mentions-legales?x=1` vérifié). |
+| AC8 | Zéro cookie / tiers / analytics | ✅ ⚠️ | Aucun `Set-Cookie`, aucune requête tierce, aucun outil de mesure — vérifié en production. Le dépôt ne contient aucun script. **Mais Cloudflare injecte un script d'obfuscation d'e-mail dans la page servie** : même origine, non analytique, donc le critère tient à la lettre — mais l'objectif « zéro JS » du Mini-ADR-01 n'est plus respecté à l'arrivée. Voir §8.3. |
 
 ## 2. Fichiers produits
 
@@ -70,7 +70,8 @@ check-leaks  : OK — 23 fichiers, aucun motif interdit
 check-jsonld : OK — @graph valide, 7 nœuds, 5 Q/R identiques DOM ↔ balisage
 html-validate: OK — 3 fichiers, zéro erreur
 release-gate : OK — plus aucun placeholder dans public/
-Rich Results : à passer sur l'URL de production
+schema.org  : 0 erreur, 0 avertissement sur https://hkconseils.fr/
+Rich Results: NON EXÉCUTÉ — voir §5.1
 
 Lighthouse (mobile, médiane de 3 runs par page)
                         Perf.  A11y  B.P.  SEO
@@ -78,6 +79,30 @@ Lighthouse (mobile, médiane de 3 runs par page)
   /mentions-legales      100    100   100   100
   /confidentialite       100    100   100   100
 ```
+
+### 5.1 Sur le test des résultats enrichis
+
+Le Rich Results Test de Google n'expose **aucune API publique** — l'endpoint
+`urlTestingTools/richResults:run` répond 404, et l'outil n'existe que dans une
+interface web. Sans navigateur sur la machine de travail, **je ne peux pas
+l'exécuter**, et je ne le déclarerai pas passé sur la foi d'un substitut.
+
+Ce qui a pu être vérifié à sa place, et qui l'a été :
+
+- le **validateur schema.org** (`validator.schema.org`, appelé sur l'URL de
+  production) : `totalNumErrors = 0`, `totalNumWarnings = 0` ;
+- le **JSON-LD tel que servi** : JSON valide, `@graph` complet avec ses 7 nœuds
+  — `ProfessionalService`, `Person`, 3 × `Service`, `Product`, `FAQPage` — et
+  l'adresse électronique intacte ;
+- `check-jsonld.py` : nœuds requis présents, propriétés minimales présentes, et
+  les 5 Q/R de la FAQ strictement identiques entre le DOM et le balisage.
+
+Une réserve de méthode : le validateur schema.org ne restitue que 5 objets dans
+sa vue synthétique (`numObjects = 5`), sans `ProfessionalService` ni `Person`. Le
+contrôle direct du JSON-LD servi montre que les deux nœuds sont bien présents et
+valides — c'est une limite d'affichage du validateur sur les nœuds référencés par
+`@id`, pas un défaut du balisage. **Le passage au Rich Results Test reste dû**,
+depuis un navigateur, et son verdict devra être consigné ici.
 
 Un run isolé de la page d'accueil est descendu à 87 en performance (démarrage à
 froid du navigateur), les deux autres à 100. C'est pour cela que la configuration
@@ -106,84 +131,75 @@ HTTP 521 avant la bascule. Aucun service vivant n'a été interrompu.
 3. **Mentions légales, complétude LCEN** — voir §9.
 4. **Search Console et fiche d'établissement Google** — actions Hémerson.
 
-## 8. Deux actions hors de portée du jeton d'API
+## 8. Réglages Cloudflare — état après correction
 
-Les deux demandent le tableau de bord Cloudflare, ou un jeton portant
-`Zone → Bot Management` et `Zone → Config Rules`. Le jeton utilisé répond
-`request is not authorized` sur les deux.
+Les deux réglages signalés le 13/08 ont été corrigés par Hémerson dans le tableau
+de bord, puis **re-vérifiés par mesure, pas sur parole**.
 
-### 8.1 Le pare-feu bloque les robots des moteurs de réponse — critique
+### 8.1 Accès des robots — résolu
 
-Le « Managed robots.txt » a bien été désactivé le 13/08 : le fichier servi est
-maintenant celui du dépôt, sans aucun `Disallow`. **Mais ce n'était que la partie
-déclarative.** Un second réglage, *Block AI training bots* réglé sur
-*Block on all pages*, refuse l'accès au niveau du pare-feu.
-
-Mesure faite sur la production, en variant l'en-tête User-Agent :
+`Managed robots.txt` désactivé et `Block AI training bots` levé. Mesure sur la
+production, en variant l'en-tête User-Agent :
 
 ```
-GPTBot          -> HTTP 403
-ClaudeBot       -> HTTP 403
-PerplexityBot   -> HTTP 403
-OAI-SearchBot   -> HTTP 403
-Googlebot       -> HTTP 200
-navigateur      -> HTTP 200
+GPTBot         200      OAI-SearchBot  200      Applebot   200
+ClaudeBot      200      Googlebot      200      navigateur 200
+PerplexityBot  200      Bingbot        200
 ```
 
-Le tableau de bord AI Crawl Control le confirme sur 24 h : **669 requêtes de
-robots IA, 0 autorisée, 657 réponses HTTP 403**, dont 261 du seul OAI-SearchBot.
-Tous les fournisseurs sont à zéro requête autorisée — Google, OpenAI, Microsoft,
-Anthropic, Apple, ByteDance, Perplexity, Common Crawl, DuckDuckGo, Huawei.
+Le `robots.txt` servi est identique à celui du dépôt (`diff` vide) : aucun
+`Disallow`, aucun `Content-Signal`. Rappel de l'état antérieur, pour mémoire :
+657 réponses 403 sur 669 requêtes de robots en 24 h.
 
-Un `robots.txt` accueillant devant une porte fermée à 403 ne sert à rien : le
-robot ne lit pas une autorisation, il se fait refouler. En l'état, le site est
-invisible pour les moteurs de réponse — c'est-à-dire que l'objectif GEO de la
-directive, et l'échéance du 11/09, ne sont pas tenus.
+### 8.2 Redirection `www` — résolu
 
-À noter : le réglage s'appelle « training bots », mais il refoule aussi
-**OAI-SearchBot et PerplexityBot**, qui sont des robots de recherche et de
-citation, pas d'entraînement. La distinction que suggère l'intitulé n'est pas
-celle qu'applique la règle.
-
-**À faire** : tableau de bord → zone `hkconseils.fr` → *Overview*, encadré
-*Manage AI bot access* → *Block AI training bots* : passer de
-*Block on all pages* à la valeur qui n'en bloque aucun.
-
-Vérification :
-
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" \
-  -A "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)" \
-  https://hkconseils.fr/
+```
+https://www.hkconseils.fr/                    301 -> https://hkconseils.fr/
+https://www.hkconseils.fr/mentions-legales?x=1 301 -> https://hkconseils.fr/mentions-legales?x=1
 ```
 
-Attendu : `200`.
+Chemin et chaîne de requête préservés. L'AC7 est satisfaite.
 
-Si le blocage doit être conservé pour l'entraînement uniquement, la voie propre
-est une règle WAF ciblant les seuls agents d'entraînement, en laissant passer les
-robots de recherche et de citation. Mais cela demande d'arbitrer entre protéger le
-contenu et être cité — arbitrage qui appartient à Hémerson, pas au site.
+### 8.3 Anomalie nouvelle — obfuscation d'e-mail Cloudflare
 
-### 8.2 Rediriger `www` vers l'apex en 301
+Constatée en inspectant la page **telle que servie**, et non le dépôt.
 
-`public/_redirects` ne peut pas le faire : ses règles portent sur les chemins, pas
-sur les noms d'hôte, et `www.hkconseils.fr` est attaché au même projet Pages — il
-sert donc le site en 200.
+L'option *Email Obfuscation* de la zone (`email_obfuscation = on`) réécrit le HTML
+à la volée :
 
-**Chemin** : tableau de bord → zone → *Rules* → *Redirect Rules* → *Create rule*
-(une *Single Redirect*, incluse dans l'offre gratuite) :
+- les deux liens `mailto:` — bouton du héros et bloc contact — deviennent
+  `href="/cdn-cgi/l/email-protection#4b232e262e39…"` ;
+- le texte visible de l'adresse est remplacé par `[email protected]` ;
+- un script est injecté dans la page :
+  `<script src="/cdn-cgi/scripts/…/email-decode.min.js">`.
 
-- Si `Hostname` égal `www.hkconseils.fr`
-- Alors redirection dynamique vers `concat("https://hkconseils.fr", http.request.uri.path)`
-- Code **301**, conserver la chaîne de requête
+Conséquences :
 
-```bash
-curl -sI https://www.hkconseils.fr/ | head -2
-```
+1. **Le site n'est plus à zéro JavaScript.** Le Mini-ADR-01 gelait « pas de build,
+   pas de framework, zéro JS ou ≤ 2 Ko ». Le dépôt respecte la contrainte ; la page
+   servie non. Le script est de même origine et n'est pas analytique, donc l'AC8
+   tient à la lettre — mais l'intention est perdue.
+2. **L'adresse de contact disparaît pour qui n'exécute pas JavaScript**, ce qui est
+   le cas de la plupart des robots de moteurs de réponse. Sur les 3 occurrences de
+   l'adresse dans la page servie, **une seule reste en clair : celle du JSON-LD**.
+   Le seul chemin de conversion du site est ce `mailto:` — on vient d'ouvrir la porte
+   aux robots et l'adresse leur est masquée dans le corps de page.
 
-Attendu : `301` puis `location: https://hkconseils.fr/`.
+**Arbitrage à rendre** — l'obfuscation existe pour limiter la récolte d'adresses par
+les robots à spam. La désactiver rend l'adresse lisible par tous, moissonneurs
+compris. Le compromis n'appartient pas au site :
 
-## 9. Mentions légales — ce qui est exigible et ce qui manque
+- **Option A — désactiver** (recommandée) : `email_obfuscation = off`. Le `mailto:`
+  redevient un lien HTML ordinaire, la page repasse à zéro JavaScript, l'adresse
+  redevient lisible par les moteurs de réponse. Coût : davantage de spam.
+- **Option B — conserver** : accepter que le corps de page masque l'adresse et
+  s'appuyer sur le JSON-LD, où elle reste en clair. Coût : un script injecté et un
+  chemin de conversion dégradé pour les agents sans JS.
+
+Le jeton d'API porte la permission nécessaire (`email_obfuscation`, `editable: true`).
+**Rien n'a été modifié** : le réglage attend l'arbitrage.
+
+## 9. Mentions légales — jeu complet
 
 L'AC6 est satisfaite. Pour mémoire, la LCEN (art. 6-III-1) attend d'un site
 professionnel un ensemble un peu plus large. État actuel :
@@ -198,7 +214,7 @@ professionnel un ensemble un peu plus large. État actuel :
 | Moyen de contact | ✅ courriel — **le texte cite le téléphone**, écarté par le §6 de la directive |
 | Capital social | ✅ 100 euros (Kbis) |
 | RCS et ville du greffe | ✅ RCS de Lyon, numéro 100 332 816 (Kbis) |
-| Numéro de TVA intracommunautaire | ⏳ **en attente** — à publier seulement si assujetti ; en franchise en base, ne rien afficher |
+| Numéro de TVA intracommunautaire | ✅ FR 88 100 332 816 — assujetti confirmé. Clé recalculée `(12 + 3 × (SIREN mod 97)) mod 97 = 88`, concordante |
 
 Capital et RCS ont été ajoutés le 13/08 à partir du Kbis : l'article R.123-237,
 auquel renvoie la LCEN, les rend exigibles pour une société commerciale — ma
