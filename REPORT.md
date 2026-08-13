@@ -3,8 +3,9 @@
 - **Directive** : SITE-01 (Mini-ADR-01) · **Exécutant** : Claude Code · **Date** : 2026-08-13
 - **Dépôt** : `HKCONSEILS/hkconseils-site` (privé) · **Branche** : `main`
 - **Production** : `https://hkconseils.fr` — **en ligne**
-- **État** : livré, déployé, **8 AC sur 8 vérifiés par mesure**. Un reliquat
-  cosmétique (capture Editos) et une anomalie nouvelle à arbitrer (§8.3).
+- **Amendement** : SITE-01b (souveraineté par couche + FAQ n°6) — appliqué le 14/08
+- **État** : livré, déployé, **8 AC sur 8 vérifiés par mesure**. Reliquats : capture
+  Editos (cosmétique), Rich Results Test (§5.1), obfuscation d'e-mail à arbitrer (§8.3).
 
 ---
 
@@ -73,7 +74,7 @@ release-gate : OK — plus aucun placeholder dans public/
 schema.org  : 0 erreur, 0 avertissement sur https://hkconseils.fr/
 Rich Results: NON EXÉCUTÉ — voir §5.1
 
-Lighthouse (mobile, médiane de 3 runs par page)
+Lighthouse (mobile, médiane des runs — re-mesuré après SITE-01b, 14/08)
                         Perf.  A11y  B.P.  SEO
   /                      100    100   100   100
   /mentions-legales      100    100   100   100
@@ -104,10 +105,10 @@ valides — c'est une limite d'affichage du validateur sur les nœuds référenc
 `@id`, pas un défaut du balisage. **Le passage au Rich Results Test reste dû**,
 depuis un navigateur, et son verdict devra être consigné ici.
 
-Un run isolé de la page d'accueil est descendu à 87 en performance (démarrage à
-froid du navigateur), les deux autres à 100. C'est pour cela que la configuration
-exécute 3 runs et retient la médiane, comme `lhci assert` : une mesure unique
-n'aurait pas été reproductible.
+Au premier passage, un run isolé de la page d'accueil était descendu à 87 en
+performance (démarrage à froid du navigateur). C'est pour cela que la configuration
+exécute plusieurs runs et retient la médiane, comme `lhci assert` : une mesure
+unique n'aurait pas été reproductible. Au passage du 14/08, tous les runs sont à 100.
 
 ## 6. Mise en production
 
@@ -226,3 +227,123 @@ domicile personnel du président y figurent, sans aucune raison d'être sur le s
 À noter au passage : le siège social est le domicile personnel du dirigeant. Cette
 adresse est déjà publique par le Kbis et le RNE, la publier ne crée donc pas de
 divulgation nouvelle — mais autant le savoir.
+
+## 10. Passe de rédaction du 14/08 — tics de rédaction
+
+Signalement d'Hémerson : le site « sonne IA ». Relevé objectif sur le corps de page
+avant intervention :
+
+```
+souverain / souveraine   9      « cas d'usage »           5
+auto-hébergé*            6      tirets cadratins          8
+« en production »        3      tournures « … : a, b, c » 13
+```
+
+Le marqueur dominant n'était pas le vocabulaire mais **le rythme** : treize
+paragraphes bâtis sur « affirmation : énumération de trois éléments », dans une page
+qui en compte une vingtaine.
+
+### 10.1 Premier passage — redondances (7 corrections)
+
+Ce passage n'a **pas** touché la ponctuation, ce qui était le défaut principal :
+tirets cadratins 8 avant, 8 après. Ce qui a été corrigé :
+
+1. suppression d'un paragraphe de remplissage sous « Trois interventions » ;
+2. le H2 de la section R&D répétait mot pour mot l'ouverture de son propre
+   paragraphe → titre ramené à « OpenClaw » ;
+3-6. quatre surtitres qui redisaient leur H2, supprimés puis **rétablis avec des
+   libellés porteurs d'information** (Infrastructure, À propos, FAQ, Contact) pour
+   préserver l'homogénéité visuelle des sections ;
+7. suppression de « vous recevrez une réponse argumentée, pas une plaquette ».
+   Outre la tournure « X, pas Y », cette phrase **inventait un engagement de
+   service** absent de la directive, laquelle interdit d'ajouter tout élément qui
+   n'y figure pas. C'était le plus grave des sept.
+
+### 10.2 Second passage — ponctuation (13 corrections)
+
+Inventaire des tirets cadratins et de leur origine :
+
+| Emplacement | Nombre | Origine |
+|---|---|---|
+| Héros, « Chaque recommandation — modèle, GPU, dimensionnement — » | 2 | directive §3.2 |
+| Editos, « Pipeline hybride — … — avec charte » | 2 | rédaction Claude Code |
+| FAQ RGPD | 2 | directive |
+| FAQ équipe technique | 1 | directive |
+| Contact, « Lyon — toute la France » | 1 | directive |
+| Mentions légales | 3 | rédaction Claude Code |
+| Confidentialité | 2 | rédaction Claude Code |
+
+Sept sur treize venaient de moi. Les six autres ont été corrigés également : le §3.2
+de SITE-01 autorise explicitement « polish typography/microcopy freely », sous la
+seule réserve de ne pas ajouter de fait. Aucun fait n'a été modifié.
+
+**Résultat mesuré sur la page servie** : zéro tiret cadratin dans le corps
+rédactionnel, hors les deux de la FAQ n°6 (voir §11.4) et les séparateurs de
+`<title>`, qui relèvent de l'usage typographique courant.
+
+## 11. SITE-01b — souveraineté par couche + FAQ n°6 (14/08)
+
+### 11.1 E1 — copie
+
+| Élément | Avant | Après |
+|---|---|---|
+| H1 | « …sans dépendre du cloud américain » | « …sans confier vos données au cloud américain » |
+| Meta description | 155 car. | **148 car.** (voir 11.2) |
+| `og:image:alt` | ancienne formulation | alignée |
+
+### 11.2 Écart assumé sur la meta description
+
+La formulation fournie au §1.2 fait **162 caractères**, au-dessus de la limite de 155
+de l'AC2, et **ne contient pas « souveraine »** — que ce même §1.2 demande pourtant
+de ne pas perdre. Le §1.2 autorisant un ajustement à la marge, cinq variantes ont été
+mesurées et la retenue fait 148 caractères en conservant « Lyon » **et**
+« souveraine » :
+
+> Conseil en IA souveraine à Lyon : diagnostic, LLM auto-hébergés (RAG, image,
+> vidéo), formation. Vos données ne quittent jamais votre infrastructure.
+
+Termes perdus par rapport à la proposition : « Cabinet de » et « déploiement de ».
+
+### 11.3 §1.3 — balayage de cohérence
+
+```
+grep -ri "sans dépendre\|sans dépendance" public/   →   0 occurrence
+```
+
+Une occurrence non textuelle a été trouvée hors du champ du grep : **l'image Open
+Graph affichait l'ancienne accroche en dur**. Non corrigée, la carte sociale aurait
+montré « sans dépendre du cloud américain » alors que son propre attribut `alt`
+annonçait la nouvelle formule. L'image a été régénérée.
+
+### 11.4 E2 — FAQ n°6
+
+Ajoutée en 6e position, DOM et JSON-LD, texte verbatim. `check-jsonld.py` valide
+6/6 paires identiques.
+
+**Point signalé** : la réponse approuvée verbatim s'ouvre sur « Non — la souveraineté
+se raisonne… ». Elle réintroduit donc un tiret cadratin dans un corps de page qui
+venait d'en être purgé à la demande d'Hémerson. Le verbatim demandé par SITE-01b a
+primé ; la substitution du tiret par un point est une modification d'un caractère,
+disponible sur simple accord.
+
+### 11.5 Validation
+
+```
+check-jsonld  : OK — 7 nœuds, 6 Q/R identiques DOM ↔ balisage
+check-leaks   : OK — aucun motif introduit
+html-validate : OK — zéro erreur, une seule H1
+CI            : verte sur les 3 jobs
+```
+
+Vérifications publiques (résolution forcée) : nouveau H1 servi, description à
+148 caractères, FAQ n°6 présente dans le HTML initial (6 blocs `<details>`, aucun
+JavaScript), `sans dépendre` à zéro occurrence, GPTBot toujours en 200.
+
+### 11.6 Rich Results Test — toujours dû
+
+Le §3.6 demande de le passer après ce déploiement. **Il n'a pas pu être exécuté** :
+l'outil de Google n'a pas d'API publique et n'existe qu'en interface web, or la
+machine de travail n'a pas de navigateur. Ce qui a été fait à la place est décrit au
+§5.1 — validateur schema.org à 0 erreur et 0 avertissement, JSON-LD servi vérifié
+nœud par nœud. Le test reste à passer par Hémerson depuis un navigateur, sur
+`https://hkconseils.fr`, en vérifiant que `FAQPage` remonte bien **6** questions.
