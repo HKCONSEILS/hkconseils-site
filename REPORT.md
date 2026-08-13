@@ -55,6 +55,7 @@ Deux écarts assumés par rapport au design system, tous deux imposés par la di
 | `<title>` | « HK CONSEILS — Conseil en IA générative souveraine pour PME · Lyon » (65 car.) | « HK CONSEILS — IA générative souveraine pour PME · Lyon » (54 car.) | Le titre prescrit au §3.2 dépasse de 5 caractères la limite de 60 fixée par l'AC2. Arbitrage en faveur du critère mesurable ; « conseil » est conservé en tête de la meta description. **À confirmer.** |
 | Meta description | 184 car. | 155 car. | Même conflit §3.2 / AC2. Coupe minimale : « fondé en 2026 » et « et » retirés, tous les termes porteurs conservés. |
 | Lien LinkedIn | attendu comme acquis | `{{LINKEDIN_URL}}` | Aucune URL de profil dans les sources fournies. Elle n'a pas été inventée. Traitée comme `{{ADRESSE_SIEGE}}` : bloquante à la publication. |
+| URL des pages légales | `mentions-legales.html` | `/mentions-legales` | Constaté sur le premier déploiement : Cloudflare Pages retire l'extension `.html` et redirige en 308. Les liens internes, les balises canoniques et le sitemap ont été alignés sur les URL réellement servies, pour ne pas publier un sitemap intégralement redirigé ni des canoniques pointant une URL qui n'existe pas. |
 
 ## 5. Résultats des portes
 
