@@ -15,9 +15,9 @@
 | AC1 | Lighthouse mobile ≥ 95 × 4 | ✅ | **100 / 100 / 100 / 100** sur les trois pages (mobile, 3 runs par page, médiane — §5). Poids hors images : **98,9 Ko** pour une limite de 500 Ko. |
 | AC2 | HTML valide, 1 × H1, méta | ✅ | `html-validate` : 3 fichiers, zéro erreur. 1 seul H1 par page, hiérarchie sans saut, `alt` + `width`/`height` sur l'image, `lang="fr"`. Titre **54 car.**, description **155 car.** (limites 60 / 155), canonique, Open Graph et Twitter Card présents. |
 | AC3 | JSON-LD | ✅/⏳ | `check-jsonld.py` passe : @graph à 7 nœuds — ProfessionalService, Person, 3 × Service, Product, FAQPage — et les 5 Q/R FAQ sont identiques entre le DOM et le balisage. Test des résultats enrichis : à passer sur l'URL de production. |
-| AC4 | robots.txt | ⛔ | Le fichier du dépôt est conforme, **mais Cloudflare préfixe un « Managed robots.txt » qui interdit GPTBot, ClaudeBot, Google-Extended, CCBot, Bytespider, Amazonbot, Applebot-Extended et meta-externalagent**, et pose `Content-Signal: ai-train=no`. Voir §8.1. |
+| AC4 | robots.txt | ✅ | Le « Managed robots.txt » de Cloudflare a été désactivé le 13/08. Le fichier servi est désormais celui du dépôt, sans aucun `Disallow`. **Mais l'accès des robots reste bloqué en amont, au niveau du pare-feu — voir §8.1, c'est le point le plus important du rapport.** |
 | AC5 | Zéro fuite | ✅ | `check-leaks.sh` passe sur les 23 fichiers suivis. **Testé négativement** : les 6 familles de motifs se déclenchent sur un fichier piégé. |
-| AC6 | Mentions légales | ✅ | SASU HK CONSEILS, SIREN 100 332 816, siège réel (6 boulevard Edouard Herriot, 69800 Saint-Priest), directeur de la publication Hemerson Koffi, hébergeur Cloudflare Inc. avec adresse, politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
+| AC6 | Mentions légales | ✅ | SASU HK CONSEILS, SIREN 100 332 816, siège réel (6 boulevard Édouard Herriot, 69800 Saint-Priest), directeur de la publication Hemerson Koffi, hébergeur Cloudflare Inc. avec adresse, politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
 | AC7 | HTTPS + www → apex | ⚠️ | `https://hkconseils.fr` sert le site, certificat valide (Google Trust Services, TLS 1.3), `http://` redirige en 301 vers `https://`, aucun contenu mixte. **Mais `www` répond 200 au lieu de rediriger** — §8.2. La balise canonique consolide vers l'apex, ce qui limite le préjudice sans satisfaire le critère. |
 | AC8 | Zéro cookie / tiers / analytics | ✅ | Vérifié sur le site en production : aucun `Set-Cookie`, aucun script, aucune ressource externe. Polices auto-hébergées. Une porte automatisée refuse toute ressource chargée depuis un domaine tiers. |
 
@@ -112,42 +112,57 @@ Les deux demandent le tableau de bord Cloudflare, ou un jeton portant
 `Zone → Bot Management` et `Zone → Config Rules`. Le jeton utilisé répond
 `request is not authorized` sur les deux.
 
-### 8.1 Désactiver le « Managed robots.txt » — prioritaire
+### 8.1 Le pare-feu bloque les robots des moteurs de réponse — critique
 
-Cloudflare préfixe au `robots.txt` du site un bloc managé qui **interdit
-explicitement les robots des moteurs de réponse** :
+Le « Managed robots.txt » a bien été désactivé le 13/08 : le fichier servi est
+maintenant celui du dépôt, sans aucun `Disallow`. **Mais ce n'était que la partie
+déclarative.** Un second réglage, *Block AI training bots* réglé sur
+*Block on all pages*, refuse l'accès au niveau du pare-feu.
+
+Mesure faite sur la production, en variant l'en-tête User-Agent :
 
 ```
-User-agent: *
-Content-Signal: search=yes,ai-train=no,use=reference
-...
-User-agent: ClaudeBot
-Disallow: /
-User-agent: GPTBot
-Disallow: /
-User-agent: Google-Extended
-Disallow: /
-(idem CCBot, Bytespider, Amazonbot, Applebot-Extended, meta-externalagent)
+GPTBot          -> HTTP 403
+ClaudeBot       -> HTTP 403
+PerplexityBot   -> HTTP 403
+OAI-SearchBot   -> HTTP 403
+Googlebot       -> HTTP 200
+navigateur      -> HTTP 200
 ```
 
-C'est l'exact contraire de l'objectif GEO de la directive. En théorie, la RFC 9309
-impose de fusionner les groupes portant le même agent et, à longueur de chemin
-égale, de faire primer `Allow` — le bloc `Allow: /` du dépôt, placé ensuite,
-devrait donc l'emporter chez un robot conforme. Mais tous ne fusionnent pas les
-groupes, certains retiennent le premier qui correspond, et le
-`Content-Signal: ai-train=no` reste une réserve de droits expresse au titre de
-l'article 4 de la directive 2019/790. Faire reposer la proposition de valeur du
-cabinet sur une subtilité d'interprétation n'est pas acceptable.
+Le tableau de bord AI Crawl Control le confirme sur 24 h : **669 requêtes de
+robots IA, 0 autorisée, 657 réponses HTTP 403**, dont 261 du seul OAI-SearchBot.
+Tous les fournisseurs sont à zéro requête autorisée — Google, OpenAI, Microsoft,
+Anthropic, Apple, ByteDance, Perplexity, Common Crawl, DuckDuckGo, Huawei.
 
-**Chemin** : tableau de bord Cloudflare → zone `hkconseils.fr` → *AI Crawl Control*
-(anciennement *AI Audit*, sous *Security*) → désactiver *Managed robots.txt*.
+Un `robots.txt` accueillant devant une porte fermée à 403 ne sert à rien : le
+robot ne lit pas une autorisation, il se fait refouler. En l'état, le site est
+invisible pour les moteurs de réponse — c'est-à-dire que l'objectif GEO de la
+directive, et l'échéance du 11/09, ne sont pas tenus.
+
+À noter : le réglage s'appelle « training bots », mais il refoule aussi
+**OAI-SearchBot et PerplexityBot**, qui sont des robots de recherche et de
+citation, pas d'entraînement. La distinction que suggère l'intitulé n'est pas
+celle qu'applique la règle.
+
+**À faire** : tableau de bord → zone `hkconseils.fr` → *Overview*, encadré
+*Manage AI bot access* → *Block AI training bots* : passer de
+*Block on all pages* à la valeur qui n'en bloque aucun.
+
+Vérification :
 
 ```bash
-curl -s https://hkconseils.fr/robots.txt | head -5
+curl -s -o /dev/null -w "%{http_code}\n" \
+  -A "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)" \
+  https://hkconseils.fr/
 ```
 
-Attendu ensuite : le fichier commence par `User-agent: *` et ne contient plus
-aucun `Disallow`.
+Attendu : `200`.
+
+Si le blocage doit être conservé pour l'entraînement uniquement, la voie propre
+est une règle WAF ciblant les seuls agents d'entraînement, en laissant passer les
+robots de recherche et de citation. Mais cela demande d'arbitrer entre protéger le
+contenu et être cité — arbitrage qui appartient à Hémerson, pas au site.
 
 ### 8.2 Rediriger `www` vers l'apex en 301
 
@@ -181,11 +196,17 @@ professionnel un ensemble un peu plus large. État actuel :
 | Directeur de la publication | ✅ Hemerson Koffi |
 | Hébergeur (dénomination, adresse) | ✅ Cloudflare, Inc. |
 | Moyen de contact | ✅ courriel — **le texte cite le téléphone**, écarté par le §6 de la directive |
-| Capital social | ❌ absent — 100 EUR selon le RNE |
-| RCS et ville du greffe | ❌ absent — le RNE ne mentionne pas le greffe, à prendre sur le Kbis |
-| Numéro de TVA intracommunautaire | ❌ absent — à ajouter seulement si assujetti |
+| Capital social | ✅ 100 euros (Kbis) |
+| RCS et ville du greffe | ✅ RCS de Lyon, numéro 100 332 816 (Kbis) |
+| Numéro de TVA intracommunautaire | ⏳ **en attente** — à publier seulement si assujetti ; en franchise en base, ne rien afficher |
 
-Aucun de ces manques n'est bloquant pour la mise en ligne. Trois décisions
-attendent Hémerson : afficher ou non le capital social (100 €, signal commercial
-faible pour un bénéfice légal nul à ce stade), fournir la ville du greffe, et
-indiquer s'il y a un numéro de TVA à publier.
+Capital et RCS ont été ajoutés le 13/08 à partir du Kbis : l'article R.123-237,
+auquel renvoie la LCEN, les rend exigibles pour une société commerciale — ma
+réserve commerciale initiale sur l'affichage du capital ne tenait pas face à
+l'obligation. Reste la TVA, seule question ouverte.
+
+Rien d'autre du Kbis n'est publié. Date et lieu de naissance, nationalité et
+domicile personnel du président y figurent, sans aucune raison d'être sur le site.
+À noter au passage : le siège social est le domicile personnel du dirigeant. Cette
+adresse est déjà publique par le Kbis et le RNE, la publier ne crée donc pas de
+divulgation nouvelle — mais autant le savoir.
