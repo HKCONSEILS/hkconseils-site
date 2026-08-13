@@ -67,10 +67,19 @@ autodiscover) ne doivent pas être modifiés.**
 
 | Nom | Type | Valeur | Modifié le |
 |---|---|---|---|
-| `hkconseils.fr` | — | *(à documenter lors de la bascule)* | — |
-| `www.hkconseils.fr` | — | *(à documenter lors de la bascule)* | — |
+| `hkconseils.fr` | CNAME → `hkconseils-site.pages.dev`, proxifié | *avant : `A 213.186.33.5` (origine OVH, hors service — HTTP 521)* | 2026-08-13 |
+| `www.hkconseils.fr` | CNAME → `hkconseils-site.pages.dev`, proxifié | *avant : `A 213.186.33.5`* | 2026-08-13 |
 
-La redirection `www` → apex est assurée par `public/_redirects`.
+Aucun autre enregistrement n'a été touché. La messagerie (MX ×3, SPF, DMARC,
+DKIM, autodiscover) est restée intacte.
+
+**Retour arrière DNS** : recréer les deux `A` vers `213.186.33.5` en proxifié —
+étant entendu que cette origine ne répondait plus.
+
+> ⚠️ La redirection `www` → apex **n'est pas assurée par `public/_redirects`** :
+> les règles de ce fichier s'appliquent aux chemins, pas aux noms d'hôte, et
+> `www` est attaché au même projet Pages. Il sert donc le site en 200. Le
+> correctif est une *Single Redirect* au niveau de la zone (voir `REPORT.md`).
 
 ## Retour arrière
 
