@@ -34,10 +34,14 @@ def main() -> int:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError):
             continue
+        # lhci dépose aussi un manifest.json, qui est une liste : tout ce qui
+        # n'est pas un rapport Lighthouse complet est ignoré silencieusement.
+        if not isinstance(data, dict):
+            continue
         url = data.get("finalDisplayedUrl") or data.get("finalUrl") or data.get("requestedUrl")
         cats = data.get("categories")
         if not url or not isinstance(cats, dict):
-            continue  # fichiers de manifeste et autres sous-produits de lhci
+            continue
         for key in CATEGORIES:
             value = (cats.get(key) or {}).get("score")
             if isinstance(value, (int, float)):

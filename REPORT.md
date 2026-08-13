@@ -10,7 +10,7 @@
 
 | AC | Objet | État | Détail |
 |---|---|---|---|
-| AC1 | Lighthouse mobile ≥ 95 × 4 | ⏳ | Seuils armés dans `lighthouserc.json`, exécution en CI. Non mesurable localement (Node.js et Chrome absents de la machine de travail). Poids hors images : **98,9 Ko** pour une limite de 500 Ko. |
+| AC1 | Lighthouse mobile ≥ 95 × 4 | ✅ | **100 / 100 / 100 / 100** sur les trois pages (mobile, 3 runs par page, médiane — voir §5). Poids hors images : **98,9 Ko** pour une limite de 500 Ko. |
 | AC2 | HTML valide, 1 × H1, méta | ✅/⏳ | Structure vérifiée : 1 seul H1 par page, hiérarchie sans saut, `alt` + `width`/`height` sur l'image, `lang="fr"`. Titre **54 car.**, description **155 car.** (limites 60 / 155). `html-validate` s'exécute en CI. |
 | AC3 | JSON-LD | ✅/⏳ | `scripts/check-jsonld.py` passe : @graph à 7 nœuds — ProfessionalService, Person, 3 × Service, Product, FAQPage — et **les 5 Q/R FAQ sont identiques entre le DOM et le balisage**. Validation finale par le test des résultats enrichis : à faire après mise en ligne. |
 | AC4 | robots.txt | ✅ | GPTBot, PerplexityBot, ClaudeBot, Claude-Web, Google-Extended et `*` explicitement autorisés ; `Sitemap:` pointe le sitemap déployé, qui liste les 3 pages. |
@@ -60,13 +60,23 @@ Deux écarts assumés par rapport au design system, tous deux imposés par la di
 ## 5. Résultats des portes
 
 ```
-check-leaks : OK — 16 fichiers analysés, aucun motif interdit
-              (test négatif : 6/6 familles de motifs déclenchées)
-check-jsonld: OK — @graph valide, 7 nœuds, 5 Q/R identiques DOM ↔ balisage
-Lighthouse  : en attente d'exécution CI
-html-validate: en attente d'exécution CI
-Rich Results: en attente de mise en ligne
+check-leaks  : OK — aucun motif interdit
+               (test négatif : 6/6 familles de motifs déclenchées)
+check-jsonld : OK — @graph valide, 7 nœuds, 5 Q/R identiques DOM ↔ balisage
+html-validate: OK — 3 fichiers, zéro erreur
+Rich Results : en attente de mise en ligne (test manuel)
+
+Lighthouse (mobile, médiane de 3 runs par page)
+                        Perf.  A11y  B.P.  SEO
+  /                      100    100   100   100
+  /mentions-legales      100    100   100   100
+  /confidentialite       100    100   100   100
 ```
+
+Un run isolé de la page d'accueil est descendu à 87 en performance (démarrage à
+froid du navigateur), les deux autres à 100. C'est précisément pourquoi la
+configuration exécute 3 runs et retient la médiane, comme le fait `lhci assert` :
+mesurer une seule fois aurait produit un résultat non reproductible.
 
 ## 6. Questions ouvertes
 
