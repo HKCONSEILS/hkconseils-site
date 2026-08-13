@@ -22,6 +22,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 INDEX = Path(__file__).resolve().parent.parent / "public" / "index.html"
+FAQ_MINIMUM = 5
 
 
 class Extractor(HTMLParser):
@@ -148,8 +149,13 @@ def main() -> int:
         ]
         dom = [(q, a) for q, a in p.faq]
 
-        if len(markup) != 5:
-            errors.append(f"FAQPage : {len(markup)} question(s) balisée(s), 5 attendues")
+        # La directive SITE-01 en imposait 5, SITE-01b en ajoute une 6e. Le nombre
+        # exact n'est pas la propriété à défendre : ce qui compte est qu'il ne
+        # descende pas sous le socle, et surtout que balisage et DOM concordent.
+        if len(markup) < FAQ_MINIMUM:
+            errors.append(
+                f"FAQPage : {len(markup)} question(s) balisée(s), au moins {FAQ_MINIMUM} attendues"
+            )
         if len(dom) != len(markup):
             errors.append(
                 f"FAQ : {len(dom)} paire(s) dans le DOM contre {len(markup)} dans le balisage"
@@ -176,7 +182,7 @@ def main() -> int:
 
     print(
         f"check-jsonld: OK — @graph valide, "
-        f"{len(graph)} nœuds, 5 Q/R FAQ identiques entre le DOM et le balisage."
+        f"{len(graph)} nœuds, {len(p.faq)} Q/R FAQ identiques entre le DOM et le balisage."
     )
     return 0
 
