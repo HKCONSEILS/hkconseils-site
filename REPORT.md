@@ -281,6 +281,44 @@ seule réserve de ne pas ajouter de fait. Aucun fait n'a été modifié.
 rédactionnel, hors les deux de la FAQ n°6 (voir §11.4) et les séparateurs de
 `<title>`, qui relèvent de l'usage typographique courant.
 
+### 10.3 Troisième passage — humanisation complète (14/08)
+
+Demande d'Hémerson : supprimer tous les tirets cadratins et toute autre marque de
+rédaction automatique, « le texte le plus humanisé possible ». Passe menée à
+**faits constants**.
+
+| Marqueur | Avant | Après |
+|---|---|---|
+| Tirets cadratins (corps) | 13 | **0** |
+| Tirets cadratins (`title`, `og:image:alt`) | 6 | **0** |
+| Tournures « affirmation : a, b, c » | 13 | **0** |
+| « cas d'usage » | 4 | 1 |
+
+La tournure à deux-points était le marqueur dominant, pas la ponctuation : treize
+paragraphes bâtis sur le même moule dans une page qui en compte une vingtaine. Le
+style nominal des cartes d'offre (« État des lieux des cas d'usage… ») a été
+remplacé par des phrases à verbe conjugué. Longueur des phrases après passe :
+médiane 16 mots, écart-type 10 — le rythme est irrégulier, ce qu'il n'était pas.
+
+**Contrôle des faits.** Chaque chiffre du dossier a été recompté après réécriture :
+1 485, 100/100, ~120/h, 1 750, 51 → 94, 16 000 $, 48 Go, 19,9 Go, 24 Go, 11 modèles,
+45 métriques, 27-35 milliards, 4 GPU, 16 ans, et toutes les dates. Deux formulations
+diluaient un chiffre et ont été corrigées : « treize agents » est redevenu
+« 13 agents », et « inférence entièrement locale » est redevenue « inférence 100 %
+locale ». Un moteur de réponse extrait mieux un chiffre qu'un mot.
+
+**Écart assumé sur les `title`.** SITE-01b §4 gelait le titre de la page. La demande
+d'Hémerson portait sur *tous* les tirets cadratins, y compris celui du séparateur.
+Seul le glyphe change, remplacé par le point médian déjà employé ailleurs sur le
+site : aucun mot modifié, longueur inchangée à 54 caractères, sous la limite de 60.
+Les deux pages légales ont reçu le même traitement.
+
+**Vérification en production.** Premier relevé trompeur : un edge Cloudflare servait
+encore une copie périmée, mêlant nouveau corps et ancien titre. Mesure reprise avec
+contournement de cache sur trois requêtes : titre au point médian, zéro tiret
+cadratin dans le corps, une seule occurrence de « : » sur toute la page. CI verte,
+Lighthouse toujours à 100 sur les quatre axes.
+
 ## 11. SITE-01b — souveraineté par couche + FAQ n°6 (14/08)
 
 ### 11.1 E1 — copie
