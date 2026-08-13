@@ -1,0 +1,49 @@
+name: validate
+
+# Site statique : les « tests » sont des validations automatisées.
+# Toutes les dépendances sont épinglées — actions par SHA, paquets npm par
+# version exacte. Aucun secret n'est nécessaire : Cloudflare Pages déploie via
+# sa propre intégration Git, aucun jeton d'API ne doit entrer dans ce dépôt.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  leaks-check:
+    name: Fuites (AC5) et JSON-LD (AC3)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: check-leaks
+        # RELEASE=1 sur main : un placeholder {{...}} y devient bloquant.
+        run: RELEASE=${{ github.ref == 'refs/heads/main' && '1' || '0' }} bash scripts/check-leaks.sh
+      - name: check-jsonld
+        run: python3 scripts/check-jsonld.py
+
+  html-validate:
+    name: HTML valide (AC2)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22.11.0'
+      - run: npm install --no-save --no-package-lock html-validate@11.6.2
+      - run: npx html-validate "public/**/*.html"
+
+  lighthouse-ci:
+    name: Lighthouse mobile >= 95 (AC1)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22.11.0'
+      - run: npm install --no-save --no-package-lock @lhci/cli@0.15.1
+      - run: npx lhci autorun
