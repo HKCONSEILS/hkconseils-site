@@ -1,18 +1,25 @@
 ---
 import Base from './Base.astro';
 
+interface Heading { depth: number; slug: string; text: string }
 interface Props {
   title: string;
   description: string;
   pubDate: Date;
   originalDate: Date;
+  tags: string[];
   slug: string;
+  headings: Heading[];
 }
-const { title, description, pubDate, originalDate, slug } = Astro.props;
+const { title, description, pubDate, originalDate, tags, slug, headings } = Astro.props;
 const canonical = `https://hkconseils.fr/blog/${slug}/`;
-
+const iso = (d: Date) => d.toISOString().slice(0, 10);
 const fr = (d: Date) =>
   d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// Sommaire ancré sur les seuls titres de niveau 2 : au delà, il redouble le
+// texte au lieu de le résumer. En dessous de trois sections, il n'apporte rien.
+const toc = headings.filter((h) => h.depth === 2);
 
 // L'auteur et l'éditeur pointent vers les nœuds déjà présents dans le @graph de
 // la page d'accueil, plutôt que d'en redéclarer des copies : une seule entité
@@ -22,9 +29,10 @@ const jsonld = {
   '@type': 'Article',
   headline: title,
   description,
-  datePublished: pubDate.toISOString().slice(0, 10),
-  dateModified: pubDate.toISOString().slice(0, 10),
+  datePublished: iso(pubDate),
+  dateModified: iso(pubDate),
   inLanguage: 'fr-FR',
+  keywords: tags.join(', '),
   mainEntityOfPage: canonical,
   author: { '@id': 'https://hkconseils.fr/#hemerson-koffi' },
   publisher: { '@id': 'https://hkconseils.fr/#organisation' },
@@ -35,78 +43,135 @@ const jsonld = {
 
   <article class="section article">
     <div class="wrap">
-      <p class="eyebrow">Article</p>
-      <h1>{title}</h1>
-      <p class="chapo">{description}</p>
-      <p class="article-meta">
-        Publié le <time datetime={pubDate.toISOString().slice(0, 10)}>{fr(pubDate)}</time>.
-        Publié initialement sur LinkedIn le {fr(originalDate)}.
+      <p class="meta-haut">
+        <time datetime={iso(pubDate)}>{iso(pubDate)}</time>
+        {tags.map((tag) => <span class="tag">{tag}</span>)}
       </p>
+      <h1>{title}</h1>
+
+      <div class="tldr">
+        <p class="tldr-titre">En bref</p>
+        <p>{description}</p>
+      </div>
+
+      <p class="origine">
+        Publié initialement sur LinkedIn le {fr(originalDate)}. Le texte décrit
+        l'état des choses à cette date et n'a pas été actualisé depuis.
+      </p>
+
+      {toc.length >= 3 && (
+        <nav class="sommaire" aria-label="Sommaire de l'article">
+          <p class="sommaire-titre">Sommaire</p>
+          <ol>
+            {toc.map((h) => (
+              <li><a href={`#${h.slug}`}>{h.text}</a></li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
       <div class="prose">
         <slot />
       </div>
+
       <p class="article-retour"><a href="/blog/">Retour à la liste des articles</a></p>
     </div>
   </article>
 </Base>
 
 <style>
+  .meta-haut {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-fg-muted);
+    margin-bottom: var(--space-2);
+  }
+  .meta-haut time { font-variant-numeric: tabular-nums; }
+  .tag {
+    text-transform: lowercase;
+    color: var(--color-accent);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 1px 6px;
+  }
   .article h1 {
     font-size: clamp(1.85rem, 4.2vw, 2.6rem);
     line-height: 1.15;
     letter-spacing: var(--tracking-tight);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
     max-width: 22ch;
     text-wrap: balance;
   }
-  .chapo {
-    font-size: var(--text-lead);
-    line-height: var(--leading-relaxed);
-    color: var(--color-fg);
-    max-width: var(--measure);
-    margin-bottom: var(--space-2);
+  /* Le « en bref » est ce que lit un décideur pressé : il doit se distinguer du
+     corps sans se déguiser en citation. */
+  .tldr {
+    border-left: 3px solid var(--hk-blue);
+    background: var(--color-surface-sunken);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
   }
-  .article-meta {
+  .tldr-titre {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 6px;
+  }
+  .tldr p:last-child { margin: 0; color: var(--color-fg); font-size: var(--text-lead); }
+  .origine {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    line-height: 1.6;
+    color: var(--color-fg-muted);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    max-width: var(--measure);
+  }
+  .sommaire { margin-top: var(--space-6); }
+  .sommaire-titre {
     font-family: var(--font-mono);
     font-size: var(--text-micro);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--color-fg-muted);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-1);
   }
-  .prose { margin-top: var(--space-6); }
+  .sommaire ol { padding-left: 1.4em; margin: 0; }
+  .sommaire li { margin-bottom: 3px; font-size: var(--text-small); }
+
+  .prose { margin-top: var(--space-8); }
   .prose :global(h2) {
     font-size: 1.375rem;
     line-height: var(--leading-snug);
     letter-spacing: -0.015em;
     margin-top: var(--space-8);
     margin-bottom: var(--space-1);
+    scroll-margin-top: var(--space-3);
   }
-  .prose :global(h3) {
-    font-size: 1.0625rem;
-    margin-top: var(--space-6);
-    margin-bottom: var(--space-1);
-  }
-  .prose :global(p),
-  .prose :global(li) { max-width: var(--measure); color: var(--color-fg-muted); }
+  .prose :global(h3) { font-size: 1.0625rem; margin-top: var(--space-6); margin-bottom: var(--space-1); }
+  .prose :global(p), .prose :global(li) { max-width: var(--measure); color: var(--color-fg-muted); }
   .prose :global(p) { margin-bottom: var(--space-2); }
-  .prose :global(ul),
-  .prose :global(ol) { padding-left: 1.2em; margin-bottom: var(--space-3); list-style: disc; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.2em; margin-bottom: var(--space-3); list-style: disc; }
   .prose :global(ol) { list-style: decimal; }
   .prose :global(li) { margin-bottom: 6px; }
   .prose :global(strong) { color: var(--color-fg); font-weight: 600; }
   .prose :global(pre) {
-    background: var(--hk-navy);
-    color: rgba(255, 255, 255, 0.92);
     border-radius: var(--radius-sm);
     padding: var(--space-3);
     overflow-x: auto;
-    font-family: var(--font-mono);
     font-size: 0.8125rem;
     line-height: 1.7;
     margin-bottom: var(--space-3);
+    border: 1px solid var(--color-border-on-dark);
   }
+  .prose :global(pre code) { font-family: var(--font-mono); background: none; padding: 0; }
   .prose :global(code) {
     font-family: var(--font-mono);
     font-size: 0.875em;
@@ -114,12 +179,16 @@ const jsonld = {
     padding: 1px 5px;
     border-radius: 3px;
   }
-  .prose :global(pre code) { background: none; padding: 0; color: inherit; }
+  /* Une citation sert d'encadré « piège » : ce qui a coûté du temps, et qu'on
+     aurait aimé lire avant. */
   .prose :global(blockquote) {
     border-left: 3px solid var(--hk-blue);
-    padding-left: var(--space-3);
-    margin: var(--space-3) 0;
+    background: var(--color-surface-sunken);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: var(--space-3);
+    margin: var(--space-4) 0;
   }
+  .prose :global(blockquote p:last-child) { margin-bottom: 0; }
   .prose :global(img) { border-radius: var(--radius-sm); border: 1px solid var(--color-border); }
   .prose :global(table) { width: 100%; border-collapse: collapse; font-size: var(--text-small); }
   .prose :global(th) {
@@ -133,5 +202,6 @@ const jsonld = {
     padding: 0 12px 8px 0;
   }
   .prose :global(td) { border-bottom: 1px solid var(--color-border); padding: 10px 12px 10px 0; }
+  .prose :global(td) { font-variant-numeric: tabular-nums; }
   .article-retour { margin-top: var(--space-8); font-size: var(--text-small); }
 </style>

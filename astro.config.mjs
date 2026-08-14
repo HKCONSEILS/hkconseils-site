@@ -12,11 +12,13 @@ export default defineConfig({
   // Aucune intégration : pas de framework, pas de MDX, pas de sitemap tiers.
   integrations: [],
   markdown: {
-    // La coloration syntaxique de Shiki pose un attribut style= sur chaque jeton,
-    // ce que html-validate refuse (no-inline-style) et qui alourdit le HTML de
-    // plusieurs kilooctets par bloc de code. Les blocs sont stylés par la feuille
-    // du site, sur le même navy que le reste.
-    syntaxHighlight: false,
+    // Coloration syntaxique par Shiki, au build : aucun JavaScript n'est émis,
+    // la couleur est calculée une fois pour toutes et posée dans le HTML.
+    // Contrepartie connue : Shiki pose un attribut style= par jeton. La règle
+    // no-inline-style de html-validate est donc levée pour les seules pages
+    // générées du blog, jamais pour la vitrine écrite à la main.
+    syntaxHighlight: 'shiki',
+    shikiConfig: { theme: 'github-dark' },
   },
   // Le blog n'émet aucun JavaScript ; les styles restent groupés dans un seul
   // fichier plutôt que dispersés en balises inline, pour rester cacheable.

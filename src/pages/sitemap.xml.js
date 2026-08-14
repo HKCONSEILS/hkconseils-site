@@ -15,7 +15,8 @@ const STATIC_PAGES = [
 ];
 
 export async function GET() {
-  const posts = (await getCollection('blog')).sort(
+  // Un brouillon n'a pas d'URL : il n'a rien à faire dans le sitemap.
+  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
   );
 
