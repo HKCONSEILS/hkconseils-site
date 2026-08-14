@@ -2,7 +2,8 @@
 title: "Quatre GPU morts à 1 h du matin, et le mauvais coupable"
 description: "Un bug NVIDIA non corrigé nous pendait au nez. La panne est arrivée, et ce n'était pas lui. Le capteur posé quelques jours plus tôt a permis de trancher en minutes au lieu d'une nuit, et c'est la seule raison pour laquelle l'incident a duré onze minutes."
 pubDate: 2026-08-16
-originalDate: 2026-07-14
+originalDate: 2026-07-01
+originalDatePrecision: mois
 tags: ["rex", "gpu", "sre", "observabilité"]
 ---
 

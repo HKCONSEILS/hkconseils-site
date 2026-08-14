@@ -13,6 +13,9 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     originalDate: z.coerce.date(),
+    // 'jour' quand la date exacte est connue, 'mois' quand elle est approchée.
+    // Afficher un jour qu'on n'a pas vérifié serait une précision fausse.
+    originalDatePrecision: z.enum(['jour', 'mois']).default('jour'),
     // Étiquettes techniques courtes, en minuscules, affichées en monospace.
     tags: z.array(z.string()).default([]),
     // Un brouillon est rédigé et versionné, mais absent du site publié :

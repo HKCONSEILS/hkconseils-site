@@ -8,14 +8,17 @@ interface Props {
   pubDate: Date;
   originalDate: Date;
   tags: string[];
+  originalDatePrecision: 'jour' | 'mois';
   slug: string;
   headings: Heading[];
 }
-const { title, description, pubDate, originalDate, tags, slug, headings } = Astro.props;
+const { title, description, pubDate, originalDate, tags, originalDatePrecision, slug, headings } = Astro.props;
 const canonical = `https://hkconseils.fr/blog/${slug}/`;
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 const fr = (d: Date) =>
   d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const frMois = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+const origine = originalDatePrecision === 'mois' ? `en ${frMois(originalDate)}` : `le ${fr(originalDate)}`;
 
 // Sommaire ancré sur les seuls titres de niveau 2 : au delà, il redouble le
 // texte au lieu de le résumer. En dessous de trois sections, il n'apporte rien.
@@ -55,7 +58,7 @@ const jsonld = {
       </div>
 
       <p class="origine">
-        Publié initialement sur LinkedIn le {fr(originalDate)}. Le texte décrit
+        Publié initialement sur LinkedIn {origine}. Le texte décrit
         l'état des choses à cette date et n'a pas été actualisé depuis.
       </p>
 
