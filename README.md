@@ -2,39 +2,56 @@
 
 Site vitrine de HK CONSEILS — `https://hkconseils.fr`.
 
-HTML5 et CSS natifs, **aucune étape de build, aucun framework, aucun JavaScript**.
-Le répertoire `public/` est servi tel quel. Toutes les ressources (feuille de style,
-polices, images) sont locales&nbsp;: la page ne fait aucune requête vers un domaine tiers.
+Vitrine en HTML5 et CSS natifs, blog généré par Astro, **aucun framework et aucun
+JavaScript émis**. Les pages de la vitrine sont écrites à la main dans `public/` et
+recopiées telles quelles à la construction. Toutes les ressources (feuille de style,
+polices, images) sont locales&nbsp;: aucune requête vers un domaine tiers.
 
 ---
 
 ## Structure
 
 ```
-public/                    racine déployée
-  index.html               page unique (contenu, JSON-LD @graph)
+public/                    vitrine, recopiée telle quelle dans dist/
+  index.html               page d'accueil (contenu, JSON-LD @graph)
   mentions-legales.html
   confidentialite.html
-  robots.txt               crawlers IA explicitement autorisés
-  sitemap.xml
+  robots.txt               crawlers des moteurs de réponse explicitement autorisés
   _redirects               www → apex, 301
   css/main.css             tokens du design system HK CONSEILS, purgés
   fonts/                   Inter + IBM Plex Mono en WOFF2 (SIL OFL 1.1, licences incluses)
   img/                     og-image.png, editos-capture.webp, favicon.svg
+src/content/blog/          articles, un fichier Markdown par article
+src/content.config.ts      schéma des articles (titre, chapeau, dates)
+src/layouts/               gabarit de base et gabarit d'article
+src/pages/blog/            index, page article, flux RSS
+src/pages/sitemap.xml.js   sitemap, vitrine et blog réunis
 scripts/check-leaks.sh     porte AC5 — fuites d'infrastructure et de noms de clients
 scripts/check-jsonld.py    porte AC3 — @graph valide, FAQ identique entre DOM et balisage
-lighthouserc.json          seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
+lighthouserc.js            seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
 .github/workflows/validate.yml
 ```
+
+Le sitemap n'est plus un fichier statique&nbsp;: il est produit au build et inclut
+automatiquement les articles. `robots.txt` continue de l'annoncer à la même URL.
 
 ## Validations locales
 
 ```bash
 bash scripts/check-leaks.sh && python3 scripts/check-jsonld.py
+npm ci && npm run build && npx html-validate "dist/**/*.html"
 ```
 
-Aucune dépendance&nbsp;: bash et Python 3 suffisent. `html-validate` et Lighthouse CI
-tournent en intégration continue (ils demandent Node.js, absent de la machine de travail).
+Les deux portes maison ne demandent que bash et Python 3. La construction et
+`html-validate` demandent Node&nbsp;; la version attendue est dans `.nvmrc`. Lighthouse
+ne tourne qu'en intégration continue, faute de navigateur sur la machine de travail.
+
+Après suppression d'un article, vider les caches avant de reconstruire, sans quoi la
+page supprimée continue d'être générée&nbsp;:
+
+```bash
+rm -rf dist .astro node_modules/.vite node_modules/.astro
+```
 
 Pour rejouer la porte de publication telle qu'elle s'exécute sur `main`&nbsp;:
 
