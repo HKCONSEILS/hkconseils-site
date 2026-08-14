@@ -113,7 +113,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm install --no-save --no-package-lock @lhci/cli@0.15.1
-      - run: npx lhci autorun
+      - run: npx lhci autorun --config=./lighthouserc.cjs
       - name: Scores par page
         if: always()
         run: python3 scripts/print-lighthouse-scores.py

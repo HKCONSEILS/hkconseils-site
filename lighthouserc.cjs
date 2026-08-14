@@ -1,5 +1,11 @@
-import { readdirSync, existsSync } from 'node:fs';
+const { readdirSync, existsSync } = require('node:fs');
 
+// Fichier en CommonJS, et nommé .cjs à dessein : package.json déclare
+// "type": "module", or @lhci/cli charge sa configuration par require(). Un
+// lighthouserc.js serait alors lu comme un module ES, le chargement échouerait
+// en silence, et lhci retomberait sur ses assertions par défaut — ce qui s'est
+// produit : la CI a échoué sur des audits jamais déclarés ici.
+//
 // Les pages du blog n'existent qu'après le build : la liste des URL est donc
 // construite au moment de l'exécution. Deux articles suffisent à l'AC5, et ce
 // sont les deux plus récents qui sont retenus — c'est sur eux que porteront les
@@ -16,7 +22,7 @@ function articleUrls() {
     .map((e) => `http://localhost/blog/${e.name}/index.html`);
 }
 
-export default {
+module.exports = {
   ci: {
     collect: {
       staticDistDir: 'dist',

@@ -28,7 +28,7 @@ src/pages/blog/            index, page article, flux RSS
 src/pages/sitemap.xml.js   sitemap, vitrine et blog réunis
 scripts/check-leaks.sh     porte AC5 — fuites d'infrastructure et de noms de clients
 scripts/check-jsonld.py    porte AC3 — @graph valide, FAQ identique entre DOM et balisage
-lighthouserc.js            seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
+lighthouserc.cjs           seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
 .github/workflows/validate.yml
 ```
 
