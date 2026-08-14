@@ -1,13 +1,17 @@
 name: validate
 
-# Site statique : les « tests » sont des validations automatisées.
-# Toutes les dépendances sont épinglées — actions par SHA, paquets npm par
-# version exacte. Aucun secret n'est nécessaire : Cloudflare Pages déploie via
-# sa propre intégration Git, aucun jeton d'API ne doit entrer dans ce dépôt.
+# Les « tests » sont des validations automatisées. Toutes les dépendances sont
+# épinglées : actions par SHA, paquets npm par version exacte via le lockfile.
+# Aucun secret n'est nécessaire — Cloudflare Pages déploie via sa propre
+# intégration Git, aucun jeton d'API ne doit entrer dans ce dépôt.
+#
+# Depuis BLOG-01, le site est construit par Astro : la vitrine est recopiée
+# depuis public/ et le blog est généré. Les validations portent donc sur dist/,
+# c'est-à-dire sur ce qui sera réellement servi, et non sur les sources.
 
 on:
   push:
-    branches: [main]
+    branches: [main, blog-01]
   pull_request:
   workflow_dispatch:
 
@@ -21,11 +25,66 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: check-leaks
-        # Mode courant : un placeholder {{...}} restant est signalé sans bloquer.
-        # Le blocage appartient au workflow release-gate, joué avant mise en ligne.
+        # Le blocage sur placeholder appartient au workflow release-gate.
         run: bash scripts/check-leaks.sh
       - name: check-jsonld
         run: python3 scripts/check-jsonld.py
+
+  build:
+    name: Build Astro et non-régression (AC7)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Les pages existantes sont copiées sans transformation
+        # Le blog ne doit rien changer à ce qui est déjà servi. Chaque fichier de
+        # public/ doit se retrouver identique dans dist/, à l'octet près.
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            rel="${f#public/}"
+            if [ ! -f "dist/$rel" ]; then
+              echo "ABORT: dist/$rel manquant"; fail=1; continue
+            fi
+            if ! cmp -s "$f" "dist/$rel"; then
+              echo "ABORT: dist/$rel diffère de public/$rel"; fail=1
+            fi
+          done < <(find public -type f)
+          [ "$fail" -eq 0 ] || { echo "La sortie de build altère le site existant."; exit 1; }
+          echo "Non-régression vérifiée : $(find public -type f | wc -l) fichiers identiques."
+      - name: Aucun JavaScript émis (AC5)
+        run: |
+          n=$(find dist -name '*.js' | wc -l)
+          echo "fichiers .js dans dist/ : $n"
+          [ "$n" -eq 0 ] || { find dist -name '*.js'; echo "ABORT: le blog émet du JavaScript."; exit 1; }
+      - name: Une seule H1 par page du blog
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            n=$(grep -o '<h1' "$f" | wc -l)
+            [ "$n" -eq 1 ] || { echo "ABORT: $f porte $n H1"; fail=1; }
+          done < <(find dist/blog -name 'index.html' 2>/dev/null)
+          [ "$fail" -eq 0 ] || exit 1
+          echo "Une seule H1 sur chaque page du blog."
+      - name: Flux RSS et sitemap bien formés (AC3)
+        run: |
+          python3 -c "
+          import xml.etree.ElementTree as ET, sys
+          for f in ('dist/blog/rss.xml', 'dist/sitemap.xml'):
+              ET.parse(f)
+              print(f, 'bien formé')
+          "
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
 
   html-validate:
     name: HTML valide (AC2)
@@ -34,26 +93,32 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '22.11.0'
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
       - run: npm install --no-save --no-package-lock html-validate@11.6.2
-      - run: npx html-validate "public/**/*.html"
+      - name: Vitrine et blog
+        run: npx html-validate "dist/**/*.html"
 
   lighthouse-ci:
-    name: Lighthouse mobile >= 95 (AC1)
+    name: Lighthouse mobile >= 95 (AC1, AC5)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '22.11.0'
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
       - run: npm install --no-save --no-package-lock @lhci/cli@0.15.1
-      - run: npx lhci autorun
+      - run: npx lhci autorun --config=./lighthouserc.cjs
       - name: Scores par page
         if: always()
         run: python3 scripts/print-lighthouse-scores.py
-      - name: Rapports Lighthouse
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: lighthouse-reports
           path: .lighthouseci/reports

@@ -2,39 +2,56 @@
 
 Site vitrine de HK CONSEILS — `https://hkconseils.fr`.
 
-HTML5 et CSS natifs, **aucune étape de build, aucun framework, aucun JavaScript**.
-Le répertoire `public/` est servi tel quel. Toutes les ressources (feuille de style,
-polices, images) sont locales&nbsp;: la page ne fait aucune requête vers un domaine tiers.
+Vitrine en HTML5 et CSS natifs, blog généré par Astro, **aucun framework et aucun
+JavaScript émis**. Les pages de la vitrine sont écrites à la main dans `public/` et
+recopiées telles quelles à la construction. Toutes les ressources (feuille de style,
+polices, images) sont locales&nbsp;: aucune requête vers un domaine tiers.
 
 ---
 
 ## Structure
 
 ```
-public/                    racine déployée
-  index.html               page unique (contenu, JSON-LD @graph)
+public/                    vitrine, recopiée telle quelle dans dist/
+  index.html               page d'accueil (contenu, JSON-LD @graph)
   mentions-legales.html
   confidentialite.html
-  robots.txt               crawlers IA explicitement autorisés
-  sitemap.xml
+  robots.txt               crawlers des moteurs de réponse explicitement autorisés
   _redirects               www → apex, 301
   css/main.css             tokens du design system HK CONSEILS, purgés
   fonts/                   Inter + IBM Plex Mono en WOFF2 (SIL OFL 1.1, licences incluses)
   img/                     og-image.png, editos-capture.webp, favicon.svg
+src/content/blog/          articles, un fichier Markdown par article
+src/content.config.ts      schéma des articles (titre, chapeau, dates)
+src/layouts/               gabarit de base et gabarit d'article
+src/pages/blog/            index, page article, flux RSS
+src/pages/sitemap.xml.js   sitemap, vitrine et blog réunis
 scripts/check-leaks.sh     porte AC5 — fuites d'infrastructure et de noms de clients
 scripts/check-jsonld.py    porte AC3 — @graph valide, FAQ identique entre DOM et balisage
-lighthouserc.json          seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
+lighthouserc.cjs           seuils Lighthouse (mobile, ≥ 0,95 sur les 4 axes)
 .github/workflows/validate.yml
 ```
+
+Le sitemap n'est plus un fichier statique&nbsp;: il est produit au build et inclut
+automatiquement les articles. `robots.txt` continue de l'annoncer à la même URL.
 
 ## Validations locales
 
 ```bash
 bash scripts/check-leaks.sh && python3 scripts/check-jsonld.py
+npm ci && npm run build && npx html-validate "dist/**/*.html"
 ```
 
-Aucune dépendance&nbsp;: bash et Python 3 suffisent. `html-validate` et Lighthouse CI
-tournent en intégration continue (ils demandent Node.js, absent de la machine de travail).
+Les deux portes maison ne demandent que bash et Python 3. La construction et
+`html-validate` demandent Node&nbsp;; la version attendue est dans `.nvmrc`. Lighthouse
+ne tourne qu'en intégration continue, faute de navigateur sur la machine de travail.
+
+Après suppression d'un article, vider les caches avant de reconstruire, sans quoi la
+page supprimée continue d'être générée&nbsp;:
+
+```bash
+rm -rf dist .astro node_modules/.vite node_modules/.astro
+```
 
 Pour rejouer la porte de publication telle qu'elle s'exécute sur `main`&nbsp;:
 
@@ -51,13 +68,46 @@ Cloudflare Pages, projet `hkconseils-site`, connecté au dépôt GitHub.
 | Réglage | Valeur |
 |---|---|
 | Branche de production | `main` |
-| Commande de build | *(aucune)* |
-| Répertoire de sortie | `public` |
+| Commande de build | `npm ci && npm run build` |
+| Répertoire de sortie | `dist` |
+| Version de Node | lue dans `.nvmrc` (22.23.2) |
 | Variables d'environnement | *(aucune)* |
 
 Un push sur `main` déclenche le déploiement. Une pull request produit une URL de
 prévisualisation. **Aucun jeton d'API Cloudflare ne doit être ajouté au dépôt**&nbsp;:
 Cloudflare Pages déploie par sa propre intégration Git.
+
+### Cohabitation entre le site et le blog
+
+La vitrine reste du HTML natif, écrit à la main dans `public/`. Astro **recopie ce
+répertoire tel quel** dans `dist/` et n'y ajoute que `/blog/`, le flux RSS et le
+sitemap. Aucune page existante ne passe par une transformation, ce que la CI vérifie
+à chaque exécution par comparaison octet à octet entre `public/` et `dist/`.
+
+Conséquence pratique&nbsp;: pour modifier la page d'accueil ou une page légale, on
+édite le fichier dans `public/`, exactement comme avant le blog.
+
+### Bascule de la configuration de build
+
+Le passage de « aucune commande » à `npm ci && npm run build` est un réglage **de
+projet**, pas de branche&nbsp;: il s'applique aussi aux prévisualisations. Il faut donc
+le changer **avant** de pouvoir valider le blog sur l'URL de prévisualisation d'une
+branche, puisque sans build, la prévisualisation ne sert que le contenu de `public/`.
+
+Pendant la fenêtre qui sépare ce changement du merge, un déploiement de `main`
+échouera, `main` ne portant pas encore de `package.json`. **Un build en échec ne coupe
+pas le site**&nbsp;: Cloudflare Pages continue de servir le dernier déploiement réussi.
+Le risque n'est donc pas une indisponibilité, mais l'impossibilité temporaire de
+déployer un correctif urgent. Garder la fenêtre courte.
+
+**Retour arrière de la bascule**, à appliquer si la validation échoue&nbsp;:
+
+1. Tableau de bord Pages → *Settings* → *Builds & deployments*&nbsp;: remettre la
+   commande de build à vide et le répertoire de sortie à `public`.
+2. Si un déploiement fautif est déjà en production&nbsp;: *Deployments* →
+   *Rollback to this deployment* sur le dernier déploiement sain.
+3. Le site repart alors sur le HTML de `public/`, sans le blog, dans l'état qui était
+   le sien avant la bascule.
 
 ### Enregistrements DNS
 
