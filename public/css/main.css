@@ -139,6 +139,48 @@ a:hover { color: var(--color-accent-hover); }
 }
 .skip:focus { left: var(--space-2); top: var(--space-2); }
 
+/* Bande de preuve : les mêmes chiffres que plus bas dans la page, remontés
+   au-dessus de la ligne de flottaison. Aucune donnée nouvelle, seulement une
+   promesse rendue vérifiable avant que le lecteur ait à faire défiler. */
+.preuves {
+  background: var(--color-surface-sunken);
+  border-bottom: 1px solid var(--color-border);
+}
+.preuves dl {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  margin: 0;
+  padding-block: var(--space-4);
+}
+.preuves div { display: flex; flex-direction: column; gap: 4px; }
+.preuves dt {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.1;
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+}
+.preuves dt span { font-size: 1rem; font-weight: 600; }
+.preuves dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--color-fg-muted);
+}
+
+/* Le numéro de section partage la ligne du surtitre, en retrait de teinte pour
+   rester un repère et non une information. */
+.eyebrow .num {
+  color: var(--color-fg-muted);
+  margin-right: 0.6em;
+}
+.on-dark .eyebrow .num { color: var(--color-fg-muted-on-dark); }
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
@@ -322,14 +364,6 @@ a:hover { color: var(--color-accent-hover); }
   padding: var(--space-4);
   box-shadow: var(--shadow-card);
   border-top: 2px solid var(--hk-blue);
-}
-.card .num {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: var(--tracking-wide);
-  color: var(--color-accent);
-  display: block;
-  margin-bottom: var(--space-2);
 }
 .card h3 {
   font-size: var(--text-h3);
