@@ -63,18 +63,22 @@ scan() {
 }
 
 # --- 1. Adresses IP internes / d'infrastructure ------------------------------
+# Le quadruplet complet est exigé pour 10.x et 172.x : une portée sémantique de
+# lockfile (« ^10.0.2 ») déclencherait sinon la porte à chaque installation.
+# 192.168.x reste reconnu sur trois composants, la forme n'est pas ambiguë.
 scan "adresse IP privée (RFC1918)" \
-  '\b(192\.168|10)\.[0-9]{1,3}\.[0-9]{1,3}(\.[0-9]{1,3})?\b|\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3}\b'
+  '\b192\.168\.[0-9]{1,3}(\.[0-9]{1,3})?\b|\b10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b|\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3}\b'
 scan "adresse IP d'edge de l'infrastructure" '\b94\.130\.78\.137\b'
 
 # --- 2. Identifiants de machines virtuelles et de conteneurs -----------------
 # Trois formes, toutes contextuelles. Les bornes évitent d'attraper une année :
 # les commandes Proxmox ne sont jamais suivies d'un millésime.
 #   a) forme accolée      : « LXC 226 », « CT-232 », « vmid140 »
+#      (« node » en est exclu : « @types/node-24.13.3 » n'est pas un VMID)
 #   b) forme commande     : « pct exec 225 », « vzdump 216 », « qm start 140 »
 #   c) forme affectation  : « GPU_LXC="225 226" », « ALL_GUESTS="…" », « for VMID in 217 »
 scan "identifiant de VM/conteneur, forme accolée" \
-  '\b(ct|lxc|vmid|vm|pct|qm|node)[ _-]?[0-9]{2,4}\b'
+  '\b(ct|lxc|vmid|vm|pct|qm)[ _-]?[0-9]{2,4}\b'
 scan "identifiant de VM/conteneur, forme commande" \
   '\b(pct|qm|vzdump)\s+([a-z-]+\s+)?[0-9]{2,4}\b'
 scan "identifiant de VM/conteneur, forme affectation" \
@@ -82,13 +86,13 @@ scan "identifiant de VM/conteneur, forme affectation" \
 
 # --- 3. Noms d'hôtes et de services internes ---------------------------------
 scan "nom d'hôte ou de service interne" \
-  '\b(titan|render|gateway01|caddy01|bastion|cortex|huly|kuma|uptime-kuma|vaultwarden|litellm|searxng|qdrant|adguard|technitium|wireguard)\b'
+  '\b(titan|gateway01|caddy01|bastion|cortex|huly|kuma|uptime-kuma|vaultwarden|litellm|searxng|qdrant|adguard|technitium|wireguard)\b'
 
-# « storage » est à la fois un hostname de la flotte et un mot courant, présent
-# dans des options de commande parfaitement banales (« --storage local-lvm »).
-# Le motif ne se déclenche donc que sur les formes où il désigne une machine.
-scan "nom d'hôte interne « storage » en position de machine" \
-  '\b(ssh|scp|rsync|host|hostname)\s+storage\b|@storage\b|\bstorage\.(lab|hkconseils|local)\b|\bstorage:[/~]'
+# « storage » et « render » sont à la fois des hostnames de la flotte et des mots
+# courants : « --storage local-lvm » est une option de commande, « render(post) »
+# une fonction. Ils ne sont reconnus qu'en position de machine.
+scan "nom d'hôte interne ambigu en position de machine" \
+  '\b(ssh|scp|rsync|host|hostname)\s+(storage|render)\b|@(storage|render)\b|\b(storage|render)\.(lab|hkconseils|local)\b|\b(storage|render):[/~]'
 
 scan "sous-domaine interne ou de client" \
   '(lab\.hkconseils\.fr|medicapsante|devcapiliblab|openwebchat|hpmini)'

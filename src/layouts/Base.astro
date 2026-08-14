@@ -1,0 +1,72 @@
+---
+// Gabarit commun aux pages du blog. Il reproduit l'en-tête et le pied de la
+// vitrine à l'identique, et charge la même feuille de style : le blog est une
+// extension visuelle du site, pas une seconde direction artistique.
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  ogType?: string;
+}
+const { title, description, canonical, ogType = 'website' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta name="theme-color" content="#071b3b">
+<meta property="og:type" content={ogType}>
+<meta property="og:site_name" content="HK CONSEILS">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:image" content="https://hkconseils.fr/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={title}>
+<meta name="twitter:description" content={description}>
+<meta name="twitter:image" content="https://hkconseils.fr/img/og-image.png">
+<link rel="alternate" type="application/rss+xml" title="Blog HK CONSEILS" href="/blog/rss.xml">
+<link rel="preload" href="/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/main.css">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<slot name="head" />
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="site-header on-dark">
+  <div class="wrap">
+    <a class="wordmark" href="/"><span>HK</span><span class="chev" aria-hidden="true">&gt;</span><span class="name">CONSEILS</span></a>
+    <nav class="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="/#offre">Offre</a></li>
+        <li><a href="/#references">Références</a></li>
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="contenu">
+  <slot />
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 HK CONSEILS · SASU</p>
+    <ul>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/blog/rss.xml">RSS</a></li>
+      <li><a href="/mentions-legales">Mentions légales</a></li>
+      <li><a href="/confidentialite">Confidentialité</a></li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
