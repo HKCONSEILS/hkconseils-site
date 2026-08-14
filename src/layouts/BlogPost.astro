@@ -163,6 +163,9 @@ const jsonld = {
   .prose :global(li) { margin-bottom: 6px; }
   .prose :global(strong) { color: var(--color-fg); font-weight: 600; }
   .prose :global(pre) {
+    /* Shiki pose le fond du thème en style inline sur le <pre> : on impose
+       celui de la marque, sur lequel le contraste des jetons a été mesuré. */
+    background: var(--hk-navy) !important;
     border-radius: var(--radius-sm);
     padding: var(--space-3);
     overflow-x: auto;

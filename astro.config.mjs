@@ -18,7 +18,11 @@ export default defineConfig({
     // no-inline-style de html-validate est donc levée pour les seules pages
     // générées du blog, jamais pour la vitrine écrite à la main.
     syntaxHighlight: 'shiki',
-    shikiConfig: { theme: 'github-dark' },
+    // Le thème n'est pas choisi pour son allure mais pour son contraste. Mesuré
+    // sur le navy de la marque, qui sert de fond aux blocs de code : le jeton le
+    // plus faible de catppuccin-frappe atteint 6,29:1, là où github-dark tombait
+    // à 1,16 et faisait chuter l'accessibilité à 95 sur les pages à code.
+    shikiConfig: { theme: 'catppuccin-frappe' },
   },
   // Le blog n'émet aucun JavaScript ; les styles restent groupés dans un seul
   // fichier plutôt que dispersés en balises inline, pour rester cacheable.
