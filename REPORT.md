@@ -20,7 +20,7 @@
 | AC5 | Zéro fuite | ✅ | `check-leaks.sh` passe sur les 23 fichiers suivis. **Testé négativement** : les 6 familles de motifs se déclenchent sur un fichier piégé. |
 | AC6 | Mentions légales | ✅ | Jeu LCEN + R.123-237 complet : dénomination, forme, **capital 100 €**, siège (6 boulevard Édouard Herriot, 69800 Saint-Priest), SIREN, **RCS de Lyon**, **TVA FR 88 100 332 816** (clé de contrôle recalculée et concordante), directeur de la publication, hébergeur avec adresse, contact. Politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
 | AC7 | HTTPS + www → apex | ✅ | `https://hkconseils.fr` sert le site, certificat valide (Google Trust Services, TLS 1.3), `http://` redirige en 301, aucun contenu mixte. `www` redirige en **301** vers l'apex, chemin **et** chaîne de requête préservés (`/mentions-legales?x=1` vérifié). |
-| AC8 | Zéro cookie / tiers / analytics | ✅ ⚠️ | Aucun `Set-Cookie`, aucune requête tierce, aucun outil de mesure — vérifié en production. Le dépôt ne contient aucun script. **Mais Cloudflare injecte un script d'obfuscation d'e-mail dans la page servie** : même origine, non analytique, donc le critère tient à la lettre — mais l'objectif « zéro JS » du Mini-ADR-01 n'est plus respecté à l'arrivée. Voir §8.3. |
+| AC8 | Zéro cookie / tiers / analytics | ✅ | Aucun `Set-Cookie`, aucune requête tierce, aucun outil de mesure, vérifié en production. **Zéro JavaScript** : l'obfuscation d'e-mail de Cloudflare a été désactivée le 14/08 (§8.3), la page servie ne porte plus qu'une seule balise `script`, celle du JSON-LD. |
 
 ## 2. Fichiers produits
 
@@ -161,44 +161,40 @@ https://www.hkconseils.fr/mentions-legales?x=1 301 -> https://hkconseils.fr/ment
 
 Chemin et chaîne de requête préservés. L'AC7 est satisfaite.
 
-### 8.3 Anomalie nouvelle — obfuscation d'e-mail Cloudflare
+### 8.3 Obfuscation d'e-mail — résolu le 14/08
 
-Constatée en inspectant la page **telle que servie**, et non le dépôt.
+L'option *Email Obfuscation* de la zone réécrivait le HTML à la volée : les deux
+liens `mailto:` devenaient `/cdn-cgi/l/email-protection#…`, le texte visible
+devenait `[email protected]`, et un script `email-decode.min.js` était injecté.
 
-L'option *Email Obfuscation* de la zone (`email_obfuscation = on`) réécrit le HTML
-à la volée :
+Deux conséquences : le site n'était plus à zéro JavaScript, contrairement au gel du
+Mini-ADR-01, et surtout **l'adresse de contact devenait illisible pour qui n'exécute
+pas JavaScript** — donc pour GPTBot, ClaudeBot et PerplexityBot, ceux-là mêmes qui
+venaient d'être débloqués au pare-feu. Le site n'ayant ni formulaire ni téléphone,
+ce `mailto:` est l'unique chemin de conversion.
 
-- les deux liens `mailto:` — bouton du héros et bloc contact — deviennent
-  `href="/cdn-cgi/l/email-protection#4b232e262e39…"` ;
-- le texte visible de l'adresse est remplacé par `[email protected]` ;
-- un script est injecté dans la page :
-  `<script src="/cdn-cgi/scripts/…/email-decode.min.js">`.
+**Objection examinée.** Hémerson a opposé un argument de zéro-clic : tout donner aux
+robots assèche le trafic, faire venir l'utilisateur est stratégique. L'argument est
+fondé pour un site de contenu, mais il ne portait pas sur ce levier. L'obfuscation
+ne retient aucun contenu : les robots lisaient déjà l'intégralité du pitch, des
+références et de la FAQ en HTTP 200. Seule l'adresse leur échappait. Le site perdait
+donc la conversion tout en offrant la matière. Par ailleurs la protection était déjà
+contournée sur la même page, le JSON-LD portant l'adresse en clair — Cloudflare
+n'obfusque pas les données structurées. Coût entier, bénéfice nul. Décision de
+désactiver prise par Hémerson après discussion.
 
-Conséquences :
+**Mesure après bascule** (`email_obfuscation = off`, 14/08) :
 
-1. **Le site n'est plus à zéro JavaScript.** Le Mini-ADR-01 gelait « pas de build,
-   pas de framework, zéro JS ou ≤ 2 Ko ». Le dépôt respecte la contrainte ; la page
-   servie non. Le script est de même origine et n'est pas analytique, donc l'AC8
-   tient à la lettre — mais l'intention est perdue.
-2. **L'adresse de contact disparaît pour qui n'exécute pas JavaScript**, ce qui est
-   le cas de la plupart des robots de moteurs de réponse. Sur les 3 occurrences de
-   l'adresse dans la page servie, **une seule reste en clair : celle du JSON-LD**.
-   Le seul chemin de conversion du site est ce `mailto:` — on vient d'ouvrir la porte
-   aux robots et l'adresse leur est masquée dans le corps de page.
+```
+liens mailto: rétablis            2
+liens /cdn-cgi/l/email-protection 0
+script email-decode injecté       0
+balises <script> dans la page     1   (le seul JSON-LD)
+« [email protected] »             0
+adresse lisible par GPTBot        4 occurrences
+```
 
-**Arbitrage à rendre** — l'obfuscation existe pour limiter la récolte d'adresses par
-les robots à spam. La désactiver rend l'adresse lisible par tous, moissonneurs
-compris. Le compromis n'appartient pas au site :
-
-- **Option A — désactiver** (recommandée) : `email_obfuscation = off`. Le `mailto:`
-  redevient un lien HTML ordinaire, la page repasse à zéro JavaScript, l'adresse
-  redevient lisible par les moteurs de réponse. Coût : davantage de spam.
-- **Option B — conserver** : accepter que le corps de page masque l'adresse et
-  s'appuyer sur le JSON-LD, où elle reste en clair. Coût : un script injecté et un
-  chemin de conversion dégradé pour les agents sans JS.
-
-Le jeton d'API porte la permission nécessaire (`email_obfuscation`, `editable: true`).
-**Rien n'a été modifié** : le réglage attend l'arbitrage.
+Le site est de nouveau strictement sans JavaScript.
 
 ## 9. Mentions légales — jeu complet
 
