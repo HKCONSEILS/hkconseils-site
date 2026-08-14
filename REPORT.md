@@ -427,6 +427,27 @@ Sur le `FAQPage` non listé par l'outil : confirmé sans regret. La cible du bal
 FAQ est la lecture par les moteurs de réponse, pas l'encart SERP que Google a retiré
 aux sites ordinaires. La porte à 6/6 garde tout son sens.
 
+## 12 bis. Incidents
+
+### INC-2026-08-14 — Dépôt `HemersonAIBuild` public pendant un an
+
+| | |
+|---|---|
+| **Exposé** | Cartographie de l'infrastructure : 44 adresses distinctes, 10 hôtes nommés, identifiants de conteneurs. **Noms de clients**, dont un présent dans 25 fichiers. |
+| **Non exposé** | **Aucun secret.** Audit gitleaks 8.30.1 sur l'historique complet, 147 commits et 4 références, plus recherches ciblées sur cinq familles de clés. Les cinq versions des fichiers de coffre Ansible présentes dans l'historique sont chiffrées, vérifié. |
+| **Confinement** | Dépôt passé en privé le 14/08. Absence d'accès anonyme vérifiée : 404 sur la page comme sur l'API. |
+| **Résiduel accepté** | Ce qui a été lu ne peut pas être repris. 0 étoile, 0 fork : l'exposition reste théorique, aucune exploitation constatée. Accepté et daté. |
+| **Détection** | Par la porte pré-lien du §4.1 de l'amendement BLOG-01-A, qui impose d'auditer un dépôt cible avant de le lier depuis un article. |
+| **Suites** | Republication d'une version vitrine assainie, sans historique, dans un nouveau dépôt — backlog post-gel. **Les noms de branches entrent dans le périmètre d'assainissement : l'une contient un nom de projet client.** |
+
+Ce que l'incident dit du dispositif : la porte qui l'a trouvé n'avait pas été écrite
+pour ça. Elle demandait de vérifier une cible avant de poser un lien, et c'est en
+l'appliquant qu'une exposition sans rapport avec le blog est apparue. Une règle de
+contenu a servi de contrôle de sécurité, un an après le fait.
+
+Rien dans les portes du site ne pouvait le détecter : elles ne regardent que ce dépôt.
+Un contrôle périodique des dépôts publics du compte serait le complément manquant.
+
 ## 13. Gel de copie et lot post-gel
 
 **Gel actif jusqu'au 16/08 au matin.** Aucune modification de `public/` d'ici là, y
