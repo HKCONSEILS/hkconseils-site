@@ -412,3 +412,45 @@ machine de travail n'a pas de navigateur. Ce qui a été fait à la place est d�
 §5.1 — validateur schema.org à 0 erreur et 0 avertissement, JSON-LD servi vérifié
 nœud par nœud. Le test reste à passer par Hémerson depuis un navigateur, sur
 `https://hkconseils.fr`, en vérifiant que `FAQPage` remonte bien **6** questions.
+
+## 12. Decisions Log
+
+| Réf. | Décision | Date | Portée |
+|---|---|---|---|
+| **D-site-08** | **Inéligibilité du nœud `Product` assumée.** Le test des résultats enrichis juge `Editos` non valide faute de `offers`, `review` ou `aggregateRating`. Aucune des trois n'est publiable : le prix n'existe pas, les avis non plus, et les inventer serait un faux ; changer le type du nœud casserait l'AC3. Le nœud remplit son objectif réel — l'entité Editos existe dans le graphe et reste valide au sens schema.org. L'encart en SERP n'a jamais été la cible. **Ne rien modifier.** | 14/08 | JSON-LD, définitif |
+| **D-site-09** | **`priceRange: "Sur devis"` accepté** sur le nœud `ProfessionalService`, en réponse à l'avertissement non critique de la fiche d'établissement. C'est une donnée factuelle, pas une invention. **À appliquer après le gel**, dans le lot post-gel, pas avant. | 14/08 | JSON-LD, différé |
+| D-site-03 | Numéro de téléphone non publié. Délibéré, documenté, clos. Explique l'avertissement `telephone` manquant de la fiche d'établissement. | 13/08 | rappel |
+
+Sur le `FAQPage` non listé par l'outil : confirmé sans regret. La cible du balisage
+FAQ est la lecture par les moteurs de réponse, pas l'encart SERP que Google a retiré
+aux sites ordinaires. La porte à 6/6 garde tout son sens.
+
+## 13. Gel de copie et lot post-gel
+
+**Gel actif jusqu'au 16/08 au matin.** Aucune modification de `public/` d'ici là, y
+compris `priceRange`. Seule une erreur factuelle avérée lèverait le gel.
+
+Cette section et le §12 sont les seules écritures faites pendant le gel, sur
+instruction explicite de la squad (point 3 de sa note du 14/08). Elles ne portent que
+sur la documentation : `git diff` confirme qu'aucun fichier de `public/` n'est touché.
+
+**Lot post-gel**, à exécuter en une seule passe, sur GO explicite d'Hémerson après sa
+relecture à froid :
+
+1. `priceRange: "Sur devis"` sur le nœud `ProfessionalService` (D-site-09), puis
+   `check-jsonld.py` et recette sur la page servie ;
+2. les corrections issues de la relecture à froid, groupées ;
+3. le remplacement du placeholder par la capture Editos si elle est fournie d'ici là
+   (WebP, dimensions du placeholder inchangées, `alt` inchangé).
+
+À l'issue de ce lot, plus aucune tâche côté exécutant. Search Console, sitemap et
+fiche Google Business Profile sont des actions Hémerson, hors dépôt.
+
+## 14. Statut
+
+**SITE-01, SITE-01b et SITE-01c v2 : DONE.** 8 critères d'acceptation sur 8, tous
+vérifiés par la mesure. Un reliquat visuel, la capture Editos, et un lot post-gel
+unique.
+
+Le retour d'expérience du §10 — recette sur la page servie, avec variation des
+User-Agents — est adopté comme doctrine squad pour les futurs SITE-xx.
