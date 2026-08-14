@@ -1,3 +1,5 @@
 node_modules/
 .lighthouseci/
 *.log
+dist/
+.astro/
