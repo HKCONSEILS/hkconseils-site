@@ -11,7 +11,7 @@ name: validate
 
 on:
   push:
-    branches: [main, blog-01]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
