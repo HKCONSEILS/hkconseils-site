@@ -51,13 +51,46 @@ Cloudflare Pages, projet `hkconseils-site`, connecté au dépôt GitHub.
 | Réglage | Valeur |
 |---|---|
 | Branche de production | `main` |
-| Commande de build | *(aucune)* |
-| Répertoire de sortie | `public` |
+| Commande de build | `npm ci && npm run build` |
+| Répertoire de sortie | `dist` |
+| Version de Node | lue dans `.nvmrc` (22.23.2) |
 | Variables d'environnement | *(aucune)* |
 
 Un push sur `main` déclenche le déploiement. Une pull request produit une URL de
 prévisualisation. **Aucun jeton d'API Cloudflare ne doit être ajouté au dépôt**&nbsp;:
 Cloudflare Pages déploie par sa propre intégration Git.
+
+### Cohabitation entre le site et le blog
+
+La vitrine reste du HTML natif, écrit à la main dans `public/`. Astro **recopie ce
+répertoire tel quel** dans `dist/` et n'y ajoute que `/blog/`, le flux RSS et le
+sitemap. Aucune page existante ne passe par une transformation, ce que la CI vérifie
+à chaque exécution par comparaison octet à octet entre `public/` et `dist/`.
+
+Conséquence pratique&nbsp;: pour modifier la page d'accueil ou une page légale, on
+édite le fichier dans `public/`, exactement comme avant le blog.
+
+### Bascule de la configuration de build
+
+Le passage de « aucune commande » à `npm ci && npm run build` est un réglage **de
+projet**, pas de branche&nbsp;: il s'applique aussi aux prévisualisations. Il faut donc
+le changer **avant** de pouvoir valider le blog sur l'URL de prévisualisation d'une
+branche, puisque sans build, la prévisualisation ne sert que le contenu de `public/`.
+
+Pendant la fenêtre qui sépare ce changement du merge, un déploiement de `main`
+échouera, `main` ne portant pas encore de `package.json`. **Un build en échec ne coupe
+pas le site**&nbsp;: Cloudflare Pages continue de servir le dernier déploiement réussi.
+Le risque n'est donc pas une indisponibilité, mais l'impossibilité temporaire de
+déployer un correctif urgent. Garder la fenêtre courte.
+
+**Retour arrière de la bascule**, à appliquer si la validation échoue&nbsp;:
+
+1. Tableau de bord Pages → *Settings* → *Builds & deployments*&nbsp;: remettre la
+   commande de build à vide et le répertoire de sortie à `public`.
+2. Si un déploiement fautif est déjà en production&nbsp;: *Deployments* →
+   *Rollback to this deployment* sur le dernier déploiement sain.
+3. Le site repart alors sur le HTML de `public/`, sans le blog, dans l'état qui était
+   le sien avant la bascule.
 
 ### Enregistrements DNS
 
