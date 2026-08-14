@@ -173,14 +173,6 @@ a:hover { color: var(--color-accent-hover); }
   color: var(--color-fg-muted);
 }
 
-/* Le numéro de section partage la ligne du surtitre, en retrait de teinte pour
-   rester un repère et non une information. */
-.eyebrow .num {
-  color: var(--color-fg-muted);
-  margin-right: 0.6em;
-}
-.on-dark .eyebrow .num { color: var(--color-fg-muted-on-dark); }
-
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
@@ -364,6 +356,17 @@ a:hover { color: var(--color-accent-hover); }
   padding: var(--space-4);
   box-shadow: var(--shadow-card);
   border-top: 2px solid var(--hk-blue);
+}
+/* Les trois offres forment une progression réelle : diagnostic, puis
+   déploiement, puis transfert de compétences. Le numéro y porte une
+   information, à la différence des sections de la page. */
+.card .num {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: var(--space-2);
 }
 .card h3 {
   font-size: var(--text-h3);
