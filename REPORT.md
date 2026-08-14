@@ -81,29 +81,60 @@ Lighthouse (mobile, médiane des runs — re-mesuré après SITE-01b, 14/08)
   /confidentialite       100    100   100   100
 ```
 
-### 5.1 Sur le test des résultats enrichis
+### 5.1 Test des résultats enrichis — exécuté le 14/08
 
-Le Rich Results Test de Google n'expose **aucune API publique** — l'endpoint
-`urlTestingTools/richResults:run` répond 404, et l'outil n'existe que dans une
-interface web. Sans navigateur sur la machine de travail, **je ne peux pas
-l'exécuter**, et je ne le déclarerai pas passé sur la foi d'un substitut.
+Exécuté par navigateur sur `https://hkconseils.fr/`, exploration Google du
+14 août 2026 à 03:05:17, après déploiement de SITE-01c v2.
 
-Ce qui a pu être vérifié à sa place, et qui l'a été :
+| Type détecté | Verdict |
+|---|---|
+| **Organisation** | 1 élément valide, aucun problème |
+| **Commerces et services à proximité** | 1 élément valide, 2 problèmes **non critiques** |
+| **Extraits de produits** | **1 élément non valide** |
+| **FAQPage** | **non listé** par l'outil |
 
-- le **validateur schema.org** (`validator.schema.org`, appelé sur l'URL de
-  production) : `totalNumErrors = 0`, `totalNumWarnings = 0` ;
-- le **JSON-LD tel que servi** : JSON valide, `@graph` complet avec ses 7 nœuds
-  — `ProfessionalService`, `Person`, 3 × `Service`, `Product`, `FAQPage` — et
-  l'adresse électronique intacte ;
-- `check-jsonld.py` : nœuds requis présents, propriétés minimales présentes, et
-  les 5 Q/R de la FAQ strictement identiques entre le DOM et le balisage.
+**Extraits de produits, le seul point rouge.** Message de Google sur le nœud
+`Editos` : « Il faut indiquer "offers", "review", ou "aggregateRating" ».
 
-Une réserve de méthode : le validateur schema.org ne restitue que 5 objets dans
-sa vue synthétique (`numObjects = 5`), sans `ProfessionalService` ni `Person`. Le
-contrôle direct du JSON-LD servi montre que les deux nœuds sont bien présents et
-valides — c'est une limite d'affichage du validateur sur les nœuds référencés par
-`@id`, pas un défaut du balisage. **Le passage au Rich Results Test reste dû**,
-depuis un navigateur, et son verdict devra être consigné ici.
+C'est un **conflit structurel avec la directive**, pas un défaut d'exécution. Le
+§3.3 de SITE-01 impose un nœud `Product` **sans `offers`** (prix sur demande), et la
+porte `check-jsonld.py` vérifie précisément cette absence. Or Google exige l'une de
+ces trois propriétés pour rendre un `Product` éligible. Les deux exigences sont
+incompatibles.
+
+Aucune issue n'est neutre :
+
+- publier `offers` supposerait un prix, qui n'existe pas ;
+- publier `review` ou `aggregateRating` supposerait des avis, qui n'existent pas, et
+  les inventer serait un faux ;
+- changer le type du nœud ferait tomber l'AC3, qui exige « un `Product` ».
+
+**Conséquence réelle : aucune.** Un élément non éligible n'est pas pénalisé, il
+n'apparaît simplement pas en résultat enrichi. Le nœud reste du schema.org valide et
+continue de servir la compréhension de l'entité, qui est l'objectif GEO. La décision
+appartient à la squad : accepter l'inéligibilité et la documenter, ou revoir le §3.3.
+**Rien n'a été modifié** — le gel de copie de 48 h (SITE-01c §7) court.
+
+**Problèmes non critiques sur la fiche d'établissement :**
+
+- `telephone` manquant — **délibéré**, le §6 de SITE-01 interdit de publier le numéro ;
+- `priceRange` manquant — pourrait recevoir une valeur du type « Sur devis ». À
+  arbitrer après le gel, ce n'est pas une erreur factuelle.
+
+**FAQPage absent de la liste.** L'outil ne le mentionne pas parmi les types détectés,
+ce qui confirme que Google ne traite plus les résultats enrichis FAQ pour un site
+ordinaire depuis août 2023, cet affichage étant réservé aux sites gouvernementaux et
+de santé faisant autorité. Le balisage reste exact et vérifié à 6/6 par la porte ; il
+sert la lecture par les moteurs de réponse, pas l'affichage en SERP. Cela ne change
+rien à l'objectif de la directive, mais évite d'attendre un encart qui ne viendra pas.
+
+Contrôle de cohérence au passage : les données remontées par Google reflètent bien
+SITE-01c v2 — description mentionnant « clouds non européens », `email`
+`contact@hkconseils.fr`, adresse de Saint-Priest, `sameAs` LinkedIn et GitHub.
+
+Pour mémoire, les substituts joués avant d'avoir un navigateur restent cohérents avec
+ce verdict : validateur schema.org à `totalNumErrors = 0`, JSON-LD servi vérifié nœud
+par nœud, `check-jsonld.py` à 6/6.
 
 Au premier passage, un run isolé de la page d'accueil était descendu à 87 en
 performance (démarrage à froid du navigateur). C'est pour cela que la configuration
