@@ -3,19 +3,22 @@ import { getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  // Un brouillon n'a pas de page : il est versionné, pas publié.
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 <BlogPost
   title={post.data.title}
   description={post.data.description}
   pubDate={post.data.pubDate}
   originalDate={post.data.originalDate}
+  tags={post.data.tags}
   slug={post.id}
+  headings={headings}
 >
   <Content />
 </BlogPost>

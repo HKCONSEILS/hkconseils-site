@@ -13,6 +13,12 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     originalDate: z.coerce.date(),
+    // Étiquettes techniques courtes, en minuscules, affichées en monospace.
+    tags: z.array(z.string()).default([]),
+    // Un brouillon est rédigé et versionné, mais absent du site publié :
+    // ni page, ni entrée d'index, ni flux, ni sitemap. Sa publication à
+    // l'échéance prévue n'est alors qu'un changement de ce drapeau.
+    draft: z.boolean().default(false),
   }),
 });
 

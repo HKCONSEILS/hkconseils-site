@@ -98,8 +98,13 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm install --no-save --no-package-lock html-validate@11.6.2
-      - name: Vitrine et blog
-        run: npx html-validate "dist/**/*.html"
+      - name: Vitrine, règles strictes
+        run: npx html-validate "dist/*.html"
+      - name: Blog
+        # Shiki pose un attribut style= par jeton de code : la règle
+        # no-inline-style est levée pour ces pages générées, jamais pour la
+        # vitrine écrite à la main.
+        run: npx html-validate --config .htmlvalidate.blog.json "dist/blog/**/*.html"
 
   lighthouse-ci:
     name: Lighthouse mobile >= 95 (AC1, AC5)

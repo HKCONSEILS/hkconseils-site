@@ -39,7 +39,9 @@ automatiquement les articles. `robots.txt` continue de l'annoncer à la même UR
 
 ```bash
 bash scripts/check-leaks.sh && python3 scripts/check-jsonld.py
-npm ci && npm run build && npx html-validate "dist/**/*.html"
+npm ci && npm run build
+npx html-validate "dist/*.html"
+npx html-validate --config .htmlvalidate.blog.json "dist/blog/**/*.html"
 ```
 
 Les deux portes maison ne demandent que bash et Python 3. La construction et

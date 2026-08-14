@@ -2,15 +2,15 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
-const posts = (await getCollection('blog')).sort(
+// Les brouillons ne sortent jamais du dépôt : ni page, ni index, ni flux.
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const fr = (d: Date) =>
-  d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
 <Base
   title="Blog · HK CONSEILS"
-  description="Retours d'expérience sur l'IA générative auto-hébergée : infrastructure d'inférence, dimensionnement, sécurité et coûts réels."
+  description="Retours d'expérience sur l'IA générative auto-hébergée : infrastructure d'inférence, dimensionnement, incidents et coûts réels."
   canonical="https://hkconseils.fr/blog/"
 >
   <section class="section">
@@ -25,21 +25,20 @@ const fr = (d: Date) =>
       {posts.length === 0 ? (
         <p class="vide">Les premiers articles arrivent.</p>
       ) : (
-        <ul class="liste">
+        <ol class="liste">
           {posts.map((post) => (
             <li>
-              <article>
-                <p class="date">
-                  <time datetime={post.data.pubDate.toISOString().slice(0, 10)}>
-                    {fr(post.data.pubDate)}
-                  </time>
-                </p>
-                <h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2>
-                <p>{post.data.description}</p>
-              </article>
+              <a href={`/blog/${post.id}/`}>
+                <span class="meta">
+                  <time datetime={iso(post.data.pubDate)}>{iso(post.data.pubDate)}</time>
+                  {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+                </span>
+                <span class="titre">{post.data.title}</span>
+                <span class="chapo">{post.data.description}</span>
+              </a>
             </li>
           ))}
-        </ul>
+        </ol>
       )}
     </div>
   </section>
@@ -52,20 +51,57 @@ const fr = (d: Date) =>
     letter-spacing: var(--tracking-tight);
     margin-bottom: var(--space-3);
   }
-  .liste { margin-top: var(--space-8); border-top: 1px solid var(--color-border); }
-  .liste li { border-bottom: 1px solid var(--color-border); padding-block: var(--space-4); }
-  .liste .date {
+  /* Liste dense : la date et les étiquettes tiennent sur une ligne de repère,
+     le titre porte le clic, la description tient en une ligne. Aucune image,
+     aucune carte : on parcourt une table des matières, pas une galerie. */
+  .liste {
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    list-style: none;
+    padding: 0;
+  }
+  .liste li { border-bottom: 1px solid var(--color-border); }
+  .liste a {
+    display: block;
+    padding-block: var(--space-3);
+    text-decoration: none;
+    color: inherit;
+  }
+  .liste a:hover .titre { color: var(--color-accent); text-decoration: underline; }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
     font-family: var(--font-mono);
     font-size: var(--text-micro);
     letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
     color: var(--color-fg-muted);
-    margin-bottom: var(--space-1);
+    margin-bottom: 6px;
   }
-  .liste h2 { font-size: 1.25rem; line-height: var(--leading-snug); margin-bottom: var(--space-1); }
-  .liste h2 a { color: var(--color-fg); text-decoration: none; }
-  .liste h2 a:hover { color: var(--color-accent); text-decoration: underline; }
-  .liste p { color: var(--color-fg-muted); font-size: var(--text-small); }
+  .meta time { font-variant-numeric: tabular-nums; }
+  .tag {
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    color: var(--color-accent);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 1px 6px;
+  }
+  .titre {
+    display: block;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    letter-spacing: -0.008em;
+    margin-bottom: 4px;
+  }
+  .chapo {
+    display: block;
+    color: var(--color-fg-muted);
+    font-size: var(--text-small);
+    max-width: var(--measure);
+  }
   .vide {
     margin-top: var(--space-6);
     font-family: var(--font-mono);
