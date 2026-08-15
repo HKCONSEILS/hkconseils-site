@@ -15,7 +15,7 @@
 |---|---|---|---|
 | AC1 | Lighthouse mobile ≥ 95 × 4 | ✅ | **100 / 100 / 100 / 100** sur les trois pages (mobile, 3 runs par page, médiane — §5). Poids hors images : **98,9 Ko** pour une limite de 500 Ko. |
 | AC2 | HTML valide, 1 × H1, méta | ✅ | `html-validate` : 3 fichiers, zéro erreur. 1 seul H1 par page, hiérarchie sans saut, `alt` + `width`/`height` sur l'image, `lang="fr"`. Titre **54 car.**, description **155 car.** (limites 60 / 155), canonique, Open Graph et Twitter Card présents. |
-| AC3 | JSON-LD | ✅/⏳ | `check-jsonld.py` passe : @graph à 7 nœuds — ProfessionalService, Person, **4 × Service dont Editos** (D-site-08 v2, plus aucun Product), FAQPage — et les 6 Q/R FAQ sont identiques entre le DOM et le balisage. Test des résultats enrichis : à passer sur l'URL de production. |
+| AC3 | JSON-LD | ✅/⏳ | `check-jsonld.py` passe : @graph à **8 nœuds** — ProfessionalService, Person, **5 × Service** dont `#reprise-actifs` (SITE-01d) et Editos (D-site-08 v2, plus aucun Product), FAQPage — et les **7 Q/R** FAQ sont identiques entre le DOM et le balisage. Test des résultats enrichis : à passer sur l'URL de production. |
 | AC4 | robots.txt | ✅ | « Managed robots.txt » désactivé : le fichier servi est identique à celui du dépôt (`diff` vide), zéro `Disallow`, zéro `Content-Signal`. Blocage pare-feu levé : **GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot, Googlebot, Bingbot et Applebot répondent tous 200**, mesuré sur la production. |
 | AC5 | Zéro fuite | ✅ | `check-leaks.sh` passe sur les 23 fichiers suivis. **Testé négativement** : les 6 familles de motifs se déclenchent sur un fichier piégé. |
 | AC6 | Mentions légales | ✅ | Jeu LCEN + R.123-237 complet : dénomination, forme, **capital 100 €**, siège (6 boulevard Édouard Herriot, 69800 Saint-Priest), SIREN, **RCS de Lyon**, **TVA FR 88 100 332 816** (clé de contrôle recalculée et concordante), directeur de la publication, hébergeur avec adresse, contact. Politique de confidentialité cohérente avec l'absence de cookie et de mesure d'audience. |
@@ -80,6 +80,10 @@ Lighthouse (mobile, médiane des runs — re-mesuré après SITE-01b, 14/08)
   /mentions-legales      100    100   100   100
   /confidentialite       100    100   100   100
 ```
+
+> **Relevé daté du 14/08, conservé tel quel.** Les chiffres du JSON-LD ci-dessus
+> (7 nœuds, 5 Q/R) sont ceux de ce jour-là. État courant : **8 nœuds, 7 Q/R** depuis
+> SITE-01d — voir §11 ter.
 
 ### 5.1 Test des résultats enrichis — exécuté le 14/08
 
@@ -419,6 +423,79 @@ machine de travail n'a pas de navigateur. Ce qui a été fait à la place est d�
 §5.1 — validateur schema.org à 0 erreur et 0 avertissement, JSON-LD servi vérifié
 nœud par nœud. Le test reste à passer par Hémerson depuis un navigateur, sur
 `https://hkconseils.fr`, en vérifiant que `FAQPage` remonte bien **6** questions.
+
+## 11 ter. SITE-01d — nommer la reprise d'applications (15/08)
+
+La prestation la plus différenciante du cabinet n'existait qu'implicitement, dans
+l'étude de cas santé. Un lecteur venu faire reprendre son application ne pouvait pas
+deviner que c'était une offre. SITE-01d la nomme, sans casser le rythme des trois
+interventions : le compteur reste `01/02/03`.
+
+### Ce qui a changé
+
+| Élément | Nature |
+|---|---|
+| Carte d'offre n°2 | titre élargi en « Déploiement & reprise d'applications IA souveraines », texte remplacé. Cartes 1 et 3 intactes |
+| Bande `#reprise-actifs` | nouveau bloc pleine largeur entre l'offre et les références. Trois phrases, **aucun chiffre nouveau, aucun nom de client**, ancre interne vers l'étude de cas santé |
+| Ancre `#cas-sante` | ajoutée sur l'article de l'étude de cas santé, qui n'en portait pas |
+| FAQ n°7 | « Pouvez-vous reprendre une application développée par un autre prestataire ? », DOM et balisage identiques |
+| JSON-LD | nœud `Service` `#reprise-actifs` ajouté ; le graphe passe de 7 à **8 nœuds**, 5 `Service` |
+
+**Aucun style nouveau.** La bande reprend `.sunken`, déjà dans les tokens. Aucun tiret
+cadratin : contrôlé sur la copie servie, décompte à 0.
+
+### Une mise en cohérence non demandée, signalée
+
+Le nœud `#service-deploiement` reprenait **mot pour mot** le texte de la carte 2. La
+directive ne demandait que l'ajout du nouveau nœud. Le laisser tel quel aurait fait
+décrire au graphe une offre que la page ne proposait plus : `name` et `description`
+ont donc été réalignés sur le nouveau texte. Signalé plutôt qu'enfoui — c'est une
+initiative, pas une consigne.
+
+### Porte AC3 mise à jour
+
+`Service` 4 → **5**, socle FAQ 6 → **7**, et la vérification nommée par `@id`
+généralisée : `#editos` et `#reprise-actifs` sont contrôlés chacun sur son `@type` et
+ses propriétés requises, au lieu d'être simplement comptés. Le compte seul laisserait
+passer cinq `Service` quelconques.
+
+**Tests négatifs rejoués**, sur copie hors dépôt :
+
+```
+cas 1 — nœud #reprise-actifs supprimé
+  ABORT: JSON-LD non conforme
+    - nœud Service : 4 trouvé(s), 5 attendu(s)
+    - nœud Reprise d'actifs (#reprise-actifs) absent du @graph
+  code = 1
+
+cas 2 — 7e question retirée du DOM seulement
+  ABORT: JSON-LD non conforme
+    - FAQ : 6 paire(s) dans le DOM contre 7 dans le balisage
+  code = 1
+```
+
+### Cohérences périphériques (§6 de la directive)
+
+Meta description, `og:title`, `og:description` et `og:image:alt` **ne citaient pas**
+l'ancien titre de la carte 2 : elles décrivent les offres en termes génériques, et
+l'alt de l'image OG porte le H1. Vérifié par grep avant de conclure ; **rien à
+modifier**, image OG non régénérée. Blog et pages légales intouchés.
+
+Reste à la main d'Hémerson, hors dépôt : si la fiche Google Business Profile est créée
+avec la description proposée par la squad, y remplacer « déploiement d'IA souveraine
+on-premise ou sur cloud européen » par « déploiement et reprise d'applications IA
+souveraines ».
+
+### Validation
+
+| Contrôle | Résultat |
+|---|---|
+| Portes locales | `check-jsonld.py` OK (8 nœuds, 7 Q/R), `check-leaks.sh` OK (45 fichiers) |
+| CI `validate`, run 31898940192 | **success**, 4 jobs sur 4 |
+| Lighthouse mobile | **100 / 100 / 100 / 100**, médiane de 6 runs, sur toutes les pages |
+| Recette servie, 3 User-Agents dont Googlebot | 8 nœuds, 5 `Service`, 0 `Product`, FAQ 7 balisage / 7 DOM, carte 2 au nouveau titre, bande présente, ancre `#cas-sante` présente des deux côtés, 0 tiret cadratin, 0 nom de client |
+
+Commit **`a33f415`**, poussé le jour même.
 
 ## 12. Decisions Log
 
