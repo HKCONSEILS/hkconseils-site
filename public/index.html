@@ -94,8 +94,8 @@
         </article>
         <article class="card">
           <span class="num">02</span>
-          <h3>Déploiement IA souveraine</h3>
-          <p>Des LLM, du RAG, de la génération d’images et de vidéo, auto-hébergés chez vous ou chez un hébergeur européen. La sécurité du LLM est pensée dès la conception.</p>
+          <h3>Déploiement &amp; reprise d’applications IA souveraines</h3>
+          <p>LLM, RAG, génération d’images et de vidéo auto-hébergés, on-premise ou sur cloud européen. Reprise en pleine propriété d’applications existantes : code, données et hébergement repris à un prestataire tiers, puis exploités pour votre compte. Sécurité par conception.</p>
         </article>
         <article class="card">
           <span class="num">03</span>
@@ -106,13 +106,25 @@
     </div>
   </section>
 
+  <!-- Bande « reprise d'actifs » (SITE-01d §2). Fond alterné pris dans les tokens
+       existants (.sunken), aucun style nouveau. Le lien est une ancre interne vers
+       l'étude de cas santé, qui porte la preuve chiffrée : la bande ne réintroduit
+       aucun chiffre et ne nomme aucun client. -->
+  <section class="section sunken" id="reprise-actifs">
+    <div class="wrap">
+      <p class="eyebrow">Reprise d’actifs</p>
+      <h2>Votre application entre vos mains</h2>
+      <p>HK CONSEILS reprend en pleine propriété des applications développées par des tiers : audit du code et des données, transfert d’hébergement, remise en exploitation souveraine. Réalisé en production pour une plateforme du secteur de la santé, reprise intégralement à un éditeur SaaS. <a href="#cas-sante">Voir l’étude de cas</a>.</p>
+    </div>
+  </section>
+
   <section class="section sunken" id="references">
     <div class="wrap">
       <p class="eyebrow">Références</p>
       <h2>Deux plateformes en production</h2>
       <div class="cases">
 
-        <article class="case">
+        <article class="case" id="cas-sante">
           <p class="caption">Santé</p>
           <h3>Plateforme souveraine avec essayage virtuel par IA</h3>
           <p>Une TPE du secteur des dispositifs médicaux capillaires a repris en pleine propriété un actif SaaS qui appartenait à un tiers, code, données et hébergement compris. La plateforme porte un annuaire national de 1&#160;485 établissements et un module d’essayage par IA générative auto-hébergé.</p>
@@ -200,6 +212,10 @@
         <details>
           <summary>Faut-il tout héberger en Europe pour être souverain ?</summary>
           <p>Non. La souveraineté se raisonne par sensibilité de la donnée. Les données métier, clients ou de santé exigent une infrastructure maîtrisée, on-premise ou européenne. Un contenu public, comme un site vitrine, peut être diffusé par la plateforme la plus performante, où qu'elle soit. HK CONSEILS applique cette proportionnalité, avec des traitements sensibles auto-hébergés chez ses clients et des supports publics confiés aux meilleurs services disponibles.</p>
+        </details>
+        <details>
+          <summary>Pouvez-vous reprendre une application développée par un autre prestataire ?</summary>
+          <p>Oui. HK CONSEILS audite le code et les données existants, négocie le transfert avec l'éditeur, rapatrie l'hébergement sur une infrastructure que le client contrôle, puis assure l'exploitation et les évolutions. Cette prestation a été menée en production pour une plateforme de santé : code, données et hébergement repris intégralement à un éditeur SaaS, avec continuité de service pour les utilisateurs.</p>
         </details>
       </div>
     </div>
@@ -298,9 +314,18 @@
     {
       "@type": "Service",
       "@id": "https://hkconseils.fr/#service-deploiement",
-      "name": "Déploiement IA souveraine",
-      "description": "Des LLM, du RAG, de la génération d’images et de vidéo, auto-hébergés chez le client ou chez un hébergeur européen. La sécurité du LLM est pensée dès la conception.",
+      "name": "Déploiement & reprise d’applications IA souveraines",
+      "description": "LLM, RAG, génération d’images et de vidéo auto-hébergés, on-premise ou sur cloud européen. Reprise en pleine propriété d’applications existantes : code, données et hébergement repris à un prestataire tiers, puis exploités pour le compte du client. Sécurité par conception.",
       "serviceType": "Déploiement d’IA générative auto-hébergée",
+      "areaServed": { "@type": "Country", "name": "France" },
+      "provider": { "@id": "https://hkconseils.fr/#organisation" }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://hkconseils.fr/#reprise-actifs",
+      "name": "Reprise en pleine propriété d’applications",
+      "description": "HK CONSEILS reprend en pleine propriété des applications développées par des tiers : audit du code et des données, transfert d’hébergement, remise en exploitation souveraine. Réalisé en production pour une plateforme du secteur de la santé, reprise intégralement à un éditeur SaaS.",
+      "serviceType": "Reprise et exploitation d’applications",
       "areaServed": { "@type": "Country", "name": "France" },
       "provider": { "@id": "https://hkconseils.fr/#organisation" }
     },
@@ -371,6 +396,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Non. La souveraineté se raisonne par sensibilité de la donnée. Les données métier, clients ou de santé exigent une infrastructure maîtrisée, on-premise ou européenne. Un contenu public, comme un site vitrine, peut être diffusé par la plateforme la plus performante, où qu'elle soit. HK CONSEILS applique cette proportionnalité, avec des traitements sensibles auto-hébergés chez ses clients et des supports publics confiés aux meilleurs services disponibles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pouvez-vous reprendre une application développée par un autre prestataire ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui. HK CONSEILS audite le code et les données existants, négocie le transfert avec l'éditeur, rapatrie l'hébergement sur une infrastructure que le client contrôle, puis assure l'exploitation et les évolutions. Cette prestation a été menée en production pour une plateforme de santé : code, données et hébergement repris intégralement à un éditeur SaaS, avec continuité de service pour les utilisateurs."
           }
         }
       ]

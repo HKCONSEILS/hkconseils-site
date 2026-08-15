@@ -5,7 +5,11 @@ check-jsonld.py — porte AC3.
 Vérifie que le bloc JSON-LD de public/index.html :
   1. est du JSON valide, structuré en @graph ;
   2. contient les nœuds exigés par la directive : ProfessionalService, Person,
-     quatre Service, un FAQPage ;
+     cinq Service, un FAQPage ;
+
+     SITE-01d — la reprise en pleine propriété d'applications devient un service
+     nommé : nœud `#reprise-actifs`, vérifié par son @id comme `#editos`. Le socle
+     FAQ passe à 7 questions.
 
      D-site-08 v2 — Editos est décrit en Service et non plus en Product. Product
      est un type à résultat enrichi : Search Console y réclame offers, review et
@@ -28,7 +32,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 INDEX = Path(__file__).resolve().parent.parent / "public" / "index.html"
-FAQ_MINIMUM = 5
+FAQ_MINIMUM = 7
 
 
 class Extractor(HTMLParser):
@@ -120,7 +124,7 @@ def main() -> int:
     expected = {
         "ProfessionalService": 1,
         "Person": 1,
-        "Service": 4,
+        "Service": 5,
         "FAQPage": 1,
     }
     for t, n in expected.items():
@@ -150,22 +154,28 @@ def main() -> int:
         if "provider" not in node:
             errors.append(f"Service '{node.get('name')}' : 'provider' manquant")
 
-    # Le compte de Service ne suffit plus à défendre Editos : quatre Service
-    # quelconques passeraient. On vérifie le nœud par son @id, et les propriétés
-    # que D-site-08 v2 demande expressément de conserver au changement de type.
-    editos = next(
-        (n for n in graph if n.get("@id") == "https://hkconseils.fr/#editos"), None
+    # Le compte de Service ne suffit pas à défendre les nœuds qui portent une
+    # décision : cinq Service quelconques passeraient. Ceux-là sont donc vérifiés
+    # nommément, par leur @id, avec les propriétés que leur directive exige.
+    nommes = (
+        # (fragment d'@id, libellé, propriétés requises)
+        ("#editos", "Editos", ("name", "description", "image", "provider")),
+        ("#reprise-actifs", "Reprise d'actifs", ("name", "description", "provider")),
     )
-    if editos is None:
-        errors.append("nœud Editos (#editos) absent du @graph")
-    else:
-        if editos.get("@type") != "Service":
-            errors.append(f"Editos : @type '{editos.get('@type')}', 'Service' attendu")
-        for key in ("name", "description", "image", "provider"):
-            if key not in editos:
-                errors.append(f"Editos : propriété '{key}' manquante")
-        if "brand" in editos:
-            errors.append("Editos : 'brand' subsiste, remplacé par 'provider' en D-site-08 v2")
+    for fragment, libelle, requises in nommes:
+        node = next(
+            (n for n in graph if n.get("@id") == f"https://hkconseils.fr/{fragment}"), None
+        )
+        if node is None:
+            errors.append(f"nœud {libelle} ({fragment}) absent du @graph")
+            continue
+        if node.get("@type") != "Service":
+            errors.append(f"{libelle} : @type '{node.get('@type')}', 'Service' attendu")
+        for key in requises:
+            if key not in node:
+                errors.append(f"{libelle} : propriété '{key}' manquante")
+        if "brand" in node:
+            errors.append(f"{libelle} : 'brand' présent, 'provider' attendu (D-site-08 v2)")
 
     # -- FAQ : le balisage doit refléter le DOM --------------------------------
     faq_nodes = by_type.get("FAQPage", [])
