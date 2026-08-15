@@ -5,7 +5,13 @@ check-jsonld.py — porte AC3.
 Vérifie que le bloc JSON-LD de public/index.html :
   1. est du JSON valide, structuré en @graph ;
   2. contient les nœuds exigés par la directive : ProfessionalService, Person,
-     trois Service, un Product, un FAQPage ;
+     quatre Service, un FAQPage ;
+
+     D-site-08 v2 — Editos est décrit en Service et non plus en Product. Product
+     est un type à résultat enrichi : Search Console y réclame offers, review et
+     aggregateRating, qu'une application interne sans prix public ni avis ne peut
+     fournir sans les inventer. Service n'appelle pas ces propriétés, et l'entité
+     reste comprise du graphe. Le script refuse donc désormais tout nœud Product.
   3. porte les propriétés minimales attendues sur chaque nœud ;
   4. — le point qui casse le plus souvent en silence — expose des questions et
      réponses FAQ **strictement identiques** au texte rendu dans le DOM.
@@ -114,14 +120,22 @@ def main() -> int:
     expected = {
         "ProfessionalService": 1,
         "Person": 1,
-        "Service": 3,
-        "Product": 1,
+        "Service": 4,
         "FAQPage": 1,
     }
     for t, n in expected.items():
         got = len(by_type.get(t, []))
         if got != n:
             errors.append(f"nœud {t} : {got} trouvé(s), {n} attendu(s)")
+
+    # D-site-08 v2 : plus aucun nœud Product, quelle qu'en soit la raison. C'est le
+    # motif même de l'amendement ; le rendre explicite évite qu'il revienne par
+    # inadvertance et rouvre l'erreur Search Console qu'on vient de fermer.
+    if "Product" in by_type:
+        errors.append(
+            f"nœud Product : {len(by_type['Product'])} trouvé(s), 0 attendu "
+            "(D-site-08 v2 — type à résultat enrichi, réclame offers/review/aggregateRating)"
+        )
 
     # -- propriétés minimales --------------------------------------------------
     for node in by_type.get("ProfessionalService", []):
@@ -135,9 +149,23 @@ def main() -> int:
     for node in by_type.get("Service", []):
         if "provider" not in node:
             errors.append(f"Service '{node.get('name')}' : 'provider' manquant")
-    for node in by_type.get("Product", []):
-        if "offers" in node:
-            errors.append("Product : 'offers' présent alors que le prix est sur demande")
+
+    # Le compte de Service ne suffit plus à défendre Editos : quatre Service
+    # quelconques passeraient. On vérifie le nœud par son @id, et les propriétés
+    # que D-site-08 v2 demande expressément de conserver au changement de type.
+    editos = next(
+        (n for n in graph if n.get("@id") == "https://hkconseils.fr/#editos"), None
+    )
+    if editos is None:
+        errors.append("nœud Editos (#editos) absent du @graph")
+    else:
+        if editos.get("@type") != "Service":
+            errors.append(f"Editos : @type '{editos.get('@type')}', 'Service' attendu")
+        for key in ("name", "description", "image", "provider"):
+            if key not in editos:
+                errors.append(f"Editos : propriété '{key}' manquante")
+        if "brand" in editos:
+            errors.append("Editos : 'brand' subsiste, remplacé par 'provider' en D-site-08 v2")
 
     # -- FAQ : le balisage doit refléter le DOM --------------------------------
     faq_nodes = by_type.get("FAQPage", [])
