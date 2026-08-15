@@ -11,6 +11,11 @@ Vérifie que le bloc JSON-LD de public/index.html :
      nommé : nœud `#reprise-actifs`, vérifié par son @id comme `#editos`. Le socle
      FAQ passe à 7 questions.
 
+     SITE-01e — la zone d'intervention s'élargit à l'espace francophone. Le nombre
+     de nœuds ne bouge pas : `areaServed` est une propriété du ProfessionalService,
+     pas un nœud. Les Service d'offre n'en portent plus : ils héritent par
+     `provider`, et une zone dupliquée sur chacun se serait désynchronisée.
+
      D-site-08 v2 — Editos est décrit en Service et non plus en Product. Product
      est un type à résultat enrichi : Search Console y réclame offers, review et
      aggregateRating, qu'une application interne sans prix public ni avis ne peut
@@ -33,6 +38,7 @@ from pathlib import Path
 
 INDEX = Path(__file__).resolve().parent.parent / "public" / "index.html"
 FAQ_MINIMUM = 7
+AREA_SERVED_ATTENDU = 31
 
 
 class Extractor(HTMLParser):
@@ -176,6 +182,40 @@ def main() -> int:
                 errors.append(f"{libelle} : propriété '{key}' manquante")
         if "brand" in node:
             errors.append(f"{libelle} : 'brand' présent, 'provider' attendu (D-site-08 v2)")
+
+    # SITE-01e : la zone d'intervention est courte dans la prose et exhaustive dans le
+    # balisage. La porte contrôle le compte, la forme, et deux pays en sonde
+    # d'échantillon — énumérer les 31 reviendrait à recopier la donnée qu'elle vérifie,
+    # et la porte ne dirait plus que « le fichier est égal à lui-même ».
+    orga = next(
+        (n for n in graph if n.get("@id") == "https://hkconseils.fr/#organisation"), None
+    )
+    if orga is not None and "areaServed" in orga:
+        zone = orga["areaServed"]
+        if not isinstance(zone, list):
+            errors.append(
+                f"areaServed : {type(zone).__name__}, tableau de Country attendu"
+            )
+        else:
+            if len(zone) != AREA_SERVED_ATTENDU:
+                errors.append(
+                    f"areaServed : {len(zone)} entrée(s), {AREA_SERVED_ATTENDU} attendues"
+                )
+            noms = {e.get("name") for e in zone if isinstance(e, dict)}
+            for sonde in ("France", "Sénégal"):
+                if sonde not in noms:
+                    errors.append(f"areaServed : « {sonde} » absent (sonde d'échantillon)")
+            hors_type = [
+                e for e in zone if not isinstance(e, dict) or e.get("@type") != "Country"
+            ]
+            if hors_type:
+                errors.append(
+                    f"areaServed : {len(hors_type)} entrée(s) ne sont pas de type Country"
+                )
+            if len(noms) != len(zone):
+                errors.append(
+                    f"areaServed : {len(zone) - len(noms)} doublon(s) de pays"
+                )
 
     # -- FAQ : le balisage doit refléter le DOM --------------------------------
     faq_nodes = by_type.get("FAQPage", [])
