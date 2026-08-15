@@ -582,6 +582,51 @@ la ligne de contact. À arbitrer, hors de cette livraison.
 
 Commit **`8cce0a8`**, poussé le jour même.
 
+## 11 quinquies. Retouches arbitrées après SITE-01e (15/08)
+
+Deux points laissés ouverts par les livraisons précédentes, tranchés par Hémerson et
+déployés **d'un seul tenant**.
+
+### Bandeau du héros
+
+« Interventions dans toute la France » → **« Interventions en France et dans l'espace
+francophone »**.
+
+SITE-01e imposait deux retouches exactement et interdisait toute autre modification de
+copie : le bandeau était donc resté en l'état, signalé au §11 quater. L'affirmation
+était vraie mais incomplète, et c'était la première chose que lisait un visiteur,
+au-dessus de la ligne de flottaison. Plus aucune occurrence de « Interventions dans
+toute la France » dans la page.
+
+### Bande « reprise d'actifs » — `.sunken` → `.on-dark`
+
+Le rendu n'avait pas pu être vérifié à la livraison de SITE-01d, faute de navigateur ;
+la réserve avait été portée au §9 de son rapport. Le défaut était structurel et
+prévisible à la lecture : **la bande et la section Références qui la suit étaient toutes
+deux `.sunken`**, donc collées sur un même fond creusé. La bande se lisait comme le
+début de Références plutôt que comme un bloc à elle.
+
+`.on-dark` lui rend son autonomie. **Toujours aucun style nouveau** : la classe est déjà
+dans les tokens, et le lien de la bande hérite automatiquement de `--color-accent-on-dark`,
+la variante de bleu éclaircie créée parce que le bleu canonique plafonne à 3,3:1 sur
+navy (§3).
+
+**Le point à surveiller était le contraste** : Lighthouse le mesure, **accessibilité à
+100** après déploiement. Le fond sombre apparaît désormais trois fois dans la page
+(`#reprise-actifs`, `#rd`, `#contact`) ; c'est un choix de rythme, arbitré.
+
+### Validation
+
+| Contrôle | Résultat |
+|---|---|
+| Portes locales | `check-jsonld.py` OK (8 nœuds, 7 Q/R), `check-leaks.sh` OK |
+| CI `validate`, run 31902345202 | **success**, 4 jobs sur 4 |
+| Lighthouse mobile | **100 / 100 / 100 / 100**, médiane de 6 runs |
+| Recette servie, 4 User-Agents dont Googlebot | bandeau au nouveau texte, **0** occurrence résiduelle, bande en `on-dark` et plus en `sunken`, ancre `#cas-sante` présente des deux côtés, 8 nœuds, 5 `Service`, 0 `Product`, `areaServed` 31, FAQ 7/7, 0 tiret cadratin |
+
+Commit **`6d3df64`**, poussé le jour même. Les deux retouches sont de la copie et du
+gabarit : le retour arrière est un `git revert` sans effet de bord.
+
 ## 12. Decisions Log
 
 | Réf. | Décision | Date | Portée |
