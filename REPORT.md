@@ -497,6 +497,91 @@ souveraines ».
 
 Commit **`a33f415`**, poussé le jour même.
 
+## 11 quater. SITE-01e — zone d'intervention élargie à l'espace francophone (15/08)
+
+Le site s'arrêtait aux frontières françaises. La règle retenue sépare ce que lit un
+humain de ce que lit une machine : **prose courte dans le visible, exhaustivité dans le
+balisage**. Ni « monde entier », ni liste de pays dans la copie.
+
+### Ce qui a changé
+
+| Élément | Nature |
+|---|---|
+| Ligne de zone, section Contact | « Lyon et toute la France » → « Basé à Lyon. Interventions sur site dans toute la France, à distance dans l'espace francophone : Europe, Canada, Afrique francophone. » |
+| Paragraphe À-propos | « les PME et TPE **françaises** » → « les PME et TPE **des pays francophones** ». Reste de la phrase inchangé |
+| `areaServed` du `ProfessionalService` | objet unique `France` → **tableau de 31 `Country`** |
+| `areaServed` des 4 nœuds `Service` | **retiré** : ils héritent par `provider` |
+
+**Le nombre de nœuds ne bouge pas (8)** : `areaServed` est une propriété, pas un nœud.
+`#editos` est inchangé, il n'en portait pas.
+
+### La seule interprétation que j'ai eu à faire, et son motif
+
+La directive dit que les `Service` « héritent par `provider` — ne pas dupliquer
+`areaServed` sur chacun ». Or les quatre en portaient déjà un, à `France`. Deux
+lectures : ne pas y recopier les 31, ou ne pas leur en laisser du tout.
+
+**J'ai retenu la seconde.** Laisser `France` aurait fait dire au graphe que le cabinet
+sert 31 pays mais que chacune de ses prestations s'arrête à la France, en contradiction
+directe avec la phrase écrite juste au-dessus dans la même livraison. Une zone dupliquée
+est aussi une zone qui se désynchronise au prochain élargissement.
+
+C'est une interprétation, pas une consigne littérale. Elle se renverse en restaurant
+quatre lignes.
+
+### Porte
+
+`areaServed` : compte à **31**, type `Country` sur chaque entrée, absence de doublon, et
+**deux pays en sonde d'échantillon** (France, Sénégal). La porte **n'énumère pas** les
+31 : recopier la donnée qu'elle vérifie reviendrait à contrôler que le fichier est égal
+à lui-même.
+
+**Trois tests négatifs**, sur copie hors dépôt :
+
+```
+cas 1 — areaServed retiré
+    - ProfessionalService : propriété 'areaServed' manquante          code = 1
+cas 2 — un pays de moins (30)
+    - areaServed : 30 entrée(s), 31 attendues
+    - areaServed : « Sénégal » absent (sonde d'échantillon)           code = 1
+cas 3 — retour à un objet unique
+    - areaServed : dict, tableau de Country attendu                   code = 1
+```
+
+Le compte de 31 annoncé par la directive a été **recalculé depuis sa propre liste**
+avant d'être posé dans la porte (6 + 25, aucun doublon). Une porte calée sur un chiffre
+faux échoue sur du contenu correct.
+
+### Cohérences périphériques (§4)
+
+FAQ inchangée (7/7). **Aucune métadonnée ne disait « toute la France »** : ni `<title>`,
+ni description, ni Open Graph, ni Twitter Card. Vérifié par grep, rien aligné. Zéro
+tiret cadratin. Conventions d'apostrophe respectées par contexte, leçon SITE-01d §5.
+
+Reste à la main d'Hémerson, hors dépôt : description Google Business Profile, dernière
+phrase « Interventions dans toute la France. » → « Interventions dans toute la France
+et, à distance, dans l'espace francophone. » La **zone desservie GBP reste la France**,
+l'outil sert le référencement local français.
+
+### Une occurrence non traitée, signalée
+
+Le bandeau du héros porte toujours « Interventions dans toute la France ». Le §1 de la
+directive impose deux retouches **exactement** et interdit toute autre modification de
+copie : elle n'a donc pas été touchée. L'affirmation reste vraie — les interventions sur
+site couvrent bien toute la France — mais elle est désormais **incomplète** au regard de
+la ligne de contact. À arbitrer, hors de cette livraison.
+
+### Validation
+
+| Contrôle | Résultat |
+|---|---|
+| Portes locales | `check-jsonld.py` OK (8 nœuds, 7 Q/R), `check-leaks.sh` OK |
+| CI `validate`, run 31900821906 | **success**, 4 jobs sur 4 |
+| Lighthouse mobile | **100 / 100 / 100 / 100**, médiane de 6 runs |
+| Recette servie, 4 User-Agents dont Googlebot | 8 nœuds, 5 `Service`, 0 `Product`, `areaServed` à 31 pays, **0 `Service` portant `areaServed`**, les deux retouches présentes, FAQ 7/7, 0 tiret cadratin, 0 « monde entier », aucun pays énuméré dans le visible hors la phrase prescrite |
+
+Commit **`8cce0a8`**, poussé le jour même.
+
 ## 12. Decisions Log
 
 | Réf. | Décision | Date | Portée |
@@ -506,6 +591,7 @@ Commit **`a33f415`**, poussé le jour même.
 | **D-site-09** | **`priceRange: "Sur devis"` accepté** sur le nœud `ProfessionalService`, en réponse à l'avertissement non critique de la fiche d'établissement. C'est une donnée factuelle, pas une invention. **À appliquer après le gel**, dans le lot post-gel, pas avant. | 14/08 | JSON-LD, différé |
 | **D-site-10** | **Amendement de D2 : la porte anti-fuite distingue désormais deux familles.** Les **identifiants** — IP, hostnames internes, VMID contextuels, noms de clients — restent bloqués partout, vitrine comme blog. Les **noms de produits ou technologies publiques** — Proxmox, ZFS, RTX, EPYC, LXC — restent bloqués sur la vitrine, qui parle en capacités agrégées par choix éditorial, et deviennent **autorisés dans les sources du blog** : « nous utilisons Proxmox » est un argument de compétence, pas une fuite. Implémentation par chemin, preuve par test négatif sur les deux périmètres. | 14/08 | `check-leaks.sh`, branche `blog-01` |
 | **D-site-11** | **Cadrage projet.** Le site et le blog sont les actifs permanents de la SASU. Le dépôt Bpifrance du 11/09 est un jalon du calendrier, pas la finalité. Le gel du 28/08 au 11/09 est une fenêtre de prudence recommandée, levable sur GO explicite si une livraison est propre et recettée. **Les priorités s'arbitrent par valeur commerciale, pas par urgence administrative** — plus aucune justification « parce que BPI » dans les rapports, chaque décision se motive par sa valeur propre. | 14/08 | doctrine, permanent |
+| **D-site-14** | **Zone d'intervention = France sur site, espace francophone à distance.** Règle de forme : **prose courte et humaine dans le visible, exhaustivité dans le JSON-LD `areaServed`** (31 pays : socle Europe + Canada, plus Afrique francophone et Maghreb). **« Monde entier » est proscrit**, ainsi que toute énumération de pays dans la copie — sauf la formule courte approuvée « Europe, Canada, Afrique francophone ». `areaServed` vit sur le seul `ProfessionalService` : les `Service` d'offre héritent par `provider` et n'en portent plus, une zone dupliquée étant une zone qui se désynchronise. La porte contrôle le compte, le type et deux pays en sonde, sans réénumérer la liste. | 15/08 | JSON-LD + copie, en vigueur |
 | D-site-03 | Numéro de téléphone non publié. Délibéré, documenté, clos. Explique l'avertissement `telephone` manquant de la fiche d'établissement. | 13/08 | rappel |
 
 Sur le `FAQPage` non listé par l'outil : confirmé sans regret. La cible du balisage
