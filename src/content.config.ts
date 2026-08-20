@@ -1,18 +1,26 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// Un article rapatrié depuis LinkedIn porte deux dates :
-//   pubDate      — sa date de publication sur ce blog, qui ordonne la liste ;
-//   originalDate — la date du post LinkedIn d'origine, affichée dans l'article.
-// Les deux sont obligatoires : un article sans provenance datée serait un
-// article réécrit en silence.
+// pubDate — date de publication sur ce blog, qui ordonne la liste. Obligatoire.
+//
+// originalDate — la date du post LinkedIn d'origine, pour les seuls articles
+// RAPATRIÉS depuis LinkedIn. Le champ reste obligatoire pour eux : un article
+// repris d'ailleurs sans provenance datée serait un article réécrit en silence.
+//
+// Il est en revanche OPTIONNEL, car un article écrit pour ce blog n'a pas de
+// provenance à déclarer : c'est le teaser qui part ensuite sur LinkedIn, dans
+// l'autre sens. Lui imposer une originalDate ferait afficher « publié
+// initialement sur LinkedIn » sur un texte qui n'y a jamais paru.
+// Ces articles-là situent leur période d'exécution DANS LEUR CORPS, en clair,
+// ce qui permet de publier en octobre un retour d'expérience de juin sans que
+// la chronologie soit portée par un champ de métadonnée.
 const blog = defineCollection({
   loader: glob({ base: './src/content/blog', pattern: '**/*.md' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
-    originalDate: z.coerce.date(),
+    originalDate: z.coerce.date().optional(),
     // 'jour' quand la date exacte est connue, 'mois' quand elle est approchée.
     // Afficher un jour qu'on n'a pas vérifié serait une précision fausse.
     originalDatePrecision: z.enum(['jour', 'mois']).default('jour'),
