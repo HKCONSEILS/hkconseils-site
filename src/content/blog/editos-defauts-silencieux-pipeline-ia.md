@@ -1,7 +1,7 @@
 ---
 title: "Editos : trois défauts qu'un pipeline IA tait"
 description: "Un correcteur éditorial qui parle de lui-même dans le livrable, un GPU qui disparaît sans erreur, un total juste mais trompeur. Trois défauts silencieux d'un pipeline de correction par LLM, comment ils ont été trouvés, et la prédiction falsifiable qui a validé le correctif."
-pubDate: 2026-08-27
+pubDate: 2026-08-26
 tags: ["llm", "qualité", "observabilité", "python"]
 ---
 
