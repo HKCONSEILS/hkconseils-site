@@ -693,3 +693,77 @@ unique.
 
 Le retour d'expérience du §10 — recette sur la page servie, avec variation des
 User-Agents — est adopté comme doctrine squad pour les futurs SITE-xx.
+
+---
+
+# BLOG-02 — Cinq articles de fond, et la provenance rendue facultative
+
+**Date** : 2026-08-20. **Branche** : `blog-02-cinq-articles`, sur `50a40d7`.
+**Entrée hors des trois actées, ouverte par un GO explicite d'Hémerson.**
+
+## 1. Ce qui entre
+
+| Article | Sujet | Mots |
+|---|---|---:|
+| `haute-disponibilite-proxmox-sans-cluster` | HA par couches, sans corosync | 2 742 |
+| `agent-ia-operations-infrastructure-protocole` | protocole d'exécution d'un agent IA | 2 503 |
+| `migrer-llm-production-on-premise-cinq-minutes` | bascule d'un LLM de production | 3 058 |
+| `modules-ia-application-sante-deploiement` | deux modules IA chez un client santé | 2 545 |
+| `editos-defauts-silencieux-pipeline-ia` | trois défauts silencieux d'un pipeline IA | 1 940 |
+
+Écrits pour ce blog, à partir des rapports d'exécution réels. Chaque chiffre cité a été
+confronté à son rapport d'origine ; trois affirmations non étayées ont été corrigées
+avant rédaction (une accroche fausse, un rollback annoncé « testé » alors qu'il n'était
+que préparé, une comparaison de débits entre deux profondeurs différentes).
+
+## 2. Décision D-blog-01 — `originalDate` devient facultative
+
+Le schéma imposait `originalDate`, et le gabarit en faisait la phrase « Publié
+initialement sur LinkedIn le [date] ». Cette phrase est **fausse** pour un article né
+ici : c'est le teaser qui part ensuite sur LinkedIn, dans l'autre sens.
+
+Le champ passe donc en `.optional()`, et le bloc de provenance n'est rendu que s'il
+existe. Il reste obligatoire de fait pour les articles rapatriés, et le commentaire du
+schéma a été réécrit pour dire pourquoi la règle d'origine reste vraie pour eux.
+
+La chronologie descend **dans le corps de l'article**, en clair, sur les cinq. Cela
+permet de publier en octobre un retour d'expérience de juin sans forcer sa date de
+publication ni mentir sur sa provenance.
+
+**Contrôle de disparition, sur le HTML produit et non sur le code** : la phrase est
+absente des cinq nouveaux et **présente** sur les trois rapatriés. Le correctif ne
+devait pas seulement la supprimer là où elle est fausse, il devait la laisser là où
+elle est vraie.
+
+## 3. Ce qu'un essai préalable a rattrapé
+
+L'ensemble a d'abord été monté sur une **copie** du dépôt. `html-validate` y a fait
+échouer **quatre articles sur cinq** : `title text cannot be longer than 70 characters`.
+Cause : le gabarit accole « · HK CONSEILS », soit 14 caractères, au titre du
+frontmatter. Le budget réel est de **56**, et rien ne le signalait avant la CI.
+
+Titres raccourcis, slugs et URL inchangés. Second passage : zéro erreur.
+
+La règle est désormais dans la porte de rédaction locale, avec son budget calculé, pour
+que le prochain article ne la redécouvre pas en CI.
+
+## 4. Contrôles rejoués avant commit
+
+`npm run build` (9 pages, 8 articles) · `check-leaks.sh` (50 fichiers) ·
+`check-jsonld.py` (8 nœuds, 7 Q/R) · non-régression `public/` → `dist/` (14 fichiers à
+l'octet) · zéro JavaScript émis · une seule H1 par page · RSS et sitemap bien formés ·
+`html-validate` vitrine et blog.
+
+**Non rejouable ici** : le job Lighthouse, qui exige un navigateur sur la machine
+d'exécution. À lire au run.
+
+## 5. Deux points laissés ouverts, à l'attention du décideur
+
+**Une `pubDate` future ne diffère pas la publication.** Seul `draft` filtre, dans
+l'index, le flux et le sitemap. Fusionner cette branche publie donc les cinq articles
+d'un coup, quelles que soient les dates portées. L'échelonnement doit se faire côté
+LinkedIn, où les teasers partent après.
+
+**L'article sur le client santé** ne le nomme pas, la porte du dépôt l'interdisant.
+Il décrit toutefois le domaine avec assez de précision pour être reconnaissable par
+quelqu'un du secteur. Arbitrage non rendu.

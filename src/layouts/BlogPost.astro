@@ -6,7 +6,7 @@ interface Props {
   title: string;
   description: string;
   pubDate: Date;
-  originalDate: Date;
+  originalDate?: Date;
   tags: string[];
   originalDatePrecision: 'jour' | 'mois';
   slug: string;
@@ -18,7 +18,14 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 const fr = (d: Date) =>
   d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 const frMois = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-const origine = originalDatePrecision === 'mois' ? `en ${frMois(originalDate)}` : `le ${fr(originalDate)}`;
+// Sans originalDate, l'article est né pour ce blog : il n'a aucune provenance
+// à déclarer, et le bloc entier disparaît plutôt que d'afficher une origine
+// fausse. Sa période d'exécution est citée dans son corps.
+const origine = !originalDate
+  ? null
+  : originalDatePrecision === 'mois'
+    ? `en ${frMois(originalDate)}`
+    : `le ${fr(originalDate)}`;
 
 // Sommaire ancré sur les seuls titres de niveau 2 : au delà, il redouble le
 // texte au lieu de le résumer. En dessous de trois sections, il n'apporte rien.
@@ -57,10 +64,12 @@ const jsonld = {
         <p>{description}</p>
       </div>
 
-      <p class="origine">
-        Publié initialement sur LinkedIn {origine}. Le texte décrit
-        l'état des choses à cette date et n'a pas été actualisé depuis.
-      </p>
+      {origine && (
+        <p class="origine">
+          Publié initialement sur LinkedIn {origine}. Le texte décrit
+          l'état des choses à cette date et n'a pas été actualisé depuis.
+        </p>
+      )}
 
       {toc.length >= 3 && (
         <nav class="sommaire" aria-label="Sommaire de l'article">
