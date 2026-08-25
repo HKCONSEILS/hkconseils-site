@@ -102,6 +102,8 @@ Trois propriétés ont été vérifiées par des tests dédiés, et c'est la tro
 
 Le troisième point est la règle de conception à retenir de tout ce chantier. La traçabilité ne doit jamais pouvoir dégrader ce qu'elle trace. Un journal qui, en tombant, ferait passer une décision interdite serait pire que pas de journal du tout : il transformerait un incident de stockage en incident métier.
 
+> **Une absence de trace n'est pas une preuve d'absence de violation.** C'est la phrase qui nous a fait retirer une affirmation d'un dossier. Elle est désagréable à écrire, et c'est exactement pour ça qu'elle vaut la peine d'être écrite avant que quelqu'un d'autre ne la formule à votre place.
+
 L'instrumentation est purement additive. Aucune règle métier n'a été touchée, et les dix-neuf tests préexistants passent inchangés.
 
 Deux limites sont énoncées avec le dispositif, parce qu'elles font partie du résultat. Le journal démarre le 22 août 2026 : il ne dit **rien** de la période d'avril à août, pour laquelle seuls valent le journal applicatif et l'état du coupe-circuit. Et les lignes produites pendant la validation technique ont été écartées dans un fichier séparé, pour ne jamais être comptées comme des décisions réelles.

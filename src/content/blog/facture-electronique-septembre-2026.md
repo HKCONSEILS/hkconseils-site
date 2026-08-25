@@ -93,6 +93,8 @@ Pour la seule obligation de réception, la liste est courte, et c'est une bonne 
 
 Le quatrième point est celui qui distingue une conformité de façade d'une conformité utile. On peut être techniquement en capacité de recevoir, et continuer à ressaisir à la main.
 
+> **Être conforme et ne rien y gagner.** Recevoir un fichier structuré et continuer à le relire à l'œil, c'est passer l'obligation sans toucher le bénéfice. La date du 1er septembre décide de la conformité ; ce que vous branchez derrière décide de ce qu'elle vous rapporte.
+
 ## Ce que l'automatisation change, et dans quel sens
 
 Il faut dire une chose contre-intuitive : la facture électronique **simplifie** le travail d'extraction automatique, elle ne le complique pas.

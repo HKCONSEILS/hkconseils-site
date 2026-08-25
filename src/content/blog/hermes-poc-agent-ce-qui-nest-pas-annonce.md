@@ -69,6 +69,29 @@ Empêcher un agent de fabriquer lui-même de nouvelles compétences semblait ten
 
 Il en faut trois. Les deux autres sont deux chemins autonomes de mise à jour de la bibliothèque de compétences ; ils sont **actifs par défaut**, **absents de la configuration livrée**, et l'un d'eux est conçu pour continuer en cas d'erreur plutôt que de s'arrêter. Ne désactiver que l'option documentée aurait donné une **fausse assurance** : l'inventaire aurait pu bouger malgré un réglage explicitement posé pour l'en empêcher.
 
+Les trois, relevés dans la configuration de la machine de POC, qui tourne encore :
+
+```yaml
+skills:
+  creation_nudge_interval: 0      # le seul que la documentation mentionne
+auxiliary:
+  background_review:
+    enabled: false                # actif par defaut, et concu pour continuer en cas d'erreur
+curator:
+    enabled: false                # actif par defaut lui aussi
+```
+
+Le résultat se vérifie du dehors, sur l'inventaire lui-même :
+
+```console
+$ ls -A ~hermes/.hermes/skills/ | wc -l
+0
+$ ls -ld ~hermes/.hermes/skills/
+dr-xr-xr-x 2 root root 4096 .../skills/
+```
+
+Zéro entrée, et un répertoire que le compte de service ne peut pas écrire. Le réglage dit ce qui devrait arriver, les droits garantissent ce qui peut arriver.
+
 Détail aggravant : la commande de configuration officielle répond « clé non reconnue » sur l'option documentée, alors que le code la lit correctement. Un avertissement faux est pire qu'un silence, parce qu'il pousse à défaire un réglage juste.
 
 ### Une panne visible seulement sur le canal qu'on n'avait pas testé
@@ -86,6 +109,8 @@ L'agent portait un fichier d'identité définissant son rôle, son périmètre e
 Sur la forme, c'est une autre affaire. Le même fichier interdisait explicitement le gras et les listes à puces sur le canal de messagerie : l'agent a utilisé les deux, dans chacune de ses réponses. Et sur une consigne de préfixe applicable à tous ses messages, la tenue est **de quatre sur quatre sur le canal de messagerie, mais de deux sur cinq en ligne de commande**.
 
 La leçon est directement transposable : **une instruction de forme donnée en langage naturel n'est pas un mécanisme**. Elle est tenue souvent, pas toujours, et pas également selon le canal. Tout ce qui doit être garanti doit sortir du texte et entrer dans le code.
+
+> **Une consigne n'est pas un contrôle.** Une instruction écrite dans une invite est une suggestion adressée à un système probabiliste : elle sera suivie souvent, jamais toujours, et pas également selon le canal. Ce qui doit être garanti se déplace du texte vers le code, ou n'est pas garanti.
 
 ## Le critère partiel, et pourquoi il n'a pas été arrondi
 

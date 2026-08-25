@@ -113,6 +113,37 @@ Un jeton de veille expiré produit exactement ce que produit un service en bonne
 
 La conséquence pratique est une règle de conception, pas une bonne intention : **tout contrôle doit produire une trace, et tout contrôle qui ne produit rien doit être considéré comme absent** jusqu'à preuve du contraire.
 
+> **Un contrôle vaut par ce qu'il exerce, pas par ce qu'il affiche.** C'est la seule phrase que je garderais si je devais n'en garder qu'une des trois évaluations. Elle s'applique aux produits qu'on achète, à ceux qu'on construit, et aux tableaux de bord qui prétendent les surveiller.
+
+<figure>
+<svg viewBox="0 0 820 390" role="img" aria-label="Quatre defaillances relevees sur les trois plateformes, presentees en trois colonnes : la cause, ce que le systeme donne a voir, et ce qui se passe reellement. Un jeton de veille expire alors que le service tourne et que les collectes passent, mais la veille est morte depuis trois semaines. Un controle sans journal applique bien ses regles, mais on ne peut rien en prouver. Une passerelle tombe alors que la ligne de commande repond parfaitement, mais le seul canal des utilisateurs est en panne. Des fichiers d identite mal places ne produisent aucune erreur et sont retrouves, mais l adherence devient intermittente. Dans les quatre cas le systeme parait sain." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
+  <rect x="0" y="0" width="820" height="390" fill="var(--color-surface-sunken,#fafbfc)" rx="10"/>
+  <text x="32" y="42" font-size="15" font-weight="700" fill="var(--color-fg,#071b3b)">La meme panne, sous quatre formes</text>
+  <text x="32" y="64" font-size="12" fill="var(--color-fg-muted,#6b7280)">Dans les quatre cas : le systeme fonctionne, ne signale rien, et le resultat est faux.</text>
+  <text x="52" y="100" font-size="10.5" font-weight="700" fill="var(--color-fg-muted,#6b7280)">CE QUI ARRIVE</text>
+  <text x="300" y="100" font-size="10.5" font-weight="700" fill="var(--color-fg-muted,#6b7280)">CE QUE LE SYSTEME MONTRE</text>
+  <text x="768" y="100" font-size="10.5" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">CE QUI EST VRAI</text>
+  <rect x="32" y="118" width="756" height="46" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="52" y="146" font-size="12" font-weight="700" fill="var(--color-fg,#071b3b)">Un jeton de veille expire</text>
+  <text x="300" y="146" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">le service tourne, les collectes passent</text>
+  <text x="768" y="146" font-size="11.5" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">la veille est morte depuis trois semaines</text>
+  <rect x="32" y="172" width="756" height="46" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="52" y="200" font-size="12" font-weight="700" fill="var(--color-fg,#071b3b)">Un controle sans journal</text>
+  <text x="300" y="200" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">les regles sont bien appliquees</text>
+  <text x="768" y="200" font-size="11.5" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">on ne peut rien en prouver</text>
+  <rect x="32" y="226" width="756" height="46" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="52" y="254" font-size="12" font-weight="700" fill="var(--color-fg,#071b3b)">Une passerelle tombe</text>
+  <text x="300" y="254" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">la ligne de commande repond parfaitement</text>
+  <text x="768" y="254" font-size="11.5" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">le seul canal des utilisateurs est en panne</text>
+  <rect x="32" y="280" width="756" height="46" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="52" y="308" font-size="12" font-weight="700" fill="var(--color-fg,#071b3b)">Des fichiers d'identite mal places</text>
+  <text x="300" y="308" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">aucune erreur, ils sont retrouves</text>
+  <text x="768" y="308" font-size="11.5" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">l'adherence devient intermittente</text>
+  <text x="32" y="368" font-size="11.5" fill="var(--color-fg,#071b3b)">D ou la regle : tout controle doit produire une trace, et tout controle qui ne produit rien est tenu pour absent jusqu a preuve du contraire.</text>
+</svg>
+<figcaption>Le mode de defaillance dominant n'est pas l'erreur bruyante, c'est le silence. Aucune de ces quatre situations ne declenche d'alerte.</figcaption>
+</figure>
+
 ### Le contrôle strict est aussi un instrument de mesure
 
 Le comportement le plus important relevé pendant ces POC n'était pas cherché. C'est une liste blanche de sortie réseau qui l'a rendu visible : sans elle, l'installation de paquets à chaque démarrage aurait réussi silencieusement, et personne n'aurait su qu'un agent tirait du code à chaque réveil.
