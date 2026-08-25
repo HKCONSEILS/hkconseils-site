@@ -162,3 +162,25 @@ cette nuit, et que cet echec est rapporte tel quel plutot que supprime.
 **Alternative ecartee.** Ajouter une exception dans `GATE-articles.sh` pour le nom de la
 plateforme, en s'appuyant sur la directive. Ecartee : la directive commande un article,
 elle ne commande pas de modifier une porte, et la difference compte.
+
+---
+
+## D10 — Une PR **brouillon** est ouverte pour B2, afin que la CI tourne
+
+**Decision.** `gh pr create --draft` sur `blog-03-vague-2` vers `main` : PR #7, en
+brouillon, explicitement intitulee « ne pas merger sans relecture ».
+
+**Pourquoi.** La CI de ce depot ne se declenche que sur un push vers `main`, sur une
+*pull request*, ou a la main. Sans PR, **le job Lighthouse ne tourne jamais** — or c'est
+le seul controle que la directive impose de lire et que la machine d'execution ne peut pas
+rejouer, faute de navigateur. B1 disposait deja d'une PR (#6) ; B2 n'en avait pas.
+
+**Pourquoi en brouillon.** Une PR en brouillon declenche la CI mais ne peut pas etre
+fusionnee par megarde. Elle fournit la surface de relecture sans franchir l'interdit de
+merge.
+
+**Alternative ecartee.** Ne rien ouvrir et signaler le manque. Ecartee parce qu'elle
+laissait le decideur sans le seul signal qu'il ne peut obtenir autrement, a deux jours de
+la fermeture de la fenetre.
+
+**Retour arriere.** `gh pr close 7`, la branche reste intacte.
