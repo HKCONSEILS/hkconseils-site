@@ -1,5 +1,13 @@
 # REPORT — SITE-01 · Site vitrine HK CONSEILS
 
+> ## ⚠️ Circuit de merge en cours — BLOG-VAGUE-2 (25/08/2026)
+>
+> Deux branches attendent une relecture puis un merge **par Hemerson uniquement** :
+> **`blog-02-cinq-articles` d'abord, `blog-03-vague-2` ensuite** (la seconde contient la
+> premiere). **Fenetre : avant le 27/08 au soir**, sinon apres le 11/09 a cause du gel
+> pre-depot BPI du 28/08 au 11/09. Detail complet en fin de fichier, section
+> « REPORT — BLOG-VAGUE-2 ». Decisions autonomes : `Decisions.md`.
+
 - **Directive** : SITE-01 (Mini-ADR-01) · **Exécutant** : Claude Code · **Date** : 2026-08-13
 - **Dépôt** : `HKCONSEILS/hkconseils-site` (privé) · **Branche** : `main`
 - **Production** : `https://hkconseils.fr` — **en ligne**
@@ -767,3 +775,278 @@ LinkedIn, où les teasers partent après.
 **L'article sur le client santé** ne le nomme pas, la porte du dépôt l'interdisant.
 Il décrit toutefois le domaine avec assez de précision pour être reconnaissable par
 quelqu'un du secteur. Arbitrage non rendu.
+
+---
+---
+
+# REPORT — BLOG-VAGUE-2 · Production nocturne du 25 au 26/08/2026
+
+> ## Circuit de merge, à lire avant tout
+>
+> **Aucun merge n'a ete fait vers `main`, et aucun ne doit l'etre par l'executant.**
+> L'ordre est : **B1 d'abord (`blog-02-cinq-articles`), B2 ensuite (`blog-03-vague-2`)**,
+> par Hemerson seul, apres relecture, **avant le 27/08 au soir**. Passe cette date, le
+> gel pre-depot BPI du 28/08 au 11/09 s'applique et la fenetre est fermee jusqu'au 11/09.
+> B2 contient B1 : verifie par `git merge-base --is-ancestor`.
+
+- **Directive** : `siteweb/directives/DIRECTIVE-BLOG-VAGUE-2-20260825.md` (remplace et annule la directive D1-D2 du meme jour, jamais deposee sur disque)
+- **Executant** : Claude Code, mode nuit autonome
+- **Branches** : **B1** `blog-02-cinq-articles` @ `670e8b3` · **B2** `blog-03-vague-2`
+- **Base** : `main` @ `50a40d7`, inchangee
+
+---
+
+## 1. Statut par tache
+
+| Tache | Livrable | Statut | Mots | pubDate |
+|---|---|---|---|---|
+| **B1** | re-datage de `editos-defauts-silencieux-pipeline-ia.md` 27/08 -> 26/08 | ✅ | — | 2026-08-26 |
+| **T1** | `facture-electronique-septembre-2026.md` | ✅ **publie** | 1 261 | 2026-08-27 |
+| **T2** | `openclaw-plateforme-multi-agents-lecons.md` | ✅ **publie** | 1 338 | 2026-08-24 |
+| **T3** | `hermes-poc-agent-ce-qui-nest-pas-annonce.md` | ✅ **publie** | 1 280 | 2026-08-24 |
+| **T4** | `ironclaw-secret-absent-pas-refuse.md` | ✅ **publie** | 1 537 | 2026-08-24 |
+| **T5** | `agents-ia-on-premise-trois-architectures.md` (pilier) | ✅ **publie** | 1 353 | 2026-08-27 |
+| **T6** | 5 teasers LinkedIn, `siteweb/articles/publications/md/linkedin/teaser-{E,F,G,H,I}-*.md` | ✅ | 456 a 496 | hors depot |
+
+**Gate factuelle T3/T4 : franchie largement.** Le seuil etait de 800 mots et 5 faits
+opposables. Les deux POC ont produit des rapports d'execution complets, avec seuils ecrits
+avant mesure : 9 criteres mesures pour T3, 11 pour T4. Aucun article n'est reste en
+brouillon, le comparatif T5 est donc dans sa version pleine et non degradee.
+
+**Total de la nuit : 6 774 mots publiables, 2 328 mots de teasers.**
+Le blog passe de 8 a **13 articles publies** ; les 6 brouillons homelab sont intacts.
+
+Ordre effectif de l'index apres build (tri decroissant sur `pubDate`) : le pilier arrive
+en tete, l'article e-facture en deuxieme.
+
+---
+
+## 2. Statut par gate
+
+| Gate | Objet | Resultat |
+|---|---|---|
+| **G1a** | `scripts/check-leaks.sh` sur B2 (fichiers suivis) | ✅ **rc=0** — `OK — 55 fichiers analyses, dont 14 soumis a la famille « produits » ; aucun motif interdit` |
+| **G1b** | familles d'identite appliquees a la main aux 10 nouveaux fichiers hors depot | ✅ **10 familles a 0**, 1 exception assumee (§4, decision D1) |
+| **G1c** | `GATE-articles.sh` (porte de redaction hors depot) | ⚠️ **rc=1 — un seul motif**, `nom d'application non arbitre` sur 3 lignes. Tout le reste vert : typographie, frontmatter, ligne de chronologie, H1, budget de titre |
+| **G2** | absence de « Editeos » et du chiffre interdit | ✅ **0 sur 56 fichiers suivis + 0 sur 20 fichiers hors depot**, temoin inverse a 1 sur les deux motifs |
+| **G3** | build Astro | ✅ **rc=0** — `14 page(s) built`, dont 13 articles + l'index. Attendu 13, constate 13 |
+| **G3a** | `check-jsonld.py` | ✅ `@graph valide, 8 noeuds, 7 Q/R FAQ identiques entre le DOM et le balisage` |
+| **G3b** | non-regression `public/` -> `dist/` | ✅ **14 fichiers identiques a l'octet** |
+| **G3c** | aucun JavaScript emis | ✅ **0 fichier `.js`** dans `dist/` |
+| **G3d** | une seule H1 par page | ✅ 14 pages, une H1 chacune |
+| **G3e** | RSS et sitemap bien formes | ✅ les deux parses sans erreur |
+| **G4a** | `html-validate` vitrine (regles strictes) et blog | ✅ **rc=0** sur les deux perimetres |
+| **G4b** | titres <= 56 caracteres, **comptes** | ✅ **0 titre hors budget sur 19**. Le plus long des nouveaux : 53 (e-facture). Marge la plus faible du depot : 55 sur un article deja publie |
+| **G5** | liens internes resolus sur le build local | ✅ **11 liens inter-articles, 0 casse**, temoin inverse (cible inexistante) bien detecte |
+| **G6** | `pubDate` <= 2026-08-27, re-datage, doublons | ✅ sur les deux premiers points, **doublons declares volontaires** (§4, decision D6) |
+| **Lighthouse** | seuil mobile >= 95 | ⛔ **non rejouable ici**, aucun navigateur sur la machine. A lire au run |
+
+### Le detail de G1c, sans le masquer
+
+```
+ABORT: nom d'application non arbitre
+    blog/agents-ia-on-premise-trois-architectures.md:14
+    blog/openclaw-plateforme-multi-agents-lecons.md:2
+    blog/openclaw-plateforme-multi-agents-lecons.md:14
+GATE: ECHEC.   >>> code retour = 1
+```
+
+Ce sont les **trois seules** occurrences, et elles sont volontaires. Voir la decision D1.
+La porte du depot, celle que la directive impose de faire passer, est verte.
+
+### Risque Lighthouse, enonce
+
+Cinq pages s'ajoutent, plus longues que la moyenne. Aucune n'introduit d'image, de script
+ni de ressource externe : le controle « ressource chargee depuis un domaine externe » est a
+zero, et `dist/` ne contient aucun `.js`. Les causes habituelles de chute sont donc
+ecartees, mais le score reel ne sera connu qu'au run.
+
+---
+
+## 3. Faits utilises, par article
+
+Convention : **[M]** = mesure, avec un fichier ou une source primaire a l'appui.
+**[E]** = estimation ou declaration non mesuree. **Aucun [E] n'a ete publie.**
+
+### T1 — facture electronique
+
+| Fait | Source | |
+|---|---|---|
+| Au 01/09/2026, toute entreprise assujettie a la TVA doit pouvoir **recevoir** | economie.gouv.fr, impots.gouv.fr | [M] |
+| Emission obligatoire GE et ETI au 01/09/2026 | economie.gouv.fr | [M] |
+| Emission micro-entreprises, TPE, PME au 01/09/2027, avec donnees de transaction | economie.gouv.fr | [M] |
+| Champ : toutes tailles, tous CA, toutes formes juridiques, tous regimes, franchise comprise | economie.gouv.fr | [M] |
+| Quatre nouvelles mentions obligatoires au 01/09/2026 | economie.gouv.fr | [M] |
+| Formats : UBL, CII, ou format mixte donnees structurees + image | impots.gouv.fr | [M] |
+| PDF ordinaire, scan et envoi par courriel **non conformes** | impots.gouv.fr | [M] |
+| Plateforme agreee = entreprise privee immatriculee par l'Etat | impots.gouv.fr | [M] |
+| 101 premieres plateformes agreees publiees en janvier | economie.gouv.fr | [M] |
+| Annuaire ouvert depuis septembre 2025, indique la plateforme de chaque entite | economie.gouv.fr | [M] |
+| Plateforme de reference du secteur public maintenue a partir de 2026 | impots.gouv.fr | [M] |
+
+Le point d'ancrage interne fourni par la directive (une ligne de cadrage marche dans
+`infra-backup-new/openclaw/docs/openclaw-masterplan-v3_10_32.html`) a ete **re-verifie et
+confirme** par les sources primaires ci-dessus, qui seules sont citees dans l'article.
+
+### T2 — plateforme multi-agents
+
+| Fait | Source | |
+|---|---|---|
+| Sept phases P0 a P6, intitules et sequencement | `infra-backup-new/openclaw/docs/openclaw-masterplan-v3_10_32.html` | [M] |
+| **P0 finalise, P1 complet**, soit 2 phases sur 7 | idem | [M] |
+| Veille : 4 collectes par jour a 00h, 06h, 12h, 18h | `homelab/docs/openclaw-masterplan-v3_10_28.html` | [M] |
+| Veille : 3 syntheses par semaine, lundi, mercredi, vendredi 8h | idem | [M] |
+| 11 depots suivis, plus les registres de paquets | idem | [M] |
+| Jeton d'acces en lecture seule, portee restreinte | idem | [M] |
+| Auto-surveillance du jeton **a chaque collecte**, avec alerte | idem | [M] |
+| Composant de controle : 221 lignes, regles constantes non modifiables par invite | `chantierG/G-RUN-20260822-132924/BPI_ENFORCEMENT_NOTE.md` | [M] |
+| Regles couvertes : sens unique, stop-loss et take-profit obligatoires, plafond de perte, taille de position, tresorerie residuelle, seuil de confiance | idem | [M] |
+| 19 tests fonctionnels passants | idem | [M] |
+| Journal applicatif du 09/04 au 22/08, 57 082 lignes, un refus explicite et date | idem | [M] |
+| Coupe-circuit tenant 3 strategies en pause, horodatage de reprise par strategie | idem | [M] |
+| Journal de decisions par ligne depuis le 22/08/2026, 6 champs | idem | [M] |
+| Trois proprietes testees, dont « une panne d'ecriture ne modifie ni le verdict ni les violations » | idem | [M] |
+| Formule « zero violation depuis avril » **retiree** car invérifiable | idem | [M] |
+| Instrumentation additive, 19 tests preexistants inchanges | idem | [M] |
+| Structure du pipeline : analystes paralleles, debat contradictoire, decideur, trois perspectives de risque, arbitrage de portefeuille | `…masterplan-v3_10_32.html` | [M] |
+
+### T3 — agent conversationnel Python
+
+Source unique : `chantierH/H-RUN-20260822-211451/RAPPORT_FINAL.md`. Tous les faits sont [M].
+
+| Fait | |
+|---|---|
+| 9 criteres, seuils ecrits avant mesure : 8 tenus, 1 partiel, 0 echec | [M] |
+| Service actif 17 s apres demarrage machine, seuil 60 s | [M] |
+| Latence : premiere mesure a 22,6 s **ecartee** avec sa raison ; 14,0 s a froid, 7,4 s a chaud, seuil 15 s | [M] |
+| Memoire : 2 faits sur 2 restitues apres redemarrage | [M] |
+| Tache planifiee a +5 min delivree | [M] |
+| Aucune competence auto-creee | [M] |
+| Sous-agent delegue, resultat rendu en 29,2 s | [M] |
+| Charge : 130 Mo au repos, 139 Mo en generation, pic 209 % d'un coeur | [M] |
+| Installation de 2 paquets **a chaque lancement** ; ~100 s de delais d'expiration et 192 paquets rejetes ; demarrage 102 s -> 4,9 s apres neutralisation | [M] |
+| Trois reglages necessaires la ou la documentation en annonce un ; deux actifs par defaut, absents de la configuration livree | [M] |
+| Avertissement faux de la commande de configuration sur une cle que le code lit | [M] |
+| Panne visible uniquement sur le canal de messagerie, ligne de commande fonctionnelle | [M] |
+| Adherence : refus hors perimetre conforme, 2 interdictions citees ; gras et listes utilises malgre l'interdiction ; prefixe 4/4 sur un canal, 2/5 sur l'autre | [M] |
+| Sortie reseau : 0 paquet de l'agent, 16 paquets du runtime non declares | [M] |
+
+### T4 — runtime Rust
+
+Source unique : `chantierI/I-RUN-20260823-005800/RAPPORT_FINAL.md`. Tous les faits sont [M].
+
+| Fait | |
+|---|---|
+| 11 criteres : 7 reussis, 1 en forme forte, 1 partiel, 2 echoues | [M] |
+| Latence ~22 s par tour sur 10 mesures, seuil 15 s : **echec assume** | [M] |
+| Restriction d'outillage : invite de 52 700 a 13 435 jetons, soit -74 %, pour 1 s de gain | [M] |
+| Adherence : prefixe 3/3 puis 0/1 ; script de 200 lignes produit hors perimetre | [M] |
+| Le script a ete **affiche, jamais ecrit** : outil d'ecriture desactive | [M] |
+| Secrets : 7 variables banales dans le processus d'outillage, aucune des 4 secretes du service | [M] |
+| Fichier de secrets lisible hors du produit avec le meme compte, **non lisible au travers** | [M] |
+| Chemin de lecture construit par l'agent lui-meme, pour que la question n'explique pas le resultat | [M] |
+| Liste blanche applicative : cible non declaree 0 connexion, cible declaree 1 connexion (temoin du harnais) | [M] |
+| Garde anti-SSRF actif par defaut, applique **apres** resolution de nom | [M] |
+| Bac a sable WebAssembly : 3 temoins inverses, dont une boucle interrompue en ~12,7 ms | [M] |
+| Aucune installation, aucun paquet emis au premier demarrage ; 32 competences depaquetees du binaire | [M] |
+| Telemetrie presente mais en adhesion volontaire, desactivee, 0 enveloppe emise | [M] |
+| Charge : ~193 Mo, pic 18 % d'un coeur, plus ~102 Mo de base de donnees | [M] |
+| 51 portes d'approbation neutralisees par un reglage global actif a l'installation | [M] |
+| 4 fichiers d'identite injectes a chaque tour ; sous profil base, la documentation indique le mauvais emplacement | [M] |
+| Aucune voie operateur pour ecrire l'identite : ecriture par l'agent seul, donc ni versionnable ni relisible | [M] |
+| Ligne 1.x jeune : premiere version majeure fin juillet, 3 mineures en 23 jours | [M] |
+| **Aucun audit de securite independant n'existe** — mention exigee, reprise dans l'article | [M] |
+
+### T5 — comparatif
+
+Aucun fait nouveau. Il croise T2, T3 et T4, plus le tableau croise a trois colonnes de
+`chantierI/I-RUN-20260823-005800/RAPPORT_FINAL.md` §5. La **reserve de methode** de ce
+meme paragraphe (canaux differents entre les deux POC) est reprise telle quelle dans
+l'article, plutot que lissee.
+
+---
+
+## 4. Balayages de matiere, et preuve de couverture
+
+Methode reprise de `AUDIT-BLOG-01.md` §6 : liste de fichiers construite d'abord, comptee,
+puis interrogee ; et un temoin positif avant toute conclusion sur une absence.
+
+| Motif | Fichiers touches, hors outillage | Verdict |
+|---|---|---|
+| runtime Rust evalue | 33 | matiere abondante, **T4 ecrit** |
+| agent Python evalue | 57 | matiere abondante, **T3 ecrit** |
+| plateforme interne | 195 | matiere abondante, **T2 ecrit** |
+| registre d'annonces legales | **4**, dont la directive elle-meme et une trace de session | **matiere insuffisante, fait abandonne** |
+
+**Chemins retenus.** T3 : `chantierH/H-RUN-20260822-211451/` (rapport final, rapport des
+phases 1 a 4, decisions). T4 : `chantierI/I-RUN-20260823-005800/` (rapport final, rapports
+de phase, runbook d'identite). T2 : `infra-backup-new/openclaw/` (plan directeur, rapports)
+et `chantierG/G-RUN-20260822-132924/` (note d'enforcement).
+
+**Preuve de couverture.** Le balayage etroit, sur six extensions de texte, a d'abord rendu
+**zero** sur le registre d'annonces legales. Ce zero etait **faux** : un balayage elargi a
+toutes les extensions a trouve deux fichiers de flux d'automatisation en `.json`. Le
+temoin positif du meme balayage elargi renvoyait 51 fichiers sur un motif connu present,
+ce qui prouve que l'outil voyait. **C'est l'elargissement, pas le temoin, qui a corrige
+l'erreur** : un temoin positif prouve que le harnais fonctionne, il ne prouve pas que le
+perimetre est le bon.
+
+Les deux fichiers trouves datent d'aout 2025, interrogent une API publique differente de
+celle annoncee et deposent dans un tableur en ligne. **Aucun journal d'execution, aucun
+comptage, aucune date de run.** Le chiffre de 7 000 entreprises par departement n'est
+donc etaye par rien sur cette machine : il n'est pas publie, et il ne figure pas non plus
+sous une forme attenuee.
+
+---
+
+## 5. Liens externes proposes
+
+Tous dans T1, tous vers des sources primaires de l'administration. **A valider au merge.**
+Aucun n'est present dans les quatre autres articles.
+
+| Lien | Justification |
+|---|---|
+| `economie.gouv.fr` — page « Tout savoir sur la facturation electronique pour les entreprises » | calendrier, champ d'application, nouvelles mentions |
+| `impots.gouv.fr` — page « Je decouvre la facturation electronique » | formats acceptes, non-conformite du PDF ordinaire, definition de la plateforme agreee |
+| `economie.gouv.fr` — actualite sur l'ouverture de l'annuaire | date d'ouverture et role de l'annuaire |
+| `economie.gouv.fr` — actualite sur la liste des 101 premieres plateformes agreees | chiffre et date de publication |
+
+> **Etat actuel : les liens ne sont PAS poses dans l'article.** Le texte cite les faits et
+> nomme les sources en clair (« l'administration fiscale ») sans hyperlien. C'est la
+> position conservatrice retenue en mode nuit : la directive demande que chaque lien
+> externe soit valide par Hemerson au merge, et un lien pose est plus difficile a retirer
+> qu'a ajouter. **Action attendue** : valider les quatre URL ci-dessus, puis les poser.
+
+---
+
+## 6. Decisions autonomes
+
+Detaillees, avec l'alternative ecartee, dans `Decisions.md` a la racine du depot.
+Resume : neuf decisions, dont une seule change ce qui sera publiquement visible (D1, le
+nom de la plateforme interne et son slug d'URL).
+
+---
+
+## 7. Questions for squad
+
+1. **Nommer la plateforme interne, oui ou non — et jusque dans l'URL ?** La directive la
+   nomme dans ses livrables et dans l'intitule de T2, donc l'article la nomme. Consequence
+   non triviale : le slug public devient `/blog/openclaw-plateforme-multi-agents-lecons/`.
+   La porte de redaction locale, elle, bloque toujours ce nom. Recette de retrait dans
+   `Decisions.md` D1. **A confirmer explicitement.**
+2. **Le decompte des agents du pipeline.** Deux enumerations coexistent dans le plan
+   directeur et **ne se reconcilient pas** : l'une annonce treize agents mais en detaille
+   quatorze, l'autre decrit quatre analystes la ou la premiere en compte cinq. Aucun code
+   source n'est present sur cette machine pour trancher. **Aucun decompte n'a donc ete
+   publie**, seule la structure l'a ete. Une enumeration faisant autorite serait utile.
+3. **Le registre d'annonces legales.** Le fait fourni est sans source verifiable ici
+   (§4). Fournir un journal de run, ou retirer le fait de l'argumentaire.
+4. **Le comparatif d'embeddings.** Aucun rapport de banc n'existe sur cette machine : la
+   seule trace est la dimension du modele en service. Aucune comparaison n'a ete publiee,
+   pas meme qualitative, faute de pouvoir la sourcer.
+5. **Lighthouse.** Non rejouable ici. A lire au run avant merge.
+6. **Trois visuels en reliquat**, inchange depuis le rapport du 20/08 : ils ne sont pas
+   integres (§ decision D5).
+7. **Reste ouvert depuis le 20/08** : l'article sur les modules IA en sante decrit son
+   domaine avec assez de precision pour etre reconnaissable dans le secteur, sans nommer
+   le client. Arbitrage toujours non rendu, et il porte sur B1, donc sur le premier merge.
