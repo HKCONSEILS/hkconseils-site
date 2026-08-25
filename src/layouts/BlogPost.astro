@@ -218,5 +218,45 @@ const jsonld = {
   }
   .prose :global(td) { border-bottom: 1px solid var(--color-border); padding: 10px 12px 10px 0; }
   .prose :global(td) { font-variant-numeric: tabular-nums; }
+
+  /* Fenetre de terminal. Le <pre> porte deja le navy de la marque : il ne
+     manquait qu'un cadre et une barre de titre pour donner a un extrait reel
+     l'allure d'une capture, sans en etre une. CSS pur, aucun JavaScript.
+     Les pastilles restent dans la palette : trois disques blancs a faible
+     opacite, et non le rouge, jaune, vert d'usage, qui introduirait trois
+     teintes hors charte. */
+  .prose :global(figure.terminal) {
+    margin: 0 0 var(--space-3);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-border-on-dark);
+  }
+  .prose :global(figure.terminal figcaption) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--hk-navy-950);
+    color: var(--color-fg-muted-on-dark);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-wide);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-border-on-dark);
+  }
+  .prose :global(figure.terminal figcaption::before) {
+    content: "";
+    flex: 0 0 auto;
+    width: 40px;
+    height: 9px;
+    background:
+      radial-gradient(circle 4.5px at 4.5px 4.5px, rgba(255, 255, 255, 0.34) 98%, transparent 100%),
+      radial-gradient(circle 4.5px at 20px 4.5px, rgba(255, 255, 255, 0.34) 98%, transparent 100%),
+      radial-gradient(circle 4.5px at 35.5px 4.5px, rgba(255, 255, 255, 0.34) 98%, transparent 100%);
+  }
+  .prose :global(figure.terminal pre) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
   .article-retour { margin-top: var(--space-8); font-size: var(--text-small); }
 </style>

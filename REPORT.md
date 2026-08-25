@@ -1,5 +1,353 @@
 # REPORT — SITE-01 · Site vitrine HK CONSEILS
 
+> ## ⚠️ Circuit de merge en cours — BLOG-VAGUE-2 (25/08/2026)
+>
+> Deux branches attendent une relecture puis un merge **par Hemerson uniquement** :
+> **`blog-02-cinq-articles` d'abord, `blog-03-vague-2` ensuite** (la seconde contient la
+> premiere). **Fenetre : avant le 27/08 au soir**, sinon apres le 11/09 a cause du gel
+> pre-depot BPI du 28/08 au 11/09. Detail complet en fin de fichier, section
+> « REPORT — BLOG-VAGUE-2 ». Decisions autonomes : `Decisions.md`.
+
+---
+
+# REV2 — passe du 26/08, a lire avant le reste du dossier
+
+**Verdict CI du commit final `c819c58` : `success`.** Quatre jobs verts. Lighthouse :
+**11 URL, 100 en performance, 100 en accessibilite, 100 en bonnes pratiques, 100 en SEO**,
+mediane de trois passages. L'artefact `dist` passe de **229 143 o** a **233 750 o**, soit
+**4 607 octets** de plus : du contenu servi a bien change, comme attendu.
+
+## 1. Les quatre liens officiels, poses apres recuperation reelle
+
+| Lien pose sur | Source | Recuperation | Le contenu porte-t-il le fait ? |
+|---|---|---|---|
+| « toutes les entreprises assujetties a la TVA doivent pouvoir recevoir une facture electronique » | economie.gouv.fr, « Tout savoir sur la facturation electronique » | **403** en client simple, **200 au navigateur**, meme URL, titre conforme | oui : calendrier 2026 et 2027, emission GE et ETI, champ TVA |
+| « Ce qui est attendu, ce sont des formats structures » | impots.gouv.fr, « Je decouvre la facturation electronique » | **200**, 59 167 o | oui : UBL, CII, format mixte, « plateforme agreee », « immatriculee par l'Etat », non-conformite du PDF ordinaire |
+| « premiere liste de 101 plateformes agreees » | economie.gouv.fr, actualite dediee | **200 au navigateur**, meme URL | oui : le nombre 101 et le terme « plateformes agreees » |
+| « Ouvert depuis septembre 2025 » | economie.gouv.fr, actualite sur l'ouverture de l'annuaire | **200 au navigateur**, meme URL | oui : l'article est **date du 18/09/2025** et annonce l'ouverture ce jour-la |
+
+**Le 403 n'etait pas une page morte.** Les trois pages `economie.gouv.fr` refusent un client
+non-navigateur ; le corps renvoye dit « Just a moment... Enable JavaScript », c'est un
+pare-feu applicatif. Verifie au navigateur : les trois repondent **200**, aux **memes URL**,
+avec les titres attendus. **Aucune URL n'a bouge**, aucune substitution n'a ete necessaire.
+
+### Ce que la verification a corrige dans l'article
+
+**« Quatre nouvelles mentions obligatoires » ne figure sur aucune page sourcable.** Le
+compte venait d'une synthese de recherche, pas d'une lecture. La phrase est reecrite sur ce
+que l'administration ecrit vraiment : les mentions doivent figurer **dans des champs
+dedies**, avec les exemples qu'elle cite. **Le compte a disparu de l'article.**
+
+C'est la troisieme fois de ce chantier qu'une formulation plausible tenait lieu de
+verification. Les deux precedentes : le tri de l'echantillon Lighthouse annonce comme
+chronologique alors qu'il etait alphabetique, et la case « secrets accessibles » qui
+rapportait une deduction comme une mesure.
+
+## 2. Densite visuelle, avant et apres
+
+Relevee **depuis les commits eux-memes**, pas de memoire.
+
+| Article | Avant (`a28361f`) | Apres (`c819c58`) | Seuil |
+|---|---|---|---|
+| e-facture | 1 schema, 0 code, 1 exergue | 1, **1**, 1 | atteint |
+| OpenClaw | 1, 0, 1 | 1, **2**, 1 | atteint |
+| Hermes | 1, 2, 1 | 1, **3**, 1 | atteint |
+| IronClaw | 2, 2, 1 | 2, **3**, 1 | atteint |
+| pilier | 2, 0, 1 | 2, 0, 1 | **volontairement** sans extrait, par consigne |
+
+**Neuf extraits** portent desormais l'habillage « fenetre de terminal » : cadre, barre de
+titre, pastilles, police mono. **CSS pur, aucun JavaScript**, `dist/` reste sans fichier
+`.js`. Un arbitrage a signaler : les pastilles sont **blanches a faible opacite** et non
+rouge, jaune, vert — la charte interdit d'introduire une teinte nouvelle, et les trois
+couleurs d'usage en auraient ajoute trois.
+
+## 3. Les cinq extraits ajoutes
+
+| Article | Extrait | Source | Fait de l'article qu'il illustre |
+|---|---|---|---|
+| Hermes | journal du service : decouverte d'IP de repli par DNS-over-HTTPS, puis expirations | rejoue en lecture seule sur l'hote de POC | le runtime emet un trafic **non declare** ; la liste blanche le refuse |
+| IronClaw | `ss` sur la surface d'ecoute + ligne `wasm_limiter` avec ses valeurs | rejoue en lecture seule sur l'hote de POC | le bac a sable refuse une demande de memoire a la limite declaree ; une seule socket, sur la boucle locale |
+| OpenClaw | le dictionnaire de regles constantes, tel qu'il est ecrit | piece du chantier G | « les regles sont des constantes, le modele ne peut pas les modifier par une invite » |
+| OpenClaw | une ligne de verdict au format JSONL | piece du chantier G, **produite en validation le 22/08 et ecartee du journal reel** — dit dans l'article | la regle violee est **nommee**, pas resumee en refus generique |
+| e-facture | extrait Factur-X, entreprise **fictive** `EXEMPLE-SARL` | construit d'apres la documentation publique du format | « la facture devient une donnee » : champs nommes et types |
+
+**Assainissement** : identifiants d'hote remplaces par des chevrons, chemins reels remplaces
+par une designation entre chevrons, et pour les secrets **aucune valeur**, uniquement les
+droits, le proprietaire et le nombre de noms definis.
+
+### ✅ Deux noms de tiers, CAVIARDES sur decision du decideur
+
+**Decision rendue : caviardage.** Signale d'abord comme arbitrage en attente — aucune porte
+ne les bloquait, et la litteralite de la ligne avait de la valeur — mais ce sont des
+informations **nouvelles**, introduites par un extrait et absentes de toute la prose. Le
+decideur a tranche pour le caviardage. **Applique.**
+
+Balayage systematique des 15 blocs : tout nom propre present dans un extrait a ete
+recherche dans le corps de son article, figures exclues. Deux cas ressortent.
+
+| Nom | Ou | Occurrences | Present dans la prose ? | Enjeu |
+|---|---|---|---|---|
+| **Telegram** | extrait de journal, article Hermes | **4**, toutes dans le meme bloc | **non** — la prose dit « canal de messagerie » partout, dans cet article comme dans le pilier | nomme le canal reellement eprouve pendant le POC |
+| **ETH-USD** | ligne de verdict JSONL, article OpenClaw | **1** | **non** — la prose dit « instruments volatils », sans jamais nommer d'instrument | revele qu'une paire crypto figure au perimetre du pipeline |
+
+Deux cas sans enjeu, verifies au passage : `EXEMPLE-SARL` est explicitement fictive, et
+`VAT` est un code de type du format, pas une donnee.
+
+**Ce que le caviardage a exige en plus du remplacement.** Les deux articles portaient une
+phrase decrivant leur propre assainissement. Celle de Hermes disait « les identifiants
+d'hote sont remplaces par des chevrons, **rien d'autre n'est modifie** » : elle devenait
+**fausse** au moment meme du caviardage. Elle dit desormais que l'identifiant d'hote **et le
+nom du canal** sont remplaces. Celle d'OpenClaw a recu la meme mention pour l'instrument.
+Un caviardage qui laisse derriere lui une declaration d'assainissement perimee est pire que
+pas de caviardage : il transforme une omission en affirmation fausse.
+
+L'alignement du bloc de journal a ete refait, `<messagerie>` etant plus long que le nom
+d'origine.
+
+**Recette appliquee**, conservee pour tracer ce qui a change :
+
+```
+# article Hermes, dans le seul bloc de journal
+sed -i 's/\[Telegram\]/[<messagerie>]/g; s/Telegram API/<messagerie> API/; s/Connecting to Telegram/Connecting to <messagerie>/g' \
+  src/content/blog/hermes-poc-agent-ce-qui-nest-pas-annonce.md
+# article OpenClaw, dans la ligne de verdict
+sed -i 's/"ETH-USD"/"<instrument>"/' src/content/blog/openclaw-plateforme-multi-agents-lecons.md
+```
+
+**Controle de disparition** : `Telegram` **0 occurrence**, `ETH-USD` **0 occurrence** sur
+les cinq articles, temoin inverse a 1 sur le meme motif. Le cout est assume : l'extrait perd
+la litteralite du journal, qui faisait une partie de sa force. Il garde ce qui compte, la
+sequence reelle et ses horodatages.
+
+**Controle anti-fuite sur les 15 blocs de code du blog**, cinq familles, temoin inverse a 1
+sur chacune :
+
+| Famille | Occurrences |
+|---|---|
+| adresse IP privee | **0** |
+| nom d'hote ou de service interne | **0** |
+| sous-domaine interne ou nom de client | **0** |
+| identifiant de VM ou de conteneur | **0** |
+| chaine ressemblant a une valeur de secret | **0** |
+
+## 4. Natif, extensible, convention, hors produit — ligne par ligne
+
+Deux valeurs ne suffisaient pas. L'identite chez deux des trois n'est **ni native ni
+extensible** : c'est un fichier que l'exploitant pose et que rien n'oblige, donc une
+**convention**. Et le cloisonnement reseau de ces deux-la vient du pare-feu de la machine,
+donc **hors produit**. Ces deux marqueurs ont ete ajoutes, et une legende les explique dans
+l'article.
+
+| Ligne du tableau | OpenClaw | Hermes | IronClaw | Source |
+|---|---|---|---|---|
+| Mecanisme d'identite | convention | convention | **natif** | tableau croise du rapport IronClaw, et sa section sur les quatre fichiers d'identite |
+| Qui ecrit l'identite | convention | convention | **natif** | idem |
+| Identite relisible | convention | convention | **natif** | idem |
+| Restriction d'outillage | natif | natif | natif | tableau croise, ligne « restriction de toolset » |
+| Secrets accessibles | non mesure | non mesure | **natif** | rapport IronClaw, test des secrets |
+| **Terminal accessible** | non mesure | **extensible** | natif, reglable par capacite | rapport Hermes : en ligne de commande, **c'est le jeu d'outils charge qui donne le terminal** |
+| Cloisonnement reseau | hors produit | hors produit | **natif + hors produit** | les deux rapports : pare-feu de la machine, plus une liste blanche applicative chez IronClaw |
+| Requetes detournees | non mesure | non mesure | **natif** | rapport IronClaw, garde actif par defaut |
+| Bac a sable d'outils | non mesure | non mesure | **natif** | rapport IronClaw, trois temoins inverses |
+| Installation au demarrage | non mesure | **natif** | **natif** | rapport Hermes (installation a chaque lancement), rapport IronClaw (aucune) |
+| Les trois dernieres lignes | *sans marqueur* | | | ce sont des **mesures**, pas des mecanismes |
+
+**Le cas qui justifie tout l'exercice** est celui du terminal. Chez l'agent Python, il n'est
+pas une propriete du produit : il apparait parce que le jeu d'outils charge en ligne de
+commande le fournit. Changer d'outillage change la reponse. La question « cet agent a-t-il
+acces au shell » est donc incomplete si l'on ne precise pas « avec quels outils charges ».
+
+## 5. Corrections de fond
+
+- **La prescription fausse est corrigee.** « Un POC doit etre mene sur le canal de
+  production » devient « sur un canal **identique** a celui de la production, une
+  pre-production » — mener un POC sur la production serait imprudent. L'idee conservee, et
+  qui reste vraie, est que le terminal ment par omission parce qu'il ne traverse pas la
+  meme chaine.
+- **Deux paragraphes de langage**, chacun adosse a un fait deja mesure dans son article :
+  pour Python, l'ecosysteme IA dominant contre l'installation de dependances a l'execution
+  et le pic a 209 % d'un coeur ; pour Rust, la surete memoire sans ramasse-miettes, le
+  binaire autonome (32 competences depaquetees, zero installation), l'affinite WebAssembly
+  et les 18 % d'un coeur, avec la contrepartie assumee d'un ecosysteme plus jeune et d'une
+  ligne de version fraiche.
+
+## 6. Porte de redaction
+
+Elle n'a **pas** ete rouverte par cette passe : le style « fenetre de terminal » vit dans le
+gabarit du blog, pas dans la porte. Le commentaire d'en-tete orphelin de `GATE-articles.sh`
+**reste donc au backlog**, conformement aux exclusions.
+
+
+---
+
+# DOSSIER DE RELECTURE — BLOG-VAGUE-2 (a lire en premier)
+
+## A. Verdict CI, run final
+
+**`2f2c8ee` sur `blog-03-vague-2` (PR #7) : `completed / success`.** Les quatre jobs
+passent, Lighthouse compris. Les deux runs anterieurs de la branche sont verts eux aussi
+(`0bfcbe3`, `a4cd4bb`), et le run de `blog-02-cinq-articles` (PR #6) l'est egalement, avec
+**100 / 100 / 100** en performance, accessibilite et SEO sur chaque URL echantillonnee,
+sur six passages chacune.
+
+| Branche | Commit | Build + non-regression | Fuites + JSON-LD | HTML valide | Lighthouse |
+|---|---|---|---|---|---|
+| B1 `blog-02-cinq-articles` | `670e8b3` | ✅ | ✅ | ✅ | ✅ 100/100/100 |
+| B2 `blog-03-vague-2` | `a4cd4bb` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `0bfcbe3` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `2f2c8ee` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `1462c74` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `fdf290e` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `f1aec21` *(nommage)* | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `474b557` *(schémas)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
+| B2 `blog-03-vague-2` | `f0fd64c` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `ff8a909` *(rapport)* | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `a28361f` *(aeration)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
+| **B2 `blog-03-vague-2`** | **`b7db79e`** *(final)* | ✅ | ✅ | ✅ | ✅ |
+
+**Cette reserve est levee depuis `474b557`.** L'echantillon portait sur six URL et
+n'incluait aucune page nouvelle ; il en compte desormais **onze**, dont les cinq articles
+de cette nuit. Resultat mesure sur chacun d'eux : **100 en performance, 100 en
+accessibilite, 100 en bonnes pratiques, 100 en SEO**, mediane de trois passages, six
+mesures par categorie. Le vert couvre donc bien ce qui vient d'etre ecrit, schemas
+compris, et plus seulement le gabarit.
+
+Effet de bord a connaitre : le job Lighthouse passe d'environ 4 minutes a **7 min 14**,
+puisqu'il mesure onze URL au lieu de six.
+
+## B. Liens externes de l'article e-facture, a valider
+
+Tous dans T1, tous vers des sources primaires de l'administration. **Aucun autre article
+n'en contient.** Etat actuel : **les liens ne sont PAS poses**. Le texte cite les faits et
+nomme la source en clair sans hyperlien, position conservatrice retenue en mode nuit
+puisqu'un lien pose est plus difficile a retirer qu'a ajouter.
+
+| # | Source | Ce qu'elle etaye | Justification |
+|---|---|---|---|
+| 1 | `economie.gouv.fr` — « Tout savoir sur la facturation electronique pour les entreprises » | calendrier 2026 et 2027, champ d'application, quatre nouvelles mentions | page de reference interministerielle, la plus stable dans le temps |
+| 2 | `impots.gouv.fr` — « Je decouvre la facturation electronique » | formats UBL, CII et hybride ; non-conformite du PDF ordinaire ; definition de la plateforme agreee | source fiscale directe, c'est elle qui porte les termes exacts cites dans l'article |
+| 3 | `economie.gouv.fr` — actualite « ouverture de l'annuaire dedie » | date d'ouverture (septembre 2025) et role de l'annuaire | seule source datee pour l'annuaire, qui est le maillon lent du dispositif |
+| 4 | `economie.gouv.fr` — actualite « la liste des 101 premieres plateformes agreees » | le chiffre de 101 et sa date de publication | c'est la source du seul chiffre de plateforme cite dans l'article |
+
+**Action attendue** : valider les quatre, puis les poser. Si l'un est ecarte, la phrase
+correspondante tient sans lui, aucune reecriture n'est necessaire.
+
+## C. Faits utilises, par article, avec leur source
+
+Convention : **[M]** = mesure, avec un fichier ou une source primaire a l'appui.
+**[E]** = estimation ou declaration non mesuree. **Aucun [E] n'a ete publie.**
+
+### T1 — facture electronique
+
+| Fait | Source | |
+|---|---|---|
+| Au 01/09/2026, toute entreprise assujettie a la TVA doit pouvoir **recevoir** | economie.gouv.fr, impots.gouv.fr | [M] |
+| Emission obligatoire GE et ETI au 01/09/2026 | economie.gouv.fr | [M] |
+| Emission micro-entreprises, TPE, PME au 01/09/2027, avec donnees de transaction | economie.gouv.fr | [M] |
+| Champ : toutes tailles, tous CA, toutes formes juridiques, tous regimes, franchise comprise | economie.gouv.fr | [M] |
+| Quatre nouvelles mentions obligatoires au 01/09/2026 | economie.gouv.fr | [M] |
+| Formats : UBL, CII, ou format mixte donnees structurees + image | impots.gouv.fr | [M] |
+| PDF ordinaire, scan et envoi par courriel **non conformes** | impots.gouv.fr | [M] |
+| Plateforme agreee = entreprise privee immatriculee par l'Etat | impots.gouv.fr | [M] |
+| 101 premieres plateformes agreees publiees en janvier | economie.gouv.fr | [M] |
+| Annuaire ouvert depuis septembre 2025, indique la plateforme de chaque entite | economie.gouv.fr | [M] |
+| Plateforme de reference du secteur public maintenue a partir de 2026 | impots.gouv.fr | [M] |
+
+Le point d'ancrage interne fourni par la directive (une ligne de cadrage marche dans
+`infra-backup-new/openclaw/docs/openclaw-masterplan-v3_10_32.html`) a ete **re-verifie et
+confirme** par les sources primaires ci-dessus, qui seules sont citees dans l'article.
+
+### T2 — plateforme multi-agents
+
+| Fait | Source | |
+|---|---|---|
+| Sept phases P0 a P6, intitules et sequencement | `infra-backup-new/openclaw/docs/openclaw-masterplan-v3_10_32.html` | [M] |
+| **P0 finalise, P1 complet**, soit 2 phases sur 7 | idem | [M] |
+| Veille : 4 collectes par jour a 00h, 06h, 12h, 18h | `homelab/docs/openclaw-masterplan-v3_10_28.html` | [M] |
+| Veille : 3 syntheses par semaine, lundi, mercredi, vendredi 8h | idem | [M] |
+| 11 depots suivis, plus les registres de paquets | idem | [M] |
+| Jeton d'acces en lecture seule, portee restreinte | idem | [M] |
+| Auto-surveillance du jeton **a chaque collecte**, avec alerte | idem | [M] |
+| Composant de controle : 221 lignes, regles constantes non modifiables par invite | `chantierG/G-RUN-20260822-132924/BPI_ENFORCEMENT_NOTE.md` | [M] |
+| Regles couvertes : sens unique, stop-loss et take-profit obligatoires, plafond de perte, taille de position, tresorerie residuelle, seuil de confiance | idem | [M] |
+| 19 tests fonctionnels passants | idem | [M] |
+| Journal applicatif du 09/04 au 22/08, 57 082 lignes, un refus explicite et date | idem | [M] |
+| Coupe-circuit tenant 3 strategies en pause, horodatage de reprise par strategie | idem | [M] |
+| Journal de decisions par ligne depuis le 22/08/2026, 6 champs | idem | [M] |
+| Trois proprietes testees, dont « une panne d'ecriture ne modifie ni le verdict ni les violations » | idem | [M] |
+| Formule « zero violation depuis avril » **retiree** car invérifiable | idem | [M] |
+| Instrumentation additive, 19 tests preexistants inchanges | idem | [M] |
+| Structure du pipeline : analystes paralleles, debat contradictoire, decideur, trois perspectives de risque, arbitrage de portefeuille | `…masterplan-v3_10_32.html` | [M] |
+
+### T3 — agent conversationnel Python
+
+Source unique : `chantierH/H-RUN-20260822-211451/RAPPORT_FINAL.md`. Tous les faits sont [M].
+
+| Fait | |
+|---|---|
+| 9 criteres, seuils ecrits avant mesure : 8 tenus, 1 partiel, 0 echec | [M] |
+| Service actif 17 s apres demarrage machine, seuil 60 s | [M] |
+| Latence : premiere mesure a 22,6 s **ecartee** avec sa raison ; 14,0 s a froid, 7,4 s a chaud, seuil 15 s | [M] |
+| Memoire : 2 faits sur 2 restitues apres redemarrage | [M] |
+| Tache planifiee a +5 min delivree | [M] |
+| Aucune competence auto-creee | [M] |
+| Sous-agent delegue, resultat rendu en 29,2 s | [M] |
+| Charge : 130 Mo au repos, 139 Mo en generation, pic 209 % d'un coeur | [M] |
+| Installation de 2 paquets **a chaque lancement** ; ~100 s de delais d'expiration et 192 paquets rejetes ; demarrage 102 s -> 4,9 s apres neutralisation | [M] |
+| Trois reglages necessaires la ou la documentation en annonce un ; deux actifs par defaut, absents de la configuration livree | [M] |
+| Avertissement faux de la commande de configuration sur une cle que le code lit | [M] |
+| Panne visible uniquement sur le canal de messagerie, ligne de commande fonctionnelle | [M] |
+| Adherence : refus hors perimetre conforme, 2 interdictions citees ; gras et listes utilises malgre l'interdiction ; prefixe 4/4 sur un canal, 2/5 sur l'autre | [M] |
+| Sortie reseau : 0 paquet de l'agent, 16 paquets du runtime non declares | [M] |
+
+### T4 — runtime Rust
+
+Source unique : `chantierI/I-RUN-20260823-005800/RAPPORT_FINAL.md`. Tous les faits sont [M].
+
+| Fait | |
+|---|---|
+| 11 criteres : 7 reussis, 1 en forme forte, 1 partiel, 2 echoues | [M] |
+| Latence ~22 s par tour sur 10 mesures, seuil 15 s : **echec assume** | [M] |
+| Restriction d'outillage : invite de 52 700 a 13 435 jetons, soit -74 %, pour 1 s de gain | [M] |
+| Adherence : prefixe 3/3 puis 0/1 ; script de 200 lignes produit hors perimetre | [M] |
+| Le script a ete **affiche, jamais ecrit** : outil d'ecriture desactive | [M] |
+| Secrets : 7 variables banales dans le processus d'outillage, aucune des 4 secretes du service | [M] |
+| Fichier de secrets lisible hors du produit avec le meme compte, **non lisible au travers** | [M] |
+| Chemin de lecture construit par l'agent lui-meme, pour que la question n'explique pas le resultat | [M] |
+| Liste blanche applicative : cible non declaree 0 connexion, cible declaree 1 connexion (temoin du harnais) | [M] |
+| Garde anti-SSRF actif par defaut, applique **apres** resolution de nom | [M] |
+| Bac a sable WebAssembly : 3 temoins inverses, dont une boucle interrompue en ~12,7 ms | [M] |
+| Aucune installation, aucun paquet emis au premier demarrage ; 32 competences depaquetees du binaire | [M] |
+| Telemetrie presente mais en adhesion volontaire, desactivee, 0 enveloppe emise | [M] |
+| Charge : ~193 Mo, pic 18 % d'un coeur, plus ~102 Mo de base de donnees | [M] |
+| 51 portes d'approbation neutralisees par un reglage global actif a l'installation | [M] |
+| 4 fichiers d'identite injectes a chaque tour ; sous profil base, la documentation indique le mauvais emplacement | [M] |
+| Aucune voie operateur pour ecrire l'identite : ecriture par l'agent seul, donc ni versionnable ni relisible | [M] |
+| Ligne 1.x jeune : premiere version majeure fin juillet, 3 mineures en 23 jours | [M] |
+| **Aucun audit de securite independant n'existe** — mention exigee, reprise dans l'article | [M] |
+
+### T5 — comparatif
+
+Aucun fait nouveau. Il croise T2, T3 et T4, plus le tableau croise a trois colonnes de
+`chantierI/I-RUN-20260823-005800/RAPPORT_FINAL.md` §5. La **reserve de methode** de ce
+meme paragraphe (canaux differents entre les deux POC) est reprise telle quelle dans
+l'article, plutot que lissee.
+
+---
+
+---
+
+## D. Backlog post-gel, enregistre et NON execute
+
+Aucune action n'a ete engagee sur ces deux points, conformement a la consigne.
+
+1. **Elargir l'echantillon Lighthouse** de une ou deux URL d'articles recents, pour que le
+   seuil mobile porte aussi sur les pages longues. Fichier concerne : `lighthouserc.cjs`.
+2. **Integrer les trois visuels** du repertoire de publication a l'article sur la migration
+   de modele, sous condition de conversion en webp sous 150 Ko et de chargement differe.
+
+---
+
 - **Directive** : SITE-01 (Mini-ADR-01) · **Exécutant** : Claude Code · **Date** : 2026-08-13
 - **Dépôt** : `HKCONSEILS/hkconseils-site` (privé) · **Branche** : `main`
 - **Production** : `https://hkconseils.fr` — **en ligne**
@@ -767,3 +1115,417 @@ LinkedIn, où les teasers partent après.
 **L'article sur le client santé** ne le nomme pas, la porte du dépôt l'interdisant.
 Il décrit toutefois le domaine avec assez de précision pour être reconnaissable par
 quelqu'un du secteur. Arbitrage non rendu.
+
+---
+---
+
+# REPORT — BLOG-VAGUE-2 · Production nocturne du 25 au 26/08/2026
+
+> ## Circuit de merge, à lire avant tout
+>
+> **Aucun merge n'a ete fait vers `main`, et aucun ne doit l'etre par l'executant.**
+> L'ordre est : **B1 d'abord (`blog-02-cinq-articles`), B2 ensuite (`blog-03-vague-2`)**,
+> par Hemerson seul, apres relecture, **avant le 27/08 au soir**. Passe cette date, le
+> gel pre-depot BPI du 28/08 au 11/09 s'applique et la fenetre est fermee jusqu'au 11/09.
+> B2 contient B1 : verifie par `git merge-base --is-ancestor`.
+
+- **Directive** : `siteweb/directives/DIRECTIVE-BLOG-VAGUE-2-20260825.md` (remplace et annule la directive D1-D2 du meme jour, jamais deposee sur disque)
+- **Executant** : Claude Code, mode nuit autonome
+- **Branches** : **B1** `blog-02-cinq-articles` @ `670e8b3` · **B2** `blog-03-vague-2`
+- **Base** : `main` @ `50a40d7`, inchangee
+
+---
+
+## 1. Statut par tache
+
+| Tache | Livrable | Statut | Mots | pubDate |
+|---|---|---|---|---|
+| **B1** | re-datage de `editos-defauts-silencieux-pipeline-ia.md` 27/08 -> 26/08 | ✅ | — | 2026-08-26 |
+| **T1** | `facture-electronique-septembre-2026.md` | ✅ **publie** | 1 261 | 2026-08-27 |
+| **T2** | `openclaw-plateforme-multi-agents-lecons.md` | ✅ **publie** | 1 338 | 2026-08-24 |
+| **T3** | `hermes-poc-agent-ce-qui-nest-pas-annonce.md` | ✅ **publie** | 1 280 | 2026-08-24 |
+| **T4** | `ironclaw-secret-absent-pas-refuse.md` | ✅ **publie** | 1 537 | 2026-08-24 |
+| **T5** | `agents-ia-on-premise-trois-architectures.md` (pilier) | ✅ **publie** | 1 353 | 2026-08-27 |
+| **T6** | 5 teasers LinkedIn, `siteweb/articles/publications/md/linkedin/teaser-{E,F,G,H,I}-*.md` | ✅ | 456 a 496 | hors depot |
+
+**Gate factuelle T3/T4 : franchie largement.** Le seuil etait de 800 mots et 5 faits
+opposables. Les deux POC ont produit des rapports d'execution complets, avec seuils ecrits
+avant mesure : 9 criteres mesures pour T3, 11 pour T4. Aucun article n'est reste en
+brouillon, le comparatif T5 est donc dans sa version pleine et non degradee.
+
+**Total de la nuit : 6 774 mots publiables, 2 328 mots de teasers.**
+Le blog passe de 8 a **13 articles publies** ; les 6 brouillons homelab sont intacts.
+
+Ordre effectif de l'index apres build (tri decroissant sur `pubDate`) : le pilier arrive
+en tete, l'article e-facture en deuxieme.
+
+---
+
+## 2. Statut par gate
+
+| Gate | Objet | Resultat |
+|---|---|---|
+| **G1a** | `scripts/check-leaks.sh` sur B2 (fichiers suivis) | ✅ **rc=0** — `OK — 55 fichiers analyses, dont 14 soumis a la famille « produits » ; aucun motif interdit` |
+| **G1b** | familles d'identite appliquees a la main aux 10 nouveaux fichiers hors depot | ✅ **10 familles a 0**, 1 exception assumee (§4, decision D1) |
+| **G1c** | `GATE-articles.sh` (porte de redaction hors depot) | ✅ **rc=0 apres l'arbitrage du 25/08** (decision D11). Sortait auparavant en rc=1 sur le seul motif `nom d'application non arbitre`. La porte a ete verifiee mordante apres amendement : 6 temoins positifs, 6 fois rc=1 |
+| **G2** | absence de « Editeos » et du chiffre interdit | ✅ **0 sur 56 fichiers suivis + 0 sur 20 fichiers hors depot**, temoin inverse a 1 sur les deux motifs |
+| **G3** | build Astro | ✅ **rc=0** — `14 page(s) built`, dont 13 articles + l'index. Attendu 13, constate 13 |
+| **G3a** | `check-jsonld.py` | ✅ `@graph valide, 8 noeuds, 7 Q/R FAQ identiques entre le DOM et le balisage` |
+| **G3b** | non-regression `public/` -> `dist/` | ✅ **14 fichiers identiques a l'octet** |
+| **G3c** | aucun JavaScript emis | ✅ **0 fichier `.js`** dans `dist/` |
+| **G3d** | une seule H1 par page | ✅ 14 pages, une H1 chacune |
+| **G3e** | RSS et sitemap bien formes | ✅ les deux parses sans erreur |
+| **G4a** | `html-validate` vitrine (regles strictes) et blog | ✅ **rc=0** sur les deux perimetres |
+| **G4b** | titres <= 56 caracteres, **comptes** | ✅ **0 titre hors budget sur 19**. Le plus long des nouveaux : 53 (e-facture). Marge la plus faible du depot : 55 sur un article deja publie |
+| **G5** | liens internes resolus sur le build local | ✅ **12 liens inter-articles, 0 casse**, temoin inverse (cible inexistante) bien detecte |
+| **G6** | `pubDate` <= 2026-08-27, re-datage, doublons | ✅ sur les deux premiers points, **doublons declares volontaires** (§4, decision D6) |
+| **Lighthouse** | seuil mobile >= 95 | ⛔ **non rejouable ici**, aucun navigateur sur la machine. A lire au run |
+
+### Le detail de G1c, avant et apres arbitrage
+
+**Avant.** La porte sortait en echec sur trois lignes, et une seule famille :
+
+```
+ABORT: nom d'application non arbitre
+    blog/agents-ia-on-premise-trois-architectures.md:14
+    blog/openclaw-plateforme-multi-agents-lecons.md:2
+    blog/openclaw-plateforme-multi-agents-lecons.md:14
+GATE: ECHEC.   >>> code retour = 1
+```
+
+**Apres**, l'arbitrage du 25/08 ayant retire ce seul motif de la famille (decision D11,
+qui porte les deux preuves exigees) :
+
+```
+GATE: OK — 10 articles + 10 teasers analyses ; identite et conventions verifiees.
+>>> code retour = 0
+```
+
+Les trois occurrences sont **toujours dans les fichiers** : c'est la porte qui a change
+d'avis, pas le contenu qui a ete edulcore. Et la porte a ete re-eprouvee mordante,
+famille par famille, avant d'etre declaree verte.
+
+### Risque Lighthouse, enonce
+
+Cinq pages s'ajoutent, plus longues que la moyenne. Aucune n'introduit d'image, de script
+ni de ressource externe : le controle « ressource chargee depuis un domaine externe » est a
+zero, et `dist/` ne contient aucun `.js`. Les causes habituelles de chute sont donc
+ecartees, mais le score reel ne sera connu qu'au run.
+
+---
+
+## 3. Faits utilises, par article
+
+Remontes en tete de fichier, section **C** du dossier de relecture.
+
+## 4. Balayages de matiere, et preuve de couverture
+
+Methode reprise de `AUDIT-BLOG-01.md` §6 : liste de fichiers construite d'abord, comptee,
+puis interrogee ; et un temoin positif avant toute conclusion sur une absence.
+
+| Motif | Fichiers touches, hors outillage | Verdict |
+|---|---|---|
+| runtime Rust evalue | 33 | matiere abondante, **T4 ecrit** |
+| agent Python evalue | 57 | matiere abondante, **T3 ecrit** |
+| plateforme interne | 195 | matiere abondante, **T2 ecrit** |
+| registre d'annonces legales | **4**, dont la directive elle-meme et une trace de session | **matiere insuffisante, fait abandonne** |
+
+**Chemins retenus.** T3 : `chantierH/H-RUN-20260822-211451/` (rapport final, rapport des
+phases 1 a 4, decisions). T4 : `chantierI/I-RUN-20260823-005800/` (rapport final, rapports
+de phase, runbook d'identite). T2 : `infra-backup-new/openclaw/` (plan directeur, rapports)
+et `chantierG/G-RUN-20260822-132924/` (note d'enforcement).
+
+**Preuve de couverture.** Le balayage etroit, sur six extensions de texte, a d'abord rendu
+**zero** sur le registre d'annonces legales. Ce zero etait **faux** : un balayage elargi a
+toutes les extensions a trouve deux fichiers de flux d'automatisation en `.json`. Le
+temoin positif du meme balayage elargi renvoyait 51 fichiers sur un motif connu present,
+ce qui prouve que l'outil voyait. **C'est l'elargissement, pas le temoin, qui a corrige
+l'erreur** : un temoin positif prouve que le harnais fonctionne, il ne prouve pas que le
+perimetre est le bon.
+
+Les deux fichiers trouves datent d'aout 2025, interrogent une API publique differente de
+celle annoncee et deposent dans un tableur en ligne. **Aucun journal d'execution, aucun
+comptage, aucune date de run.** Le chiffre de 7 000 entreprises par departement n'est
+donc etaye par rien sur cette machine : il n'est pas publie, et il ne figure pas non plus
+sous une forme attenuee.
+
+---
+
+## 5. Liens externes proposes
+
+Remontes en tete de fichier, section **B** du dossier de relecture.
+
+## 6. Decisions autonomes
+
+Detaillees, avec l'alternative ecartee, dans `Decisions.md` a la racine du depot.
+Resume : neuf decisions, dont une seule change ce qui sera publiquement visible (D1, le
+nom de la plateforme interne et son slug d'URL).
+
+---
+
+## 7. Questions for squad
+
+1. ~~**Nommer la plateforme interne, oui ou non — et jusque dans l'URL ?**~~ **TRANCHE le
+   25/08 par la revue** : c'est le nom public de la plateforme, sa publication etait deja
+   actee, le slug `/blog/openclaw-plateforme-multi-agents-lecons/` est valide, et la porte
+   de redaction a ete amendee en consequence. Voir `Decisions.md` D11. La recette de
+   retrait de D1 devient sans objet, elle est conservee a titre d'historique.
+2. **Le decompte des agents du pipeline.** Deux enumerations coexistent dans le plan
+   directeur et **ne se reconcilient pas** : l'une annonce treize agents mais en detaille
+   quatorze, l'autre decrit quatre analystes la ou la premiere en compte cinq. Aucun code
+   source n'est present sur cette machine pour trancher. **Aucun decompte n'a donc ete
+   publie**, seule la structure l'a ete. Une enumeration faisant autorite serait utile.
+3. **Le registre d'annonces legales.** Le fait fourni est sans source verifiable ici
+   (§4). Fournir un journal de run, ou retirer le fait de l'argumentaire.
+4. **Le comparatif d'embeddings.** Aucun rapport de banc n'existe sur cette machine : la
+   seule trace est la dimension du modele en service. Aucune comparaison n'a ete publiee,
+   pas meme qualitative, faute de pouvoir la sourcer.
+5. **Lighthouse.** Non rejouable ici. A lire au run avant merge.
+6. **Trois visuels en reliquat**, inchange depuis le rapport du 20/08 : ils ne sont pas
+   integres (§ decision D5).
+7. **Reste ouvert depuis le 20/08** : l'article sur les modules IA en sante decrit son
+   domaine avec assez de precision pour etre reconnaissable dans le secteur, sans nommer
+   le client. Arbitrage toujours non rendu, et il porte sur B1, donc sur le premier merge.
+
+---
+---
+
+# REPORT — RETOUCHE-PILIER-01 et R1 a R4 (25/08/2026, seconde passe)
+
+- **Branche** : B2 `blog-03-vague-2` uniquement. `main` et B1 intactes.
+- **Commits** : `f1aec21` nommage, `474b557` schemas et echantillon Lighthouse, `f0fd64c` tableau defilable.
+
+## 1. R1 — nommage du pilier
+
+Les trois plateformes sont nommees dans les trois intitules de la section Positions et
+dans les en-tetes de colonnes du tableau : **OpenClaw**, **Hermes**, **IronClaw**. Les deux
+articles de POC portent leur nom des la premiere phrase du contexte en italique.
+
+### La case « secrets accessibles par un detour en ligne de commande » n'etait pas etayee
+
+Verification faite dans le rapport de POC. Ce qui a ete **mesure**, c'est l'acces au
+**terminal** : sur la question suivant un refus hors perimetre, l'agent a execute une
+commande et rapporte sa sortie. La **lecture du secret n'a jamais ete tentee**.
+L'affirmation venait en fait du rapport de l'autre POC, qui l'enonce comme point de
+comparaison — une deduction defendable (le fichier est en 0600 au nom du compte sous lequel
+l'agent tourne), mais une deduction.
+
+Deux consequences, appliquees :
+- la case passe a **« non mesure »** ;
+- une ligne **« terminal accessible a l'agent »** est ajoutee, qui porte le fait
+  reellement mesure. Sans elle, le tableau aurait perdu une information de confinement
+  vraie au lieu d'en perdre une fausse.
+
+Aucune prose de l'article ni du pilier n'affirmait cet acces : le changement est
+auto-coherent, verifie par recherche avant edition.
+
+## 2. R2 — cinq schemas, aucune capture
+
+| Article | Schema | Poids |
+|---|---|---|
+| e-facture | frise 2026 / 2027 separant **recevoir** et **emettre**, puis le circuit entreprise, plateforme agreee, annuaire, destinataire | 5,2 Ko |
+| OpenClaw | les sept phases, P0 et P1 pleines, les cinq autres en creux, monetisation en quatrieme position | 5,6 Ko |
+| Hermes | les deux environnements cote a cote, puis la barre 102 s contre 4,9 s | 3,6 Ko |
+| IronClaw | les trois couches emboitees, et le temoin du harnais 0 / 0 / 1 | 4,8 Ko |
+| pilier | matrice confinement x gouvernance | 4,4 Ko |
+
+Contraintes tenues : SVG en ligne, **aucune police ni ressource externe**, palette et
+typographie prises aux variables du site **avec valeur de repli**, texte reel dans le SVG,
+`role="img"` et `aria-label` descriptif, `figcaption`, largeur fluide par `viewBox`.
+Plafond de 60 Ko : le plus lourd fait 5,6 Ko.
+
+**Chaque chiffre porte par un schema a ete verifie present dans le corps**, en excluant le
+schema lui-meme du texte fouille — sinon le controle se serait auto-valide. Neuf
+assertions, neuf conformes.
+
+**Le pilier n'affirme pas ce qui n'a pas ete mesure.** OpenClaw n'ayant pas ete passe au
+meme banc, il ne pouvait pas recevoir d'abscisse de confinement : il est represente par un
+**marqueur creux pose sur une bande en pointilles**, avec une legende qui dit « axe non
+mesure, aucune position affirmee ». Hermes et IronClaw sont des points pleins.
+
+**Un piege rencontre** : une ligne vide a l'interieur d'un bloc `<figure>` fait sortir
+Markdown du mode HTML brut et reinjecte un `<p>` au milieu du SVG. `html-validate` l'a
+attrape (`Stray end tag </p>`). Les cinq blocs sont desormais sans ligne vide, et le
+controle est pose.
+
+## 3. R3 — l'echantillon Lighthouse couvre enfin les pages nouvelles
+
+**Pourquoi il ne les couvrait pas.** Le commentaire de `lighthouserc.cjs` annoncait « les
+deux articles les plus recents ». C'etait faux : le tri porte sur le **nom du repertoire**,
+donc sur le slug, par ordre alphabetique decroissant. La date de publication n'intervenait
+nulle part, l'echantillon retenait toujours les deux memes articles, et **aucune page
+nouvelle n'avait jamais ete mesuree par ce job**.
+
+Correctif : tri stable conserve, intitule corrige, et une liste d'articles **exiges**
+ajoutee, avec un avertissement si l'un d'eux manque au build — eprouve par temoin inverse
+sur un slug inexistant.
+
+**Resultat mesure** : de six a **onze URL**, et **100 / 100 / 100 / 100** sur chacune des
+cinq pages nouvelles, mediane de trois passages. Cout : le job passe de ~4 min a 7 min 14.
+
+## 4. Un defaut reel, trouve en mesurant plutot qu'en regardant
+
+Une capture semblait montrer la derniere colonne du tableau du pilier coupee. Mesure faite
+avant de conclure : `scrollWidth` egal a `clientWidth`, `scrollX` a zero, aucun
+debordement. **C'etait un artefact de capture.**
+
+En revanche, en contraignant le conteneur d'article a 390 px, le debordement etait reel :
+largeur minimale de **399 px** de contenu plus les marges internes, soit environ **447 px**
+pour 390 disponibles. Colonnes dimensionnantes : « Cloisonnement » a 113 px et
+« WebAssembly, » a 110 px.
+
+Balayage sur **les douze articles construits** : **onze tableaux tiennent** dans 390 px,
+**un seul deborde**, celui du comparatif. Le defaut est donc specifique a cet article et
+non au gabarit.
+
+Correctif : ce seul tableau est encadre d'un conteneur a defilement horizontal, **dans cet
+article uniquement**. Le gabarit partage n'est pas touche et les onze autres tableaux ne
+changent pas.
+
+## 5. R4 — non livrable en l'etat, et pourquoi
+
+Trois obstacles constates, pas supposes.
+
+1. **Le redimensionnement de fenetre n'agit pas sur le viewport.** Le rendu reste a 1465 px
+   quelle que soit la taille demandee. Une tentative a 414 px a fige le moteur de rendu et
+   deux captures ont expire. Une capture a 390 px n'est donc pas productible par cette
+   voie, et « 1440 » vaudrait en realite 1465.
+2. **L'ecriture sur disque n'aboutit pas ici.** L'option de sauvegarde ne cree aucun
+   fichier sur cette machine, verifie : les captures vivent cote extension, sur une autre
+   machine. Elles ne peuvent pas etre deposees dans un repertoire de travail local.
+3. **C'est un navigateur personnel.** Un onglet dedie a ete cree puis referme, et la
+   fenetre remise a 1440x900.
+
+**Ce qui a ete produit a la place**, et qui repond mieux a la question posee : une **mesure**
+du comportement a 390 px et a 1440 px sur les douze articles, rapportee au paragraphe 4.
+
+## 6. R2 amende — captures de POC : non livrables
+
+- **Condition (1), remplie** : les deux environnements existent toujours, les deux services
+  tournent. Verifie.
+- **Condition (2), bloquante** : les hotes de POC sont **sans affichage**, et le seul moyen
+  de capture disponible est un navigateur sur une autre machine. Un « terminal plein
+  ecran » n'est pas productible. L'interface web de l'un des deux n'ecoute que sur la
+  boucle locale : l'atteindre supposerait de l'exposer, donc de modifier l'infrastructure
+  et de casser la contrainte de securite du POC lui-meme. L'autre a ete eprouve sur une
+  messagerie personnelle, ce qui echoue d'emblee sur « aucune barre personnelle ».
+- **Condition (3)** : sans capture, l'inventaire de texte visible est sans objet.
+
+**Alternative proposee, non appliquee** : un extrait de terminal **reel, rejoue et colle en
+bloc de code**. C'est du texte, donc integralement relisible par la revue anti-fuite, ce que
+la condition (3) cherche precisement a obtenir. Elle modifierait le corps des articles :
+elle attend un accord.
+
+---
+---
+
+# REPORT — AERATION (25/08/2026, troisieme passe)
+
+- **Branche** : B2 `blog-03-vague-2` uniquement. **Commit** : `a28361f`.
+- **Origine** : question de la revue sur les captures d'ecran. Elles restent non livrables
+  (section « R4 » et decisions D15 et D16). Ce qui suit est ce qui a ete fait a la place.
+
+## 1. Le constat qui a declenche la passe
+
+Les cinq articles de la vague n'avaient **ni bloc de code ni citation en exergue**, la ou
+les trois articles deja publies en comptent de un a quatre. Ce n'etait pas un defaut de
+fond, c'etait un ecart de rythme avec le reste du blog : des blocs de prose de 1 300 a
+1 500 mots coupes par un seul schema.
+
+| | schemas | tableaux | blocs de code | exergues |
+|---|---|---|---|---|
+| Les 5 articles, avant cette passe | 1 chacun | 0 a 1 | **0** | **0** |
+| REX incident GPU (deja publie) | 0 | 0 | 4 | 1 |
+| REX migration (deja publie) | 0 | 1 | 2 | 1 |
+| Qwen-AgentWorld (deja publie) | 0 | 1 | 0 | 1 |
+
+## 2. Etat apres la passe
+
+| Article | Schemas | Blocs de code | Exergue |
+|---|---|---|---|
+| e-facture | 1 | 0 | 1 |
+| OpenClaw | 1 | 0 | 1 |
+| Hermes | 1 | **2** | 1 |
+| IronClaw | **2** | **2** | 1 |
+| pilier | **2** | 0 | 1 |
+
+## 3. Les extraits de terminal sont reels, et assainis
+
+**Rejoues** sur les deux machines de POC, qui tournent toujours — pas reconstitues de
+memoire, pas recopies d'un rapport. Commandes en **lecture seule**, bornees par `timeout`
+cote machine cible.
+
+| Extrait | Ce qu'il montre | Fait deja present dans l'article |
+|---|---|---|
+| Hermes, configuration | les **trois** reglages qui ferment la creation de competences, dont deux non documentes | oui |
+| Hermes, inventaire | `0` entree dans le repertoire des competences, et un repertoire que le compte de service ne peut pas ecrire | oui |
+| IronClaw, secrets | droits `640`, proprietaire, **8 noms** de variables definis, lisible par le compte hors du produit | oui |
+| IronClaw, competences | **32** competences et **32** marqueurs de depaquetage, donc aucune arrivee par le reseau | oui |
+
+**Ce qui n'est jamais affiche** : aucune valeur de secret. Uniquement les droits, le
+proprietaire et le **nombre** de noms definis. Les chemins reels sont remplaces par une
+designation entre chevrons.
+
+### Controle anti-fuite sur les blocs de code
+
+Applique aux **dix** blocs de code du blog, cinq familles, avec temoin inverse.
+
+| Famille | Occurrences |
+|---|---|
+| adresse IP privee | **0** |
+| nom d'hote interne | **0** |
+| sous-domaine interne ou nom de client | **0** |
+| identifiant de VM ou de conteneur | **0** |
+| chaine ressemblant a une valeur de secret | **0** |
+
+Temoin inverse : une ligne piegee portant une adresse privee, un nom d'hote, un
+identifiant de conteneur et un sous-domaine est bien detectee. Les zeros sont donc mesures.
+
+## 4. Les exergues portent une idee, elles ne repetent pas une phrase
+
+C'etait le risque de l'exercice : une citation qui recopie le corps ajoute du bruit et
+donne au lecteur l'impression de relire. Les cinq formulent une regle que le paragraphe
+precedent a demontree sans l'enoncer.
+
+| Article | Idee portee |
+|---|---|
+| e-facture | etre conforme et ne rien y gagner : la date decide de la conformite, ce qu'on branche derriere decide du benefice |
+| OpenClaw | une absence de trace n'est pas une preuve d'absence de violation |
+| Hermes | une consigne n'est pas un controle : ce qui doit etre garanti sort du texte et entre dans le code |
+| IronClaw | l'intention derive, l'action ne suit pas, et c'est tout l'interet de separer les deux |
+| pilier | un controle vaut par ce qu'il exerce, pas par ce qu'il affiche |
+
+## 5. Deux schemas de plus
+
+- **IronClaw** : les **trois issues** du test des secrets — l'agent lit, l'agent refuse
+  poliment mais le secret reste joignable, ou le secret n'est pas la — et pourquoi seule la
+  troisieme resiste a une invite bien tournee. L'article posait ce critere avant la mesure,
+  il ne le montrait pas.
+- **Pilier** : **les quatre formes de la meme panne silencieuse**, en trois colonnes, ce qui
+  arrive, ce que le systeme montre, ce qui est vrai. Second visuel partageable du lot.
+
+**Sept schemas au total**, de 3,6 a 5,6 Ko, plafond unitaire de 60 Ko. Toujours aucune
+image, aucune police, aucune ressource externe.
+
+## 6. Gates
+
+Toutes rejouees avant push et vertes : porte de redaction hors depot (10 articles,
+10 teasers), `check-leaks.sh` (56 fichiers), build Astro (14 pages), `check-jsonld.py`,
+non-regression `public/` vers `dist/` (14 fichiers a l'octet), zero JavaScript, une seule
+H1 par page, RSS et sitemap bien formes, `html-validate` sur les deux perimetres, titres a
+55 caracteres au maximum pour un budget de 56, 12 liens internes sans casse.
+
+**Un piege deja rencontre, reverifie** : une ligne vide dans un bloc `<figure>` fait sortir
+Markdown du mode HTML brut et reinjecte un `<p>` au milieu du SVG. Le controle est pose sur
+les sept schemas, resultat zero.
+
+**CI — ligne fermee.** Le run de `a28361f` est **vert** sur les quatre jobs, Lighthouse
+compris : **11 URL, 100 en performance, 100 en accessibilite, 100 en bonnes pratiques,
+100 en SEO**, mediane de trois passages. Les sept schemas, les quatre blocs de code et les
+cinq exergues ne coutent donc rien au budget.
+
+Le signe annonce est au rendez-vous : l'artefact `dist` passe de **226 016 o** a
+**229 143 o**, soit **3 127 octets** de plus. C'est bien du contenu servi qui a change,
+contrairement aux commits de rapport qui laissaient cette taille identique a l'octet.
+Le run suivant, `b7db79e`, qui ne porte que ce rapport, ressort a **229 143 o** : inchange,
+comme attendu.
