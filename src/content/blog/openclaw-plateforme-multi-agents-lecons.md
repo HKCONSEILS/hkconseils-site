@@ -82,7 +82,36 @@ Le second bloc mature de la plateforme est un pipeline de décision financière 
 
 Au-dessus de cette chaîne, un composant que nous appelons l'enforcer. Il tient en deux cent vingt et une lignes et il fait une seule chose : refuser les décisions qui violent des règles. Interdiction de la vente à découvert, stop-loss et take-profit obligatoires, plafond de perte, taille de position maximale, trésorerie résiduelle minimale, seuil de confiance minimal, avec des valeurs durcies sur les instruments les plus volatils.
 
-Sa propriété centrale tient dans un commentaire de son propre code : **les règles sont des constantes, le modèle ne peut pas les modifier par une invite**. C'est la différence entre un garde-fou et une consigne. Une consigne écrite dans un prompt est une suggestion adressée à un système probabiliste. Une constante dans le code est une contrainte. Dix-neuf tests fonctionnels le vérifient à chaque exécution.
+Sa propriété centrale tient dans un commentaire de son propre code, et le code dit exactement ce que le commentaire annonce :
+
+<figure class="terminal">
+<figcaption>soul_enforcer.py | les regles, telles qu'elles sont ecrites</figcaption>
+
+```python
+"""Rules are CONSTANTS - the LLM cannot modify them via prompt."""
+
+RULES = {
+    "long_only": True,
+    "max_position_pct": 30,
+    "max_stop_loss_pct": -7,        # -7 % = la pire perte autorisee
+    "require_stop_loss": True,
+    "require_take_profit": True,
+    "min_cash_pct": 20,
+    "min_confidence": 4,
+}
+
+BLOCKED_ACTIONS = frozenset({"SHORT", "SELL_SHORT", "PUT", "SHORT_SELL"})
+
+MICROCAP_RULES = {          # valeurs durcies sur les instruments volatils
+    "max_position_pct": 5,
+    "max_stop_loss_pct": -15,
+    "min_confidence": 6,
+}
+```
+
+</figure>
+
+C'est la différence entre un garde-fou et une consigne. Une consigne écrite dans une invite est une suggestion adressée à un système probabiliste. Un dictionnaire de constantes, lu par du code déterministe avant toute exécution, est une contrainte. Dix-neuf tests fonctionnels le vérifient à chaque passage.
 
 Et voici la partie qui compte vraiment.
 
@@ -103,6 +132,24 @@ Trois propriétés ont été vérifiées par des tests dédiés, et c'est la tro
 Le troisième point est la règle de conception à retenir de tout ce chantier. La traçabilité ne doit jamais pouvoir dégrader ce qu'elle trace. Un journal qui, en tombant, ferait passer une décision interdite serait pire que pas de journal du tout : il transformerait un incident de stockage en incident métier.
 
 > **Une absence de trace n'est pas une preuve d'absence de violation.** C'est la phrase qui nous a fait retirer une affirmation d'un dossier. Elle est désagréable à écrire, et c'est exactement pour ça qu'elle vaut la peine d'être écrite avant que quelqu'un d'autre ne la formule à votre place.
+
+Voici à quoi ressemble une ligne de blocage. Celle-ci a été produite pendant la validation technique du 22 août, et **écartée dans un fichier séparé** pour ne jamais être comptée comme une décision réelle :
+
+<figure class="terminal">
+<figcaption>enforcer | une ligne de verdict, produite en validation</figcaption>
+
+```json
+{"ts": "2026-08-22T11:35:57.202197+00:00",
+ "ticker": "ETH-USD",
+ "action_proposee": "SHORT",
+ "verdict": "block",
+ "regle_soul": ["LONG_ONLY: action 'SHORT' is forbidden"],
+ "details": "..."}
+```
+
+</figure>
+
+La règle est **nommée**, pas résumée en un refus générique. C'est ce qui permet, six mois plus tard, de répondre à la question « pourquoi cette décision a-t-elle été refusée » sans relire le code.
 
 L'instrumentation est purement additive. Aucune règle métier n'a été touchée, et les dix-neuf tests préexistants passent inchangés.
 

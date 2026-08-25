@@ -11,11 +11,11 @@ Choisir un runtime d'agent se réduit rarement à comparer des fonctionnalités.
 
 ## Trois positions, pas trois concurrents
 
-**OpenClaw (notre plateforme interne)** est la plateforme que nous construisons et exploitons. Elle est planifiée en sept phases, dont deux sont livrées, et elle porte aujourd'hui deux blocs matures : un agent de veille en service continu, et un pipeline de décision encadré par des règles codées hors de portée du modèle. Son détail est dans [l'article qui lui est consacré](/blog/openclaw-plateforme-multi-agents-lecons/).
+**[OpenClaw (notre plateforme interne)](/blog/openclaw-plateforme-multi-agents-lecons/)** est la plateforme que nous construisons et exploitons. Elle est planifiée en sept phases, dont deux sont livrées, et elle porte aujourd'hui deux blocs matures : un agent de veille en service continu, et un pipeline de décision encadré par des règles codées hors de portée du modèle.
 
-**Hermes (agent conversationnel Python)** a été évalué comme candidat pour les usages de messagerie. Neuf critères, huit tenus. Son POC a surtout mis au jour trois comportements non annoncés, décrits dans [son article dédié](/blog/hermes-poc-agent-ce-qui-nest-pas-annonce/).
+**[Hermes (agent conversationnel Python)](/blog/hermes-poc-agent-ce-qui-nest-pas-annonce/)** a été évalué comme candidat pour les usages de messagerie. Neuf critères, huit tenus. Son POC a surtout mis au jour trois comportements non annoncés.
 
-**IronClaw (runtime Rust)** a été évalué comme option pour les contextes les plus exigeants en confinement. Onze critères, deux échecs assumés, et un mode de protection des secrets que les deux autres n'atteignent pas. Son article est [ici](/blog/ironclaw-secret-absent-pas-refuse/).
+**[IronClaw (runtime Rust)](/blog/ironclaw-secret-absent-pas-refuse/)** a été évalué comme option pour les contextes les plus exigeants en confinement. Onze critères, deux échecs assumés, et un mode de protection des secrets que les deux autres n'atteignent pas.
 
 Une précaution avant de comparer, parce qu'elle change la lecture du tableau : **notre plateforme interne n'a pas été passée au même banc**. Elle est en exploitation, pas en évaluation. Les cases vides de sa colonne signifient « non mesuré dans ce cadre », jamais « absent ».
 
@@ -23,23 +23,27 @@ Une précaution avant de comparer, parce qu'elle change la lecture du tableau : 
 
 <div style="overflow-x:auto">
 
-| | OpenClaw (plateforme interne) | Hermes (agent Python) | IronClaw (runtime Rust) |
+| Mécanisme | OpenClaw (plateforme interne) | Hermes (agent Python) | IronClaw (runtime Rust) |
 |---|---|---|---|
-| Mécanisme d'identité | fichier unique sur disque | fichier unique posé par l'exploitant | **quatre fichiers natifs**, injectés à chaque tour |
-| Qui écrit l'identité | l'exploitant | l'exploitant | **l'agent lui-même**, sous profil base de données |
-| Identité relisible avant application | oui | oui | **non**, elle vit en base |
-| Restriction d'outillage | native, par canal | native, outils non chargés | **native et plus fine**, par capacité, effet mesuré |
-| Secrets accessibles à l'agent | non mesuré | non mesuré | **non, absence structurelle** |
-| Terminal accessible à l'agent | non mesuré | **oui en ligne de commande**, prouvé par une commande exécutée | non par défaut, l'outil d'écriture étant désactivé |
-| Cloisonnement réseau | liste blanche de sortie | liste blanche de sortie par compte | **deux couches**, applicative et pare-feu, chacune prouvée seule |
-| Protection contre les requêtes détournées | non mesuré | non mesuré | **oui**, y compris après résolution de nom |
-| Bac à sable d'outils | non mesuré | non mesuré | **WebAssembly**, mémoire, temps et accès |
-| Installation au démarrage | aucune | **deux paquets, à chaque lancement** | aucune |
+| Mécanisme d'identité | fichier unique sur disque *(convention)* | fichier unique posé par l'exploitant *(convention)* | **quatre fichiers natifs**, injectés à chaque tour *(natif)* |
+| Qui écrit l'identité | l'exploitant *(convention)* | l'exploitant *(convention)* | **l'agent lui-même**, sous profil base de données *(natif)* |
+| Identité relisible avant application | oui *(convention)* | oui *(convention)* | **non**, elle vit en base *(natif)* |
+| Restriction d'outillage | native, par canal *(natif)* | native, outils non chargés *(natif)* | **native et plus fine**, par capacité *(natif)* |
+| Secrets accessibles à l'agent | non mesuré | non mesuré | **non, absence structurelle** *(natif)* |
+| Terminal accessible à l'agent | non mesuré | **oui en ligne de commande** *(extensible : il vient du jeu d'outils chargé)* | non par défaut, l'outil d'écriture étant désactivé *(natif, réglable par capacité)* |
+| Cloisonnement réseau | liste blanche de sortie *(hors produit)* | liste blanche de sortie par compte *(hors produit)* | **deux couches** *(natif + hors produit)*, chacune prouvée seule |
+| Protection contre les requêtes détournées | non mesuré | non mesuré | **oui**, après résolution de nom *(natif)* |
+| Bac à sable d'outils | non mesuré | non mesuré | **WebAssembly**, mémoire, temps et accès *(natif)* |
+| Installation au démarrage | aucune *(non mesuré)* | **deux paquets, à chaque lancement** *(natif)* | aucune *(natif)* |
 | Empreinte mémoire | non mesuré | 139 Mo | 193 Mo, plus 102 Mo de base |
 | Pic processeur en génération | non mesuré | **209 %** d'un cœur | **18 %** d'un cœur |
 | Latence par tour | non mesuré | 14,0 s à froid, 7,4 s à chaud | **environ 22 s**, plate |
 
 </div>
+
+**Comment lire les marqueurs.** *(natif)* : le mécanisme est fourni par le produit lui-même. *(extensible)* : il dépend des compétences ou outils chargés, donc il peut apparaître ou disparaître selon la configuration. *(convention)* : ce n'est pas un mécanisme du produit, c'est un fichier que l'exploitant pose et que rien n'oblige. *(hors produit)* : le contrôle vient de l'infrastructure, pas du runtime. *(non mesuré)* : les rapports de POC ne permettent pas de trancher. Les trois dernières lignes sont des mesures et non des mécanismes : elles ne portent pas de marqueur.
+
+Le cas le plus parlant est celui du terminal. Chez l'agent Python, il **n'est pas une propriété du produit** : il apparaît parce que le jeu d'outils chargé en ligne de commande le fournit. Changer de jeu d'outils change la réponse. C'est exactement la différence entre une capacité native et une capacité extensible, et c'est ce qui rend la question « cet agent a-t-il accès au shell » insuffisante si on ne précise pas « avec quels outils chargés ».
 
 ### Une réserve de méthode, à ne pas dissimuler
 

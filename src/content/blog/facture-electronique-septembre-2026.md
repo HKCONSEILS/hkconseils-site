@@ -13,13 +13,13 @@ Dans quelques jours, une obligation entre en vigueur sans période de tolérance
 
 Le calendrier tient en deux lignes.
 
-Au **1er septembre 2026**, toutes les entreprises assujetties à la TVA doivent pouvoir recevoir une facture électronique. À la même date, les grandes entreprises et les entreprises de taille intermédiaire ont en plus l'obligation d'**émettre** sous cette forme.
+Au **1er septembre 2026**, [toutes les entreprises assujetties à la TVA doivent pouvoir recevoir une facture électronique](https://www.economie.gouv.fr/tout-savoir-sur-la-facturation-electronique-pour-les-entreprises). À la même date, les grandes entreprises et les entreprises de taille intermédiaire ont en plus l'obligation d'**émettre** sous cette forme.
 
 Au **1er septembre 2027**, cette obligation d'émission s'étend aux micro-entreprises, aux TPE et aux PME, avec la transmission à l'administration des données de transaction.
 
 Le champ est large et il vaut la peine de le dire clairement : la réforme vise toutes les entreprises assujetties à la TVA, quels que soient leur taille, leur chiffre d'affaires, leur forme juridique ou leur régime d'imposition, y compris celles qui bénéficient d'une franchise. Il n'y a pas de seuil en dessous duquel on serait hors sujet.
 
-Quatre nouvelles mentions obligatoires apparaissent également sur les factures au 1er septembre 2026, dont la catégorie de l'opération facturée, vente ou prestation de services, et l'adresse de livraison quand elle diffère de l'adresse de facturation.
+Les mentions obligatoires évoluent aussi, et surtout elles changent de forme : elles doivent désormais figurer **dans des champs dédiés** plutôt que quelque part dans la mise en page. L'administration cite notamment le numéro SIREN du fournisseur et du client, la date d'émission, et l'adresse complète de livraison du bien ou du service lorsqu'elle diffère de l'adresse du client.
 
 <figure>
 <svg viewBox="0 0 820 400" role="img" aria-label="Frise chronologique de la réforme. Au 1er septembre 2026, toutes les entreprises assujetties à la TVA doivent pouvoir recevoir une facture électronique, et les grandes entreprises et entreprises de taille intermédiaire doivent en plus émettre. Au 1er septembre 2027, l'obligation d'émettre s'étend aux micro-entreprises, TPE et PME. En dessous, le circuit d'une facture : l'entreprise émettrice passe par sa plateforme agréée, laquelle s'appuie sur l'annuaire pour savoir quelle plateforme dessert l'entreprise destinataire." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
@@ -70,15 +70,47 @@ Quatre nouvelles mentions obligatoires apparaissent également sur les factures 
 
 C'est la confusion la plus répandue, et la plus coûteuse à découvrir tard. Une facture papier scannée, un PDF ordinaire, un document envoyé par courriel : rien de tout cela ne sera conforme. Le fait qu'un fichier soit numérique ne le rend pas électronique au sens de la réforme.
 
-Ce qui est attendu, ce sont des formats structurés : **UBL**, **CII**, ou un format mixte associant un fichier de données structurées et un fichier image. Ce dernier est celui que la plupart des entreprises françaises croiseront en pratique sous le nom de **Factur-X** : un PDF parfaitement lisible par un humain, qui transporte dans ses métadonnées un fichier XML lisible par une machine. Le même document sert les deux publics, et c'est tout l'intérêt du format hybride.
+[Ce qui est attendu, ce sont des formats structurés](https://www.impots.gouv.fr/professionnel/je-decouvre-la-facturation-electronique) : **UBL**, **CII**, ou un format mixte associant un fichier de données structurées et un fichier image. Ce dernier est celui que la plupart des entreprises françaises croiseront en pratique sous le nom de **Factur-X** : un PDF parfaitement lisible par un humain, qui transporte dans ses métadonnées un fichier XML lisible par une machine. Le même document sert les deux publics, et c'est tout l'intérêt du format hybride.
 
 Autrement dit, la facture cesse d'être une image à lire pour devenir une donnée à traiter. C'est un changement de nature, pas un changement de canal.
 
+Concrètement, voici à quoi ressemble la partie machine d'une facture hybride. Extrait très simplifié, à titre d'illustration, sur une entreprise fictive :
+
+<figure class="terminal">
+<figcaption>Factur-X | extrait simplifie, entreprise fictive</figcaption>
+
+```xml
+<rsm:ExchangedDocument>
+  <ram:ID>FA-2026-000128</ram:ID>
+  <ram:IssueDateTime>20260901</ram:IssueDateTime>
+</rsm:ExchangedDocument>
+
+<ram:SellerTradeParty>
+  <ram:Name>EXEMPLE-SARL</ram:Name>     <!-- entreprise fictive -->
+  <ram:SpecifiedTaxRegistration>FR00123456789</ram:SpecifiedTaxRegistration>
+</ram:SellerTradeParty>
+
+<ram:ApplicableTradeTax>
+  <ram:TypeCode>VAT</ram:TypeCode>
+  <ram:RateApplicablePercent>20.00</ram:RateApplicablePercent>
+  <ram:CalculatedAmount>240.00</ram:CalculatedAmount>
+</ram:ApplicableTradeTax>
+
+<ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+  <ram:TaxBasisTotalAmount>1200.00</ram:TaxBasisTotalAmount>
+  <ram:GrandTotalAmount>1440.00</ram:GrandTotalAmount>
+</ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+```
+
+</figure>
+
+Aucune de ces valeurs n'a besoin d'être devinée : le taux de TVA est dans un champ nommé `RateApplicablePercent`, le total hors taxes dans `TaxBasisTotalAmount`, le total à payer dans `GrandTotalAmount`. Le même document reste, pour l'humain, un PDF parfaitement lisible. C'est tout ce que veut dire « la facture devient une donnée ».
+
 ## Par où passent les factures
 
-Les échanges ne se font pas de gré à gré. Chaque entreprise doit passer par un intermédiaire, une **plateforme agréée**, définie comme une entreprise privée immatriculée par l'État. Une première liste de 101 plateformes agréées a été publiée par l'administration en janvier, et une large part d'entre elles était déjà raccordée à l'annuaire au moment de cette publication.
+Les échanges ne se font pas de gré à gré. Chaque entreprise doit passer par un intermédiaire, une **plateforme agréée**, définie comme une entreprise privée immatriculée par l'État. Une [première liste de 101 plateformes agréées](https://www.economie.gouv.fr/actualites/facturation-electronique-la-liste-des-101-premieres-plateformes-agreees-est-disponible) a été publiée par l'administration en janvier, et une large part d'entre elles était déjà raccordée à l'annuaire au moment de cette publication.
 
-L'annuaire, justement, est la pièce que l'on sous-estime. Ouvert depuis septembre 2025, il recense les entreprises et entités publiques soumises aux obligations, et indique pour chacune la plateforme agréée qui gère ses données et ses adresses de facturation électronique. C'est lui qui permet à un émetteur de savoir où adresser sa facture. Une entreprise absente de l'annuaire, ou raccordée à une plateforme qui n'a pas mis à jour son adresse, est une entreprise à qui l'on ne peut pas facturer proprement.
+L'annuaire, justement, est la pièce que l'on sous-estime. [Ouvert depuis septembre 2025](https://www.economie.gouv.fr/actualites/facturation-electronique-ouverture-de-lannuaire-dedie), il recense les entreprises et entités publiques soumises aux obligations, et indique pour chacune la plateforme agréée qui gère ses données et ses adresses de facturation électronique. C'est lui qui permet à un émetteur de savoir où adresser sa facture. Une entreprise absente de l'annuaire, ou raccordée à une plateforme qui n'a pas mis à jour son adresse, est une entreprise à qui l'on ne peut pas facturer proprement.
 
 Pour le secteur public, la plateforme de référence existante reste en place à partir de 2026.
 

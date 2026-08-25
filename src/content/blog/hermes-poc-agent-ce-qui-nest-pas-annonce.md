@@ -71,6 +71,9 @@ Il en faut trois. Les deux autres sont deux chemins autonomes de mise à jour de
 
 Les trois, relevés dans la configuration de la machine de POC, qui tourne encore :
 
+<figure class="terminal">
+<figcaption>POC Hermes | configuration de l'hote d'evaluation</figcaption>
+
 ```yaml
 skills:
   creation_nudge_interval: 0      # le seul que la documentation mentionne
@@ -81,7 +84,12 @@ curator:
     enabled: false                # actif par defaut lui aussi
 ```
 
+</figure>
+
 Le résultat se vérifie du dehors, sur l'inventaire lui-même :
+
+<figure class="terminal">
+<figcaption>POC Hermes | inventaire des competences</figcaption>
 
 ```console
 $ ls -A ~hermes/.hermes/skills/ | wc -l
@@ -89,6 +97,8 @@ $ ls -A ~hermes/.hermes/skills/ | wc -l
 $ ls -ld ~hermes/.hermes/skills/
 dr-xr-xr-x 2 root root 4096 .../skills/
 ```
+
+</figure>
 
 Zéro entrée, et un répertoire que le compte de service ne peut pas écrire. Le réglage dit ce qui devrait arriver, les droits garantissent ce qui peut arriver.
 
@@ -112,6 +122,16 @@ La leçon est directement transposable : **une instruction de forme donnée en l
 
 > **Une consigne n'est pas un contrôle.** Une instruction écrite dans une invite est une suggestion adressée à un système probabiliste : elle sera suivie souvent, jamais toujours, et pas également selon le canal. Ce qui doit être garanti se déplace du texte vers le code, ou n'est pas garanti.
 
+## Pourquoi Python compte ici
+
+Le langage n'est pas un détail de mise en oeuvre quand on choisit un agent, et il explique une partie de ce qui précède.
+
+Python est l'écosystème dominant de l'IA : les bibliothèques de modèles, les connecteurs, les intégrations y arrivent en premier, et c'est ce qui permet à un produit comme celui-ci d'ajouter un fournisseur ou un canal en quelques jours. La vitesse d'itération est réelle, et elle se voit dans le rythme des versions.
+
+La contrepartie s'est vue dans ce POC, sans qu'on la cherche. **Tirer ses dépendances au moment de l'exécution est une pratique courante de cet écosystème** : c'est exactement ce que fait l'installation de deux paquets à chaque lancement. Ce qui est banal pour un script d'analyse devient une question de sécurité pour un service qui tourne en continu et qui parle à un modèle. Et le pic à **209 % d'un coeur** en génération, contre 18 % pour le runtime compilé que nous avons évalué le lendemain, rappelle que la couche d'exécution a un coût.
+
+Aucune de ces deux choses n'est un défaut du produit. Ce sont les propriétés de l'écosystème dans lequel il vit, et elles se paient ou se neutralisent en connaissance de cause.
+
 ## Le critère partiel, et pourquoi il n'a pas été arrondi
 
 Le seul critère non pleinement tenu concerne la sortie réseau. Il faut y distinguer deux natures de trafic.
@@ -120,11 +140,31 @@ Les **actions de l'agent** n'ont produit **aucun paquet** hors de la liste autor
 
 Le **runtime du produit**, lui, émet à chaque démarrage seize paquets vers des résolveurs DNS publics, dans une tentative de découverte de points d'entrée de repli. Ce trafic n'est annoncé nulle part. Bloqué, il n'empêche pas la connexion d'aboutir.
 
+Il se lit encore aujourd'hui dans le journal du service, relevé sur la machine de POC. Les identifiants d'hôte sont remplacés par des chevrons, rien d'autre n'est modifié :
+
+<figure class="terminal">
+<figcaption>POC Hermes | journal du service, decouverte non declaree</figcaption>
+
+```log
+21:57:46 <hote-poc> python[760]: WARNING [Telegram] Discovering Telegram API
+                                 fallback IPs via DNS-over-HTTPS...
+21:57:50 <hote-poc> python[760]: WARNING [Telegram] Connecting to Telegram
+                                 (attempt 1/8)...
+21:58:10 <hote-poc> python[760]: WARNING [Telegram] Connect attempt 1/8 failed:
+                                 Timed out...
+21:58:11 <hote-poc> python[760]: WARNING [Telegram] Connecting to Telegram
+                                 (attempt 2/8)...
+```
+
+</figure>
+
+La première ligne est celle qui compte : le produit part interroger des résolveurs publics avant même d'essayer de se connecter, et aucune documentation ne l'annonce. Les suivantes sont l'effet de la liste blanche, qui refuse ce trafic. Vingt secondes d'attente par tentative, huit tentatives : c'est le même mécanisme qui coûtait cent secondes au démarrage.
+
 Le critère est donc tenu pour l'agent et pas pour le produit. Nous l'avons noté partiel plutôt que vert, parce que la distinction entre « l'agent respecte sa politique » et « rien ne sort de cette machine » est exactement celle qu'un client aura en tête, et qu'il vaut mieux la porter soi-même que se la faire opposer.
 
 ## Ce que je retiens
 
-**Un POC doit être mené sur le canal de production.** Le terminal ment par omission : il ne traverse pas la même chaîne, et il aurait ici validé un produit en panne.
+**Un POC doit être mené sur un canal identique à celui de la production.** Pas sur la production elle-même, ce serait imprudent : sur une pré-production qui emprunte la même chaîne. Le terminal, lui, ment par omission, parce qu'il ne la traverse pas, et il aurait ici validé un produit en panne.
 
 **Fermer la sortie réseau est un instrument de mesure.** Le comportement le plus important de cette nuit n'a pas été cherché, il est apparu parce qu'un contrôle strict l'a rendu bruyant.
 

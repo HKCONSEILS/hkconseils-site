@@ -72,6 +72,9 @@ Même compte, même fichier, lisible hors du produit et pas au travers. Le runti
 
 Rejoué sur la machine de POC, qui tourne encore. Les valeurs ne sont jamais affichées, seuls les droits et le nombre de noms définis :
 
+<figure class="terminal">
+<figcaption>POC IronClaw | proprietes du fichier de secrets</figcaption>
+
 ```console
 $ stat -c '%a %U:%G' <fichier de secrets du service>
 640 root:ironclaw
@@ -80,6 +83,8 @@ LISIBLE
 $ runuser -u ironclaw -- grep -c '^[A-Z_]*=' <fichier de secrets du service>
 8
 ```
+
+</figure>
 
 Le compte de service lit donc parfaitement ses huit variables **hors** du produit. C'est au travers de l'outil de l'agent, et là seulement, qu'elles disparaissent.
 
@@ -102,6 +107,24 @@ Un contrôle du produit a d'ailleurs bloqué notre propre plan de test. Le témo
 ## Le bac à sable, éprouvé par trois témoins inverses
 
 Les outils s'exécutent dans un bac à sable WebAssembly, avec trois limites indépendantes. Chacune a été éprouvée par un cas conçu pour la déclencher : trois lectures de fichiers refusées, y compris une tentative de remontée d'arborescence ; une demande de mémoire refusée à la limite déclarée ; et une boucle infinie interrompue en **environ 12,7 millisecondes**.
+
+Le refus de mémoire est encore dans le journal du service, avec ses valeurs. Et tant qu'on y est, ce que le service écoute, puisque c'est la contrainte que le POC s'était donnée :
+
+<figure class="terminal">
+<figcaption>POC IronClaw | bac a sable et surface d'ecoute</figcaption>
+
+```console
+$ ss -lntp | grep ironclaw
+LISTEN 0  128  127.0.0.1:3000  0.0.0.0:*  users:(("ironclaw",pid=982,fd=9))
+
+$ journalctl -u ironclaw | grep wasm_limiter
+WARN ironclaw_wasm_limiter: WASM memory growth denied
+     used=8454144  desired=16842752  growth=8388608  limit=10485760
+```
+
+</figure>
+
+La limite est de dix mégaoctets, la demande en réclamait seize : refusée, journalisée, chiffrée. Et une seule socket, sur la boucle locale : rien n'écoute ailleurs.
 
 Un bac à sable dont on n'a pas essayé de sortir est une case cochée. Trois témoins inverses, c'est une mesure.
 
@@ -151,12 +174,17 @@ Au premier démarrage, ce runtime n'installe **rien** et n'émet **aucun paquet*
 
 Le compte se vérifie encore aujourd'hui, marqueur de dépaquetage par marqueur :
 
+<figure class="terminal">
+<figcaption>POC IronClaw | competences depaquetees du binaire</figcaption>
+
 ```console
 $ ls -1 <repertoire des competences> | wc -l
 32
 $ find <repertoire des competences> -name .ironclaw-reborn-bundled.json | wc -l
 32
 ```
+
+</figure>
 
 Trente-deux compétences, trente-deux marqueurs : aucune n'est arrivée par le réseau. Un module de télémétrie existe, mais il est en adhésion volontaire, désactivé, sans destination configurée, et **aucune enveloppe n'a été émise**.
 
@@ -173,6 +201,18 @@ Côté charge, le produit reste sobre en processeur : **environ 193 Mo** d'empre
 **Il n'existe aucune voie opérateur pour les écrire.** L'interface de contenu est en lecture seule ; la seule écriture possible passe par la mémoire, donc **par l'agent lui-même**. Conséquence directe, et c'est le vrai point d'architecture : cette identité **ne se versionne pas et ne se relit pas avant application**. Sur les deux autres runtimes que nous avons évalués, l'identité est un fichier posé par l'exploitant, donc revu, daté, comparable. Ici, elle vit dans une base et c'est l'agent qui l'y écrit. Un contrôle d'empreinte après écriture devient obligatoire.
 
 Dernier élément de contexte, à dire plutôt qu'à laisser découvrir : la ligne 1.x est **jeune**. Première version majeure fin juillet, trois versions mineures en vingt-trois jours. Sur un composant à qui l'on confie des secrets, la fraîcheur est une donnée d'arbitrage.
+
+## Pourquoi Rust compte ici
+
+Le choix du langage explique plusieurs des mesures ci-dessus, et il vaut la peine de le dire sans en faire un argument d'école.
+
+**La sécurité mémoire sans ramasse-miettes** est ce qui permet à un runtime d'agent d'être à la fois strict sur ses limites et sobre en processeur. Le pic mesuré ici, **18 % d'un coeur** en génération, contre 209 % pour l'agent en langage interprété évalué la veille, n'est pas un détail de confort : c'est ce qui rend crédible de faire tourner plusieurs agents sur une machine modeste.
+
+**Le binaire autonome** explique les trente-deux compétences dépaquetées, et surtout l'absence totale d'installation au démarrage. Rien n'est tiré du réseau parce que rien n'a besoin de l'être. C'est un argument de conformité autant que de performance.
+
+**L'affinité avec WebAssembly** n'est pas un hasard non plus : l'outillage du langage y mène naturellement, et c'est ce qui donne le bac à sable observé, avec ses limites de mémoire et de temps mesurables de l'extérieur.
+
+La contrepartie est déjà dans cet article et il faut la garder en tête : **l'écosystème IA y est plus jeune**, et cette ligne de version est fraîche, première version majeure fin juillet et trois mineures en vingt-trois jours. On échange de la maturité d'écosystème contre des propriétés d'exécution.
 
 ## Ce que je retiens
 
