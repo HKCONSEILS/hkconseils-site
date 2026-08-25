@@ -402,3 +402,29 @@ plutot qu'applique en silence, et une legende l'explique dans l'article lui-meme
 **Les trois dernieres lignes du tableau ne portent aucun marqueur** : ce sont des mesures
 d'empreinte, de processeur et de latence, pas des mecanismes. Les qualifier de natifs ou
 d'extensibles n'aurait rien voulu dire.
+
+---
+
+## D21 — Telegram et ETH-USD caviardes, et les phrases d'assainissement corrigees avec
+
+**Decision d'Hemerson**, rendue apres le signalement de REV2 : les deux noms de tiers
+introduits par un extrait et absents de toute la prose sont **caviardes**. Appliquee.
+
+- `[Telegram]`, `Telegram API`, `Connecting to Telegram` deviennent `<messagerie>` dans le
+  seul bloc de journal de l'article Hermes. Quatre occurrences, zero restante.
+- `"ticker": "ETH-USD"` devient `"ticker": "<instrument>"` dans la ligne de verdict de
+  l'article OpenClaw. Une occurrence, zero restante.
+
+**Ce que le remplacement ne suffisait pas a faire.** Les deux articles portaient une phrase
+decrivant leur propre assainissement. Celle de Hermes affirmait « les identifiants d'hote
+sont remplaces par des chevrons, **rien d'autre n'est modifie** ». Caviarder sans la
+toucher aurait laisse dans l'article une **affirmation fausse sur son propre contenu** —
+exactement le defaut que ces articles decrivent. Les deux phrases sont corrigees et
+nomment desormais ce qui est remplace.
+
+L'alignement du bloc de journal a ete refait, le chevron etant plus long que le nom
+d'origine.
+
+**Controle de disparition** : zero occurrence des deux termes sur les cinq articles, temoin
+inverse a 1. **Cout assume** : l'extrait perd sa litteralite, qui faisait une partie de sa
+force ; il garde la sequence reelle et ses horodatages.

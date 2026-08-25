@@ -133,14 +133,14 @@ Le troisième point est la règle de conception à retenir de tout ce chantier. 
 
 > **Une absence de trace n'est pas une preuve d'absence de violation.** C'est la phrase qui nous a fait retirer une affirmation d'un dossier. Elle est désagréable à écrire, et c'est exactement pour ça qu'elle vaut la peine d'être écrite avant que quelqu'un d'autre ne la formule à votre place.
 
-Voici à quoi ressemble une ligne de blocage. Celle-ci a été produite pendant la validation technique du 22 août, et **écartée dans un fichier séparé** pour ne jamais être comptée comme une décision réelle :
+Voici à quoi ressemble une ligne de blocage. Celle-ci a été produite pendant la validation technique du 22 août, et **écartée dans un fichier séparé** pour ne jamais être comptée comme une décision réelle. L'instrument est remplacé par un chevron, le reste est la ligne telle qu'elle a été écrite :
 
 <figure class="terminal">
 <figcaption>enforcer | une ligne de verdict, produite en validation</figcaption>
 
 ```json
 {"ts": "2026-08-22T11:35:57.202197+00:00",
- "ticker": "ETH-USD",
+ "ticker": "<instrument>",
  "action_proposee": "SHORT",
  "verdict": "block",
  "regle_soul": ["LONG_ONLY: action 'SHORT' is forbidden"],

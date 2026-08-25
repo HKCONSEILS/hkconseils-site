@@ -75,12 +75,12 @@ couleurs d'usage en auraient ajoute trois.
 par une designation entre chevrons, et pour les secrets **aucune valeur**, uniquement les
 droits, le proprietaire et le nombre de noms definis.
 
-### ⚠️ Deux noms de tiers que les extraits rendent publics, et qui n'etaient nulle part ailleurs
+### ✅ Deux noms de tiers, CAVIARDES sur decision du decideur
 
-**A ratifier ou a caviarder par le decideur avant merge.** Aucune porte ne les bloque, et
-l'authenticite de la ligne a de la valeur — mais ce sont des informations **nouvelles**,
-introduites par un extrait et absentes de toute la prose. Ce n'est donc pas une decision
-d'executant.
+**Decision rendue : caviardage.** Signale d'abord comme arbitrage en attente — aucune porte
+ne les bloquait, et la litteralite de la ligne avait de la valeur — mais ce sont des
+informations **nouvelles**, introduites par un extrait et absentes de toute la prose. Le
+decideur a tranche pour le caviardage. **Applique.**
 
 Balayage systematique des 15 blocs : tout nom propre present dans un extrait a ete
 recherche dans le corps de son article, figures exclues. Deux cas ressortent.
@@ -93,8 +93,18 @@ recherche dans le corps de son article, figures exclues. Deux cas ressortent.
 Deux cas sans enjeu, verifies au passage : `EXEMPLE-SARL` est explicitement fictive, et
 `VAT` est un code de type du format, pas une donnee.
 
-**Recette de caviardage, si la decision est de ne pas nommer.** Un remplacement par fichier,
-sans retoucher le reste :
+**Ce que le caviardage a exige en plus du remplacement.** Les deux articles portaient une
+phrase decrivant leur propre assainissement. Celle de Hermes disait « les identifiants
+d'hote sont remplaces par des chevrons, **rien d'autre n'est modifie** » : elle devenait
+**fausse** au moment meme du caviardage. Elle dit desormais que l'identifiant d'hote **et le
+nom du canal** sont remplaces. Celle d'OpenClaw a recu la meme mention pour l'instrument.
+Un caviardage qui laisse derriere lui une declaration d'assainissement perimee est pire que
+pas de caviardage : il transforme une omission en affirmation fausse.
+
+L'alignement du bloc de journal a ete refait, `<messagerie>` etant plus long que le nom
+d'origine.
+
+**Recette appliquee**, conservee pour tracer ce qui a change :
 
 ```
 # article Hermes, dans le seul bloc de journal
@@ -104,8 +114,10 @@ sed -i 's/\[Telegram\]/[<messagerie>]/g; s/Telegram API/<messagerie> API/; s/Con
 sed -i 's/"ETH-USD"/"<instrument>"/' src/content/blog/openclaw-plateforme-multi-agents-lecons.md
 ```
 
-Le caviardage coute la litteralite du journal, qui est precisement ce qui donne sa force a
-l'extrait. C'est l'arbitrage a rendre, et il appartient au decideur.
+**Controle de disparition** : `Telegram` **0 occurrence**, `ETH-USD` **0 occurrence** sur
+les cinq articles, temoin inverse a 1 sur le meme motif. Le cout est assume : l'extrait perd
+la litteralite du journal, qui faisait une partie de sa force. Il garde ce qui compte, la
+sequence reelle et ses horodatages.
 
 **Controle anti-fuite sur les 15 blocs de code du blog**, cinq familles, temoin inverse a 1
 sur chacune :

@@ -140,20 +140,21 @@ Les **actions de l'agent** n'ont produit **aucun paquet** hors de la liste autor
 
 Le **runtime du produit**, lui, émet à chaque démarrage seize paquets vers des résolveurs DNS publics, dans une tentative de découverte de points d'entrée de repli. Ce trafic n'est annoncé nulle part. Bloqué, il n'empêche pas la connexion d'aboutir.
 
-Il se lit encore aujourd'hui dans le journal du service, relevé sur la machine de POC. Les identifiants d'hôte sont remplacés par des chevrons, rien d'autre n'est modifié :
+Il se lit encore aujourd'hui dans le journal du service, relevé sur la machine de POC. Les identifiants d'hôte **et le nom du canal de messagerie** sont remplacés par des chevrons ; le reste est la ligne telle qu'elle a été écrite :
 
 <figure class="terminal">
 <figcaption>POC Hermes | journal du service, decouverte non declaree</figcaption>
 
 ```log
-21:57:46 <hote-poc> python[760]: WARNING [Telegram] Discovering Telegram API
-                                 fallback IPs via DNS-over-HTTPS...
-21:57:50 <hote-poc> python[760]: WARNING [Telegram] Connecting to Telegram
-                                 (attempt 1/8)...
-21:58:10 <hote-poc> python[760]: WARNING [Telegram] Connect attempt 1/8 failed:
-                                 Timed out...
-21:58:11 <hote-poc> python[760]: WARNING [Telegram] Connecting to Telegram
-                                 (attempt 2/8)...
+21:57:46 <hote-poc> python[760]: WARNING [<messagerie>] Discovering
+                                 <messagerie> API fallback IPs
+                                 via DNS-over-HTTPS...
+21:57:50 <hote-poc> python[760]: WARNING [<messagerie>] Connecting to
+                                 <messagerie> (attempt 1/8)...
+21:58:10 <hote-poc> python[760]: WARNING [<messagerie>] Connect attempt 1/8
+                                 failed: Timed out...
+21:58:11 <hote-poc> python[760]: WARNING [<messagerie>] Connecting to
+                                 <messagerie> (attempt 2/8)...
 ```
 
 </figure>
