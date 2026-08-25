@@ -30,7 +30,9 @@ sur six passages chacune.
 | B2 `blog-03-vague-2` | `fdf290e` | ✅ | ✅ | ✅ | ✅ |
 | B2 `blog-03-vague-2` | `f1aec21` *(nommage)* | ✅ | ✅ | ✅ | ✅ |
 | B2 `blog-03-vague-2` | `474b557` *(schémas)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
-| **B2 `blog-03-vague-2`** | **`f0fd64c`** *(final)* | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `f0fd64c` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `ff8a909` *(rapport)* | ✅ | ✅ | ✅ | ✅ |
+| **B2 `blog-03-vague-2`** | **`a28361f`** *(aeration)* | *en cours a la redaction* | | | |
 
 **Cette reserve est levee depuis `474b557`.** L'echantillon portait sur six URL et
 n'incluait aucune page nouvelle ; il en compte desormais **onze**, dont les cinq articles
@@ -1242,3 +1244,110 @@ du comportement a 390 px et a 1440 px sur les douze articles, rapportee au parag
 bloc de code**. C'est du texte, donc integralement relisible par la revue anti-fuite, ce que
 la condition (3) cherche precisement a obtenir. Elle modifierait le corps des articles :
 elle attend un accord.
+
+---
+---
+
+# REPORT — AERATION (25/08/2026, troisieme passe)
+
+- **Branche** : B2 `blog-03-vague-2` uniquement. **Commit** : `a28361f`.
+- **Origine** : question de la revue sur les captures d'ecran. Elles restent non livrables
+  (section « R4 » et decisions D15 et D16). Ce qui suit est ce qui a ete fait a la place.
+
+## 1. Le constat qui a declenche la passe
+
+Les cinq articles de la vague n'avaient **ni bloc de code ni citation en exergue**, la ou
+les trois articles deja publies en comptent de un a quatre. Ce n'etait pas un defaut de
+fond, c'etait un ecart de rythme avec le reste du blog : des blocs de prose de 1 300 a
+1 500 mots coupes par un seul schema.
+
+| | schemas | tableaux | blocs de code | exergues |
+|---|---|---|---|---|
+| Les 5 articles, avant cette passe | 1 chacun | 0 a 1 | **0** | **0** |
+| REX incident GPU (deja publie) | 0 | 0 | 4 | 1 |
+| REX migration (deja publie) | 0 | 1 | 2 | 1 |
+| Qwen-AgentWorld (deja publie) | 0 | 1 | 0 | 1 |
+
+## 2. Etat apres la passe
+
+| Article | Schemas | Blocs de code | Exergue |
+|---|---|---|---|
+| e-facture | 1 | 0 | 1 |
+| OpenClaw | 1 | 0 | 1 |
+| Hermes | 1 | **2** | 1 |
+| IronClaw | **2** | **2** | 1 |
+| pilier | **2** | 0 | 1 |
+
+## 3. Les extraits de terminal sont reels, et assainis
+
+**Rejoues** sur les deux machines de POC, qui tournent toujours — pas reconstitues de
+memoire, pas recopies d'un rapport. Commandes en **lecture seule**, bornees par `timeout`
+cote machine cible.
+
+| Extrait | Ce qu'il montre | Fait deja present dans l'article |
+|---|---|---|
+| Hermes, configuration | les **trois** reglages qui ferment la creation de competences, dont deux non documentes | oui |
+| Hermes, inventaire | `0` entree dans le repertoire des competences, et un repertoire que le compte de service ne peut pas ecrire | oui |
+| IronClaw, secrets | droits `640`, proprietaire, **8 noms** de variables definis, lisible par le compte hors du produit | oui |
+| IronClaw, competences | **32** competences et **32** marqueurs de depaquetage, donc aucune arrivee par le reseau | oui |
+
+**Ce qui n'est jamais affiche** : aucune valeur de secret. Uniquement les droits, le
+proprietaire et le **nombre** de noms definis. Les chemins reels sont remplaces par une
+designation entre chevrons.
+
+### Controle anti-fuite sur les blocs de code
+
+Applique aux **dix** blocs de code du blog, cinq familles, avec temoin inverse.
+
+| Famille | Occurrences |
+|---|---|
+| adresse IP privee | **0** |
+| nom d'hote interne | **0** |
+| sous-domaine interne ou nom de client | **0** |
+| identifiant de VM ou de conteneur | **0** |
+| chaine ressemblant a une valeur de secret | **0** |
+
+Temoin inverse : une ligne piegee portant une adresse privee, un nom d'hote, un
+identifiant de conteneur et un sous-domaine est bien detectee. Les zeros sont donc mesures.
+
+## 4. Les exergues portent une idee, elles ne repetent pas une phrase
+
+C'etait le risque de l'exercice : une citation qui recopie le corps ajoute du bruit et
+donne au lecteur l'impression de relire. Les cinq formulent une regle que le paragraphe
+precedent a demontree sans l'enoncer.
+
+| Article | Idee portee |
+|---|---|
+| e-facture | etre conforme et ne rien y gagner : la date decide de la conformite, ce qu'on branche derriere decide du benefice |
+| OpenClaw | une absence de trace n'est pas une preuve d'absence de violation |
+| Hermes | une consigne n'est pas un controle : ce qui doit etre garanti sort du texte et entre dans le code |
+| IronClaw | l'intention derive, l'action ne suit pas, et c'est tout l'interet de separer les deux |
+| pilier | un controle vaut par ce qu'il exerce, pas par ce qu'il affiche |
+
+## 5. Deux schemas de plus
+
+- **IronClaw** : les **trois issues** du test des secrets — l'agent lit, l'agent refuse
+  poliment mais le secret reste joignable, ou le secret n'est pas la — et pourquoi seule la
+  troisieme resiste a une invite bien tournee. L'article posait ce critere avant la mesure,
+  il ne le montrait pas.
+- **Pilier** : **les quatre formes de la meme panne silencieuse**, en trois colonnes, ce qui
+  arrive, ce que le systeme montre, ce qui est vrai. Second visuel partageable du lot.
+
+**Sept schemas au total**, de 3,6 a 5,6 Ko, plafond unitaire de 60 Ko. Toujours aucune
+image, aucune police, aucune ressource externe.
+
+## 6. Gates
+
+Toutes rejouees avant push et vertes : porte de redaction hors depot (10 articles,
+10 teasers), `check-leaks.sh` (56 fichiers), build Astro (14 pages), `check-jsonld.py`,
+non-regression `public/` vers `dist/` (14 fichiers a l'octet), zero JavaScript, une seule
+H1 par page, RSS et sitemap bien formes, `html-validate` sur les deux perimetres, titres a
+55 caracteres au maximum pour un budget de 56, 12 liens internes sans casse.
+
+**Un piege deja rencontre, reverifie** : une ligne vide dans un bloc `<figure>` fait sortir
+Markdown du mode HTML brut et reinjecte un `<p>` au milieu du SVG. Le controle est pose sur
+les sept schemas, resultat zero.
+
+**CI** : le run de `a28361f` etait **en cours** au moment d'ecrire cette section. Contrairement
+aux commits de rapport, celui-ci **modifie le contenu servi** : l'artefact `dist` doit donc
+changer de taille, et c'est le signe qu'il faut lire. Verdict a consigner ici des qu'il tombe.
