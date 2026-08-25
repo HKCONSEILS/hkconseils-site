@@ -246,8 +246,8 @@ arbitrage explicite du decideur, et la preuve qu'elle mord encore accompagne le 
 
 **Trois** points portes au backlog par la revue, **aucune action entreprise sur aucun** :
 
-1. **Elargir l'echantillon Lighthouse** de une ou deux URL d'articles recents, pour que le
-   seuil mobile porte aussi sur les pages longues. Fichier : `lighthouserc.cjs`.
+1. ~~**Elargir l'echantillon Lighthouse**~~ — **FAIT le 25/08**, voir D17. L'echantillon
+   compte onze URL, dont les cinq articles nouveaux, tous a 100.
 2. **Integrer les trois visuels** a l'article sur la migration de modele, sous condition de
    conversion en webp sous 150 Ko et de chargement differe.
 3. **Nettoyer le commentaire d'en-tete de `GATE-articles.sh`**, orphelin depuis le retrait
@@ -260,3 +260,81 @@ Les deux premiers sont repris en section **D** du dossier de relecture, en tete 
 `REPORT.md`. Le troisieme est ajoute ici a la demande de la revue, sur le principe qu'un
 backlog qui ne vit que dans une conversation meurt en silence, alors qu'une ligne dans le
 depot survit.
+
+---
+
+## D13 — La case « secrets » du pilier passe a « non mesure », et une ligne la remplace
+
+**Decision, sur demande de la revue, apres verification.** Le rapport de POC ne contient
+aucune tentative de lecture de secret. Ce qu'il mesure est l'acces au **terminal** en ligne
+de commande, prouve par une commande executee et sa sortie rapportee. La case est donc
+passee a « non mesure ».
+
+**Ce que j'y ai ajoute de moi-meme, et pourquoi.** « Non mesure » seul aurait fait
+disparaitre du tableau un fait qui, lui, est mesure et qui compte dans un comparatif de
+confinement. Une ligne **« terminal accessible a l'agent »** a donc ete ajoutee pour le
+porter. Le tableau perd une affirmation fausse, il ne perd pas une information vraie.
+
+**Alternative ecartee** : s'en tenir a « non mesure » sans rien ajouter. Ecartee parce
+qu'elle rendait le tableau moins exact, pas plus.
+
+---
+
+## D14 — Le tableau du pilier devient defilable, dans ce seul article
+
+**Decision.** Le tableau du comparatif est encadre d'un conteneur a defilement horizontal.
+
+**Pourquoi.** Mesure a 390 px : largeur minimale de 399 px de contenu plus les marges,
+soit environ 447 px pour 390 disponibles. Le debordement est reel.
+
+**Pourquoi la portee est etroite.** Balayage sur les douze articles construits : onze
+tableaux tiennent, un seul deborde. Le defaut appartient a cet article, pas au gabarit.
+Modifier `BlogPost.astro` aurait touche treize pages pour en reparer une.
+
+**Alternative ecartee** : raccourcir les libelles des colonnes pour faire tenir le tableau.
+Ecartee car les mots dimensionnants sont « Cloisonnement » et « WebAssembly », deux termes
+qu'on ne peut pas abreger sans perdre du sens.
+
+---
+
+## D15 — R4, captures de relecture : non livrable, et rien n'a ete simule
+
+**Constat, pas decision.** Le redimensionnement de fenetre n'agit pas sur le viewport
+(rendu bloque a 1465 px, moteur fige a 414 px), et la sauvegarde sur disque ne cree aucun
+fichier sur cette machine.
+
+**Ce qui a ete fait a la place** : une mesure du comportement a 390 px et a 1440 px sur les
+douze articles, qui a d'ailleurs trouve le defaut du paragraphe D14.
+
+**Ce qui n'a PAS ete fait** : livrer des captures a 1465 px en les presentant comme des
+captures a 1440, ou produire une capture unique en pretendant qu'elle vaut pour les cinq
+articles. Une capture qui ment sur sa largeur est pire qu'une capture absente.
+
+**Hygiene du navigateur** : onglet dedie cree puis referme, fenetre remise a 1440x900.
+
+---
+
+## D16 — R2 amende, captures de POC : non livrables, condition (2)
+
+La condition (1) est remplie, les deux environnements tournent. La condition (2) bloque
+pour une raison materielle : les hotes de POC n'ont pas d'affichage, et le seul moyen de
+capture est un navigateur sur une autre machine. Exposer l'interface locale de l'un d'eux
+pour la capturer reviendrait a casser la contrainte de securite que le POC avait pour objet
+de verifier.
+
+**Alternative proposee, en attente d'accord** : un extrait de terminal reel, rejoue et
+colle en bloc de code. Du texte, donc relisible, ce que la condition (3) recherche.
+
+---
+
+## D17 — Le commentaire de `lighthouserc.cjs` etait faux, il est corrige
+
+Le fichier annoncait un echantillon compose des « deux articles les plus recents ». Le tri
+porte en realite sur le slug, par ordre alphabetique decroissant : aucune page nouvelle
+n'avait jamais ete mesuree depuis la creation du job.
+
+Le tri est **conserve** — un echantillon stable est une qualite pour comparer dans le temps
+— son intitule est corrige, et une liste d'articles **exiges** s'y ajoute, avec un
+avertissement si l'un d'eux manque au build. Eprouve par temoin inverse.
+
+Ceci **retire le premier item du backlog D12**, qui est desormais fait.

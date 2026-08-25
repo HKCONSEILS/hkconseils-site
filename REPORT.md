@@ -25,14 +25,22 @@ sur six passages chacune.
 | B1 `blog-02-cinq-articles` | `670e8b3` | ✅ | ✅ | ✅ | ✅ 100/100/100 |
 | B2 `blog-03-vague-2` | `a4cd4bb` | ✅ | ✅ | ✅ | ✅ |
 | B2 `blog-03-vague-2` | `0bfcbe3` | ✅ | ✅ | ✅ | ✅ |
-| **B2 `blog-03-vague-2`** | **`2f2c8ee`** *(final)* | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `2f2c8ee` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `1462c74` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `fdf290e` | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `f1aec21` *(nommage)* | ✅ | ✅ | ✅ | ✅ |
+| B2 `blog-03-vague-2` | `474b557` *(schémas)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
+| **B2 `blog-03-vague-2`** | **`f0fd64c`** *(final)* | ✅ | ✅ | ✅ | ✅ |
 
-**Ce que ce vert ne couvre pas, et qu'il faut savoir avant de le citer.** L'echantillon
-Lighthouse porte sur l'index du blog, deux retours d'experience deja publies, les deux
-pages legales et l'accueil. **Aucune des cinq pages de cette nuit n'y figure.** Le vert
-atteste une non-regression du gabarit, pas une mesure des nouveaux articles. Le risque
-reste faible (aucune image, aucun script, aucune ressource externe, `dist/` sans fichier
-`.js`), mais il n'est pas mesure. Elargir l'echantillon est au backlog post-gel.
+**Cette reserve est levee depuis `474b557`.** L'echantillon portait sur six URL et
+n'incluait aucune page nouvelle ; il en compte desormais **onze**, dont les cinq articles
+de cette nuit. Resultat mesure sur chacun d'eux : **100 en performance, 100 en
+accessibilite, 100 en bonnes pratiques, 100 en SEO**, mediane de trois passages, six
+mesures par categorie. Le vert couvre donc bien ce qui vient d'etre ecrit, schemas
+compris, et plus seulement le gabarit.
+
+Effet de bord a connaitre : le job Lighthouse passe d'environ 4 minutes a **7 min 14**,
+puisqu'il mesure onze URL au lieu de six.
 
 ## B. Liens externes de l'article e-facture, a valider
 
@@ -1105,3 +1113,132 @@ nom de la plateforme interne et son slug d'URL).
 7. **Reste ouvert depuis le 20/08** : l'article sur les modules IA en sante decrit son
    domaine avec assez de precision pour etre reconnaissable dans le secteur, sans nommer
    le client. Arbitrage toujours non rendu, et il porte sur B1, donc sur le premier merge.
+
+---
+---
+
+# REPORT — RETOUCHE-PILIER-01 et R1 a R4 (25/08/2026, seconde passe)
+
+- **Branche** : B2 `blog-03-vague-2` uniquement. `main` et B1 intactes.
+- **Commits** : `f1aec21` nommage, `474b557` schemas et echantillon Lighthouse, `f0fd64c` tableau defilable.
+
+## 1. R1 — nommage du pilier
+
+Les trois plateformes sont nommees dans les trois intitules de la section Positions et
+dans les en-tetes de colonnes du tableau : **OpenClaw**, **Hermes**, **IronClaw**. Les deux
+articles de POC portent leur nom des la premiere phrase du contexte en italique.
+
+### La case « secrets accessibles par un detour en ligne de commande » n'etait pas etayee
+
+Verification faite dans le rapport de POC. Ce qui a ete **mesure**, c'est l'acces au
+**terminal** : sur la question suivant un refus hors perimetre, l'agent a execute une
+commande et rapporte sa sortie. La **lecture du secret n'a jamais ete tentee**.
+L'affirmation venait en fait du rapport de l'autre POC, qui l'enonce comme point de
+comparaison — une deduction defendable (le fichier est en 0600 au nom du compte sous lequel
+l'agent tourne), mais une deduction.
+
+Deux consequences, appliquees :
+- la case passe a **« non mesure »** ;
+- une ligne **« terminal accessible a l'agent »** est ajoutee, qui porte le fait
+  reellement mesure. Sans elle, le tableau aurait perdu une information de confinement
+  vraie au lieu d'en perdre une fausse.
+
+Aucune prose de l'article ni du pilier n'affirmait cet acces : le changement est
+auto-coherent, verifie par recherche avant edition.
+
+## 2. R2 — cinq schemas, aucune capture
+
+| Article | Schema | Poids |
+|---|---|---|
+| e-facture | frise 2026 / 2027 separant **recevoir** et **emettre**, puis le circuit entreprise, plateforme agreee, annuaire, destinataire | 5,2 Ko |
+| OpenClaw | les sept phases, P0 et P1 pleines, les cinq autres en creux, monetisation en quatrieme position | 5,6 Ko |
+| Hermes | les deux environnements cote a cote, puis la barre 102 s contre 4,9 s | 3,6 Ko |
+| IronClaw | les trois couches emboitees, et le temoin du harnais 0 / 0 / 1 | 4,8 Ko |
+| pilier | matrice confinement x gouvernance | 4,4 Ko |
+
+Contraintes tenues : SVG en ligne, **aucune police ni ressource externe**, palette et
+typographie prises aux variables du site **avec valeur de repli**, texte reel dans le SVG,
+`role="img"` et `aria-label` descriptif, `figcaption`, largeur fluide par `viewBox`.
+Plafond de 60 Ko : le plus lourd fait 5,6 Ko.
+
+**Chaque chiffre porte par un schema a ete verifie present dans le corps**, en excluant le
+schema lui-meme du texte fouille — sinon le controle se serait auto-valide. Neuf
+assertions, neuf conformes.
+
+**Le pilier n'affirme pas ce qui n'a pas ete mesure.** OpenClaw n'ayant pas ete passe au
+meme banc, il ne pouvait pas recevoir d'abscisse de confinement : il est represente par un
+**marqueur creux pose sur une bande en pointilles**, avec une legende qui dit « axe non
+mesure, aucune position affirmee ». Hermes et IronClaw sont des points pleins.
+
+**Un piege rencontre** : une ligne vide a l'interieur d'un bloc `<figure>` fait sortir
+Markdown du mode HTML brut et reinjecte un `<p>` au milieu du SVG. `html-validate` l'a
+attrape (`Stray end tag </p>`). Les cinq blocs sont desormais sans ligne vide, et le
+controle est pose.
+
+## 3. R3 — l'echantillon Lighthouse couvre enfin les pages nouvelles
+
+**Pourquoi il ne les couvrait pas.** Le commentaire de `lighthouserc.cjs` annoncait « les
+deux articles les plus recents ». C'etait faux : le tri porte sur le **nom du repertoire**,
+donc sur le slug, par ordre alphabetique decroissant. La date de publication n'intervenait
+nulle part, l'echantillon retenait toujours les deux memes articles, et **aucune page
+nouvelle n'avait jamais ete mesuree par ce job**.
+
+Correctif : tri stable conserve, intitule corrige, et une liste d'articles **exiges**
+ajoutee, avec un avertissement si l'un d'eux manque au build — eprouve par temoin inverse
+sur un slug inexistant.
+
+**Resultat mesure** : de six a **onze URL**, et **100 / 100 / 100 / 100** sur chacune des
+cinq pages nouvelles, mediane de trois passages. Cout : le job passe de ~4 min a 7 min 14.
+
+## 4. Un defaut reel, trouve en mesurant plutot qu'en regardant
+
+Une capture semblait montrer la derniere colonne du tableau du pilier coupee. Mesure faite
+avant de conclure : `scrollWidth` egal a `clientWidth`, `scrollX` a zero, aucun
+debordement. **C'etait un artefact de capture.**
+
+En revanche, en contraignant le conteneur d'article a 390 px, le debordement etait reel :
+largeur minimale de **399 px** de contenu plus les marges internes, soit environ **447 px**
+pour 390 disponibles. Colonnes dimensionnantes : « Cloisonnement » a 113 px et
+« WebAssembly, » a 110 px.
+
+Balayage sur **les douze articles construits** : **onze tableaux tiennent** dans 390 px,
+**un seul deborde**, celui du comparatif. Le defaut est donc specifique a cet article et
+non au gabarit.
+
+Correctif : ce seul tableau est encadre d'un conteneur a defilement horizontal, **dans cet
+article uniquement**. Le gabarit partage n'est pas touche et les onze autres tableaux ne
+changent pas.
+
+## 5. R4 — non livrable en l'etat, et pourquoi
+
+Trois obstacles constates, pas supposes.
+
+1. **Le redimensionnement de fenetre n'agit pas sur le viewport.** Le rendu reste a 1465 px
+   quelle que soit la taille demandee. Une tentative a 414 px a fige le moteur de rendu et
+   deux captures ont expire. Une capture a 390 px n'est donc pas productible par cette
+   voie, et « 1440 » vaudrait en realite 1465.
+2. **L'ecriture sur disque n'aboutit pas ici.** L'option de sauvegarde ne cree aucun
+   fichier sur cette machine, verifie : les captures vivent cote extension, sur une autre
+   machine. Elles ne peuvent pas etre deposees dans un repertoire de travail local.
+3. **C'est un navigateur personnel.** Un onglet dedie a ete cree puis referme, et la
+   fenetre remise a 1440x900.
+
+**Ce qui a ete produit a la place**, et qui repond mieux a la question posee : une **mesure**
+du comportement a 390 px et a 1440 px sur les douze articles, rapportee au paragraphe 4.
+
+## 6. R2 amende — captures de POC : non livrables
+
+- **Condition (1), remplie** : les deux environnements existent toujours, les deux services
+  tournent. Verifie.
+- **Condition (2), bloquante** : les hotes de POC sont **sans affichage**, et le seul moyen
+  de capture disponible est un navigateur sur une autre machine. Un « terminal plein
+  ecran » n'est pas productible. L'interface web de l'un des deux n'ecoute que sur la
+  boucle locale : l'atteindre supposerait de l'exposer, donc de modifier l'infrastructure
+  et de casser la contrainte de securite du POC lui-meme. L'autre a ete eprouve sur une
+  messagerie personnelle, ce qui echoue d'emblee sur « aucune barre personnelle ».
+- **Condition (3)** : sans capture, l'inventaire de texte visible est sans objet.
+
+**Alternative proposee, non appliquee** : un extrait de terminal **reel, rejoue et colle en
+bloc de code**. C'est du texte, donc integralement relisible par la revue anti-fuite, ce que
+la condition (3) cherche precisement a obtenir. Elle modifierait le corps des articles :
+elle attend un accord.
