@@ -21,6 +21,8 @@ Une précaution avant de comparer, parce qu'elle change la lecture du tableau : 
 
 ## Le tableau
 
+<div style="overflow-x:auto">
+
 | | OpenClaw (plateforme interne) | Hermes (agent Python) | IronClaw (runtime Rust) |
 |---|---|---|---|
 | Mécanisme d'identité | fichier unique sur disque | fichier unique posé par l'exploitant | **quatre fichiers natifs**, injectés à chaque tour |
@@ -36,6 +38,8 @@ Une précaution avant de comparer, parce qu'elle change la lecture du tableau : 
 | Empreinte mémoire | non mesuré | 139 Mo | 193 Mo, plus 102 Mo de base |
 | Pic processeur en génération | non mesuré | **209 %** d'un cœur | **18 %** d'un cœur |
 | Latence par tour | non mesuré | 14,0 s à froid, 7,4 s à chaud | **environ 22 s**, plate |
+
+</div>
 
 ### Une réserve de méthode, à ne pas dissimuler
 
