@@ -7,7 +7,7 @@ tags: ["agents", "poc", "sécurité", "mesure"]
 
 Un POC d'agent qui se contente de vérifier que l'agent répond ne mesure presque rien. Celui-ci a été construit pour mesurer autre chose : ce que le produit fait quand on ne le lui demande pas. Neuf critères, chacun avec un seuil écrit avant la mesure, et un environnement volontairement contraint. C'est la contrainte qui a rendu visible l'essentiel.
 
-*POC mené dans la nuit du 22 au 23 août 2026, sur un mini-PC dédié, avec un agent conversationnel open source en version 0.20.5 sous licence MIT, adossé à un modèle servi par notre propre infrastructure. Toutes les valeurs citées sont des mesures de cette nuit-là.*
+*POC mené sur Hermes, agent conversationnel open source en version 0.20.5 sous licence MIT, dans la nuit du 22 au 23 août 2026, sur un mini-PC dédié, adossé à un modèle servi par notre propre infrastructure. Toutes les valeurs citées sont des mesures de cette nuit-là.*
 
 ## Le tableau, sans arrondi
 

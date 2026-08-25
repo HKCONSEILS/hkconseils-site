@@ -11,23 +11,23 @@ Choisir un runtime d'agent se réduit rarement à comparer des fonctionnalités.
 
 ## Trois positions, pas trois concurrents
 
-**Notre plateforme interne** est celle que nous construisons et exploitons. Elle est planifiée en sept phases, dont deux sont livrées, et elle porte aujourd'hui deux blocs matures : un agent de veille en service continu, et un pipeline de décision encadré par des règles codées hors de portée du modèle. Son détail est dans [l'article qui lui est consacré](/blog/openclaw-plateforme-multi-agents-lecons/).
+**OpenClaw (notre plateforme interne)** est la plateforme que nous construisons et exploitons. Elle est planifiée en sept phases, dont deux sont livrées, et elle porte aujourd'hui deux blocs matures : un agent de veille en service continu, et un pipeline de décision encadré par des règles codées hors de portée du modèle. Son détail est dans [l'article qui lui est consacré](/blog/openclaw-plateforme-multi-agents-lecons/).
 
-**L'agent conversationnel en Python** a été évalué comme candidat pour les usages de messagerie. Neuf critères, huit tenus. Son POC a surtout mis au jour trois comportements non annoncés, décrits dans [son article dédié](/blog/hermes-poc-agent-ce-qui-nest-pas-annonce/).
+**Hermes (agent conversationnel Python)** a été évalué comme candidat pour les usages de messagerie. Neuf critères, huit tenus. Son POC a surtout mis au jour trois comportements non annoncés, décrits dans [son article dédié](/blog/hermes-poc-agent-ce-qui-nest-pas-annonce/).
 
-**Le runtime en Rust** a été évalué comme option pour les contextes les plus exigeants en confinement. Onze critères, deux échecs assumés, et un mode de protection des secrets que les deux autres n'atteignent pas. Son article est [ici](/blog/ironclaw-secret-absent-pas-refuse/).
+**IronClaw (runtime Rust)** a été évalué comme option pour les contextes les plus exigeants en confinement. Onze critères, deux échecs assumés, et un mode de protection des secrets que les deux autres n'atteignent pas. Son article est [ici](/blog/ironclaw-secret-absent-pas-refuse/).
 
 Une précaution avant de comparer, parce qu'elle change la lecture du tableau : **notre plateforme interne n'a pas été passée au même banc**. Elle est en exploitation, pas en évaluation. Les cases vides de sa colonne signifient « non mesuré dans ce cadre », jamais « absent ».
 
 ## Le tableau
 
-| | Plateforme interne | Agent Python | Runtime Rust |
+| | OpenClaw (plateforme interne) | Hermes (agent Python) | IronClaw (runtime Rust) |
 |---|---|---|---|
 | Mécanisme d'identité | fichier unique sur disque | fichier unique posé par l'exploitant | **quatre fichiers natifs**, injectés à chaque tour |
 | Qui écrit l'identité | l'exploitant | l'exploitant | **l'agent lui-même**, sous profil base de données |
 | Identité relisible avant application | oui | oui | **non**, elle vit en base |
 | Restriction d'outillage | native, par canal | native, outils non chargés | **native et plus fine**, par capacité, effet mesuré |
-| Secrets accessibles à l'agent | non mesuré | **oui** par un détour en ligne de commande | **non, absence structurelle** |
+| Secrets accessibles à l'agent | non mesuré | non mesuré | **non, absence structurelle** |
 | Cloisonnement réseau | liste blanche de sortie | liste blanche de sortie par compte | **deux couches**, applicative et pare-feu, chacune prouvée seule |
 | Protection contre les requêtes détournées | non mesuré | non mesuré | **oui**, y compris après résolution de nom |
 | Bac à sable d'outils | non mesuré | non mesuré | **WebAssembly**, mémoire, temps et accès |

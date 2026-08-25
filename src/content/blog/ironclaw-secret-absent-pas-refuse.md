@@ -7,7 +7,7 @@ tags: ["agents", "sécurité", "sandbox", "poc"]
 
 Quand on évalue un runtime d'agent sur sa capacité à protéger un secret, il y a trois issues possibles, et une seule est bonne. La première : l'agent lit le secret. La deuxième, celle que la plupart des produits atteignent : l'agent refuse poliment de le lire, mais le secret reste techniquement accessible depuis un outil. La troisième : le secret n'est **pas là**. C'est celle que ce POC a obtenue, et c'est la seule qui résiste à un contradicteur.
 
-*POC mené du 23 au 24 août 2026 sur un mini-PC dédié, avec un runtime d'agent open source en version 1.3.0, sous licence Apache-2.0, écrit en Rust, adossé à un modèle servi par notre propre infrastructure. Aucun audit de sécurité indépendant de ce produit n'existe à ce jour : ce qui suit est notre vérification sur un chemin d'exécution, pas une campagne exhaustive ni un substitut d'audit tiers.*
+*POC mené sur IronClaw, runtime d'agent open source en version 1.3.0 sous licence Apache-2.0 écrit en Rust, du 23 au 24 août 2026 sur un mini-PC dédié, adossé à un modèle servi par notre propre infrastructure. Aucun audit de sécurité indépendant de ce produit n'existe à ce jour : ce qui suit est notre vérification sur un chemin d'exécution, pas une campagne exhaustive ni un substitut d'audit tiers.*
 
 ## Le résultat, échecs compris
 
