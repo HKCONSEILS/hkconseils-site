@@ -75,6 +75,38 @@ couleurs d'usage en auraient ajoute trois.
 par une designation entre chevrons, et pour les secrets **aucune valeur**, uniquement les
 droits, le proprietaire et le nombre de noms definis.
 
+### ⚠️ Deux noms de tiers que les extraits rendent publics, et qui n'etaient nulle part ailleurs
+
+**A ratifier ou a caviarder par le decideur avant merge.** Aucune porte ne les bloque, et
+l'authenticite de la ligne a de la valeur — mais ce sont des informations **nouvelles**,
+introduites par un extrait et absentes de toute la prose. Ce n'est donc pas une decision
+d'executant.
+
+Balayage systematique des 15 blocs : tout nom propre present dans un extrait a ete
+recherche dans le corps de son article, figures exclues. Deux cas ressortent.
+
+| Nom | Ou | Occurrences | Present dans la prose ? | Enjeu |
+|---|---|---|---|---|
+| **Telegram** | extrait de journal, article Hermes | **4**, toutes dans le meme bloc | **non** — la prose dit « canal de messagerie » partout, dans cet article comme dans le pilier | nomme le canal reellement eprouve pendant le POC |
+| **ETH-USD** | ligne de verdict JSONL, article OpenClaw | **1** | **non** — la prose dit « instruments volatils », sans jamais nommer d'instrument | revele qu'une paire crypto figure au perimetre du pipeline |
+
+Deux cas sans enjeu, verifies au passage : `EXEMPLE-SARL` est explicitement fictive, et
+`VAT` est un code de type du format, pas une donnee.
+
+**Recette de caviardage, si la decision est de ne pas nommer.** Un remplacement par fichier,
+sans retoucher le reste :
+
+```
+# article Hermes, dans le seul bloc de journal
+sed -i 's/\[Telegram\]/[<messagerie>]/g; s/Telegram API/<messagerie> API/; s/Connecting to Telegram/Connecting to <messagerie>/g' \
+  src/content/blog/hermes-poc-agent-ce-qui-nest-pas-annonce.md
+# article OpenClaw, dans la ligne de verdict
+sed -i 's/"ETH-USD"/"<instrument>"/' src/content/blog/openclaw-plateforme-multi-agents-lecons.md
+```
+
+Le caviardage coute la litteralite du journal, qui est precisement ce qui donne sa force a
+l'extrait. C'est l'arbitrage a rendre, et il appartient au decideur.
+
 **Controle anti-fuite sur les 15 blocs de code du blog**, cinq familles, temoin inverse a 1
 sur chacune :
 
