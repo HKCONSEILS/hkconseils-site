@@ -33,6 +33,36 @@ Ici, la sortie réseau était fermée par une liste blanche stricte. Le comporte
 
 Le point à retenir dépasse ce produit : **c'est la liste blanche qui a rendu le comportement visible**. Sans elle, l'installation aurait réussi silencieusement, le démarrage aurait été rapide, et personne n'aurait jamais su qu'un agent tirait du code à chaque réveil. Un contrôle restrictif n'a pas seulement une valeur de protection, il a une valeur de révélateur.
 
+<figure>
+<svg viewBox="0 0 820 330" role="img" aria-label="Comparaison de deux environnements. Avec une sortie réseau ouverte, l'installation de deux paquets à chaque lancement réussit en silence : le démarrage est rapide et le comportement reste invisible. Avec une liste blanche stricte, la même installation est bloquée, 192 paquets sont rejetés, environ cent secondes de délais d'expiration s'accumulent et le démarrage passe à 102 secondes, ce qui rend le comportement visible. Après neutralisation du réglage, le démarrage tombe à 4,9 secondes." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
+  <rect x="0" y="0" width="820" height="330" fill="var(--color-surface-sunken,#fafbfc)" rx="10"/>
+  <text x="32" y="42" font-size="15" font-weight="700" fill="var(--color-fg,#071b3b)">La liste blanche n'a pas seulement protégé, elle a révélé</text>
+  <rect x="32" y="66" width="370" height="196" rx="10" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="52" y="94" font-size="13" font-weight="700" fill="var(--color-fg-muted,#6b7280)">Sortie réseau ouverte</text>
+  <text x="52" y="122" font-size="12" fill="var(--color-fg,#071b3b)">Installation de 2 paquets à chaque lancement</text>
+  <text x="52" y="144" font-size="12" fill="var(--color-fg,#071b3b)">Elle réussit, sans erreur, sans trace</text>
+  <text x="52" y="166" font-size="12" fill="var(--color-fg,#071b3b)">Démarrage rapide</text>
+  <rect x="52" y="188" width="330" height="52" rx="8" fill="var(--color-surface-sunken,#fafbfc)" stroke="var(--color-border,#e5e7eb)" stroke-dasharray="4 4"/>
+  <text x="217" y="211" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">Comportement invisible</text>
+  <text x="217" y="230" font-size="11" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">un agent tire du code à chaque réveil, personne ne le sait</text>
+  <rect x="418" y="66" width="370" height="196" rx="10" fill="var(--color-surface,#fff)" stroke="var(--color-accent,#005ffa)" stroke-width="1.5"/>
+  <text x="438" y="94" font-size="13" font-weight="700" fill="var(--color-accent,#005ffa)">Liste blanche stricte</text>
+  <text x="438" y="122" font-size="12" fill="var(--color-fg,#071b3b)">Même installation, bloquée</text>
+  <text x="438" y="144" font-size="12" fill="var(--color-fg,#071b3b)"><tspan font-weight="700">192 paquets</tspan> rejetés par lancement</text>
+  <text x="438" y="166" font-size="12" fill="var(--color-fg,#071b3b)">une centaine de secondes d'attente</text>
+  <rect x="438" y="188" width="330" height="52" rx="8" fill="var(--color-accent,#005ffa)"/>
+  <text x="603" y="211" font-size="12.5" font-weight="700" text-anchor="middle" fill="#ffffff">Comportement bruyant, donc trouvé</text>
+  <text x="603" y="230" font-size="11" text-anchor="middle" fill="rgba(255,255,255,0.86)">le contrôle sert d'instrument de mesure</text>
+  <text x="32" y="292" font-size="12" font-weight="700" fill="var(--color-fg,#071b3b)">Temps de démarrage du service</text>
+  <rect x="270" y="278" width="420" height="18" rx="4" fill="var(--color-fg-muted,#6b7280)"/>
+  <text x="700" y="292" font-size="12" font-weight="700" fill="var(--color-fg-muted,#6b7280)">102 s</text>
+  <rect x="270" y="302" width="20" height="18" rx="4" fill="var(--color-accent,#005ffa)"/>
+  <text x="300" y="316" font-size="12" font-weight="700" fill="var(--color-accent,#005ffa)">4,9 s</text>
+  <text x="32" y="316" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">après neutralisation du réglage</text>
+</svg>
+<figcaption>Le même comportement produit, selon l'environnement, un démarrage rapide et silencieux ou une anomalie de 102 secondes impossible à ignorer.</figcaption>
+</figure>
+
 ### Trois réglages là où la documentation en donne un
 
 Empêcher un agent de fabriquer lui-même de nouvelles compétences semblait tenir en une option, celle qui est documentée et présente dans la configuration livrée.

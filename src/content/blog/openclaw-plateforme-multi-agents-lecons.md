@@ -17,6 +17,53 @@ OpenClaw est notre plateforme multi-agents auto-hébergée. Son plan directeur d
 
 Ce découpage a lui-même une leçon. Placer la monétisation en phase quatre, après l'orchestration et la sécurité, est un choix qui coûte cher en trésorerie et qui se défend mal en réunion. Il se défend très bien la première fois qu'un agent fait une chose qu'on ne lui avait pas demandée.
 
+<figure>
+<svg viewBox="0 0 820 250" role="img" aria-label="Les sept phases du plan de construction de la plateforme, de P0 à P6 : fondations et infrastructure, mémoire et observabilité, orchestration et sécurité, monétisation, intelligence et optimisation, passage à l'échelle, agent opérateur supervisé. Seules les deux premières, P0 et P1, sont livrées ; les cinq suivantes sont à venir. La monétisation arrive en quatrième position, après l'orchestration et la sécurité." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
+  <rect x="0" y="0" width="820" height="250" fill="var(--color-surface-sunken,#fafbfc)" rx="10"/>
+  <text x="32" y="42" font-size="15" font-weight="700" fill="var(--color-fg,#071b3b)">Sept phases planifiées, deux livrées</text>
+  <text x="32" y="66" font-size="12" fill="var(--color-fg-muted,#6b7280)">La monétisation est en quatrième position, après l'orchestration et la sécurité. C'est un choix de risque, pas un choix de planning.</text>
+  <rect x="32" y="96" width="100" height="72" rx="8" fill="var(--color-accent,#005ffa)" stroke="var(--color-accent,#005ffa)" stroke-width="1.5"/>
+  <text x="82" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="#ffffff">P0</text>
+  <text x="82" y="150" font-size="10" text-anchor="middle" fill="#ffffff">livrée</text>
+  <text x="82" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Fondations et</text>
+  <text x="82" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">infrastructure</text>
+  <rect x="140" y="96" width="100" height="72" rx="8" fill="var(--color-accent,#005ffa)" stroke="var(--color-accent,#005ffa)" stroke-width="1.5"/>
+  <text x="190" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="#ffffff">P1</text>
+  <text x="190" y="150" font-size="10" text-anchor="middle" fill="#ffffff">livrée</text>
+  <text x="190" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Mémoire et</text>
+  <text x="190" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">observabilité</text>
+  <rect x="248" y="96" width="100" height="72" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="298" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">P2</text>
+  <text x="298" y="150" font-size="10" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">à venir</text>
+  <text x="298" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Orchestration et</text>
+  <text x="298" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">sécurité</text>
+  <rect x="356" y="96" width="100" height="72" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="406" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">P3</text>
+  <text x="406" y="150" font-size="10" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">à venir</text>
+  <text x="406" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Monétisation</text>
+  <rect x="464" y="96" width="100" height="72" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="514" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">P4</text>
+  <text x="514" y="150" font-size="10" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">à venir</text>
+  <text x="514" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Intelligence et</text>
+  <text x="514" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">optimisation</text>
+  <rect x="572" y="96" width="100" height="72" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="622" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">P5</text>
+  <text x="622" y="150" font-size="10" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">à venir</text>
+  <text x="622" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Passage à</text>
+  <text x="622" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">l'échelle</text>
+  <rect x="680" y="96" width="100" height="72" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="730" y="126" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">P6</text>
+  <text x="730" y="150" font-size="10" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">à venir</text>
+  <text x="730" y="192" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">Agent opérateur</text>
+  <text x="730" y="206" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">supervisé</text>
+  <line x1="32" y1="224" x2="140" y2="224" stroke="var(--color-accent,#005ffa)" stroke-width="6" stroke-linecap="round"/>
+  <text x="152" y="229" font-size="11.5" fill="var(--color-fg,#071b3b)">livré et en exploitation</text>
+  <line x1="320" y1="224" x2="428" y2="224" stroke="var(--color-border,#e5e7eb)" stroke-width="6" stroke-linecap="round"/>
+  <text x="440" y="229" font-size="11.5" fill="var(--color-fg-muted,#6b7280)">itérations en cours ou à venir</text>
+</svg>
+<figcaption>L'état réel du plan de construction. Deux phases sur sept sont livrées : dire lesquelles est la condition pour que les chiffres de cet article aient une valeur.</figcaption>
+</figure>
+
 ## Ce qui tourne en continu, et comment on le sait
 
 La partie la plus instructive n'est pas la plus spectaculaire. C'est l'agent de veille technologique, un service modeste qui tourne sans interruption.

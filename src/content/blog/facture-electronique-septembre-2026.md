@@ -21,6 +21,51 @@ Le champ est large et il vaut la peine de le dire clairement : la réforme vise 
 
 Quatre nouvelles mentions obligatoires apparaissent également sur les factures au 1er septembre 2026, dont la catégorie de l'opération facturée, vente ou prestation de services, et l'adresse de livraison quand elle diffère de l'adresse de facturation.
 
+<figure>
+<svg viewBox="0 0 820 400" role="img" aria-label="Frise chronologique de la réforme. Au 1er septembre 2026, toutes les entreprises assujetties à la TVA doivent pouvoir recevoir une facture électronique, et les grandes entreprises et entreprises de taille intermédiaire doivent en plus émettre. Au 1er septembre 2027, l'obligation d'émettre s'étend aux micro-entreprises, TPE et PME. En dessous, le circuit d'une facture : l'entreprise émettrice passe par sa plateforme agréée, laquelle s'appuie sur l'annuaire pour savoir quelle plateforme dessert l'entreprise destinataire." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
+  <rect x="0" y="0" width="820" height="400" fill="var(--color-surface-sunken,#fafbfc)" rx="10"/>
+  <text x="32" y="42" font-size="15" font-weight="700" fill="var(--color-fg,#071b3b)">Deux échéances, deux obligations différentes</text>
+  <line x1="32" y1="96" x2="788" y2="96" stroke="var(--color-border,#e5e7eb)" stroke-width="3"/>
+  <circle cx="176" cy="96" r="9" fill="var(--color-accent,#005ffa)"/>
+  <circle cx="620" cy="96" r="9" fill="var(--color-fg-muted,#6b7280)"/>
+  <text x="176" y="76" font-size="14" font-weight="700" text-anchor="middle" fill="var(--color-accent,#005ffa)">1er septembre 2026</text>
+  <text x="620" y="76" font-size="14" font-weight="700" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">1er septembre 2027</text>
+  <rect x="40" y="120" width="272" height="58" rx="8" fill="var(--color-accent,#005ffa)"/>
+  <text x="56" y="144" font-size="13" font-weight="700" fill="#ffffff">RECEVOIR</text>
+  <text x="56" y="164" font-size="12" fill="#ffffff">toutes les entreprises assujetties à la TVA</text>
+  <rect x="40" y="186" width="272" height="58" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-accent,#005ffa)" stroke-width="1.5"/>
+  <text x="56" y="210" font-size="13" font-weight="700" fill="var(--color-accent,#005ffa)">ÉMETTRE</text>
+  <text x="56" y="230" font-size="12" fill="var(--color-fg,#071b3b)">grandes entreprises et ETI seulement</text>
+  <rect x="484" y="186" width="296" height="58" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="500" y="210" font-size="13" font-weight="700" fill="var(--color-fg-muted,#6b7280)">ÉMETTRE</text>
+  <text x="500" y="230" font-size="12" fill="var(--color-fg,#071b3b)">micro-entreprises, TPE et PME</text>
+  <line x1="312" y1="215" x2="476" y2="215" stroke="var(--color-border,#e5e7eb)" stroke-width="2" stroke-dasharray="5 5"/>
+  <text x="394" y="207" font-size="11" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">un an de plus</text>
+  <line x1="32" y1="272" x2="788" y2="272" stroke="var(--color-border,#e5e7eb)" stroke-width="1"/>
+  <text x="32" y="298" font-size="13" font-weight="700" fill="var(--color-fg,#071b3b)">Par où passe une facture</text>
+  <rect x="32" y="318" width="150" height="52" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="107" y="341" font-size="12" font-weight="700" text-anchor="middle" fill="var(--color-fg,#071b3b)">Entreprise</text>
+  <text x="107" y="358" font-size="11" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">émettrice</text>
+  <rect x="222" y="318" width="164" height="52" rx="8" fill="var(--color-surface-dark,#071b3b)"/>
+  <text x="304" y="341" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">Plateforme agréée</text>
+  <text x="304" y="358" font-size="11" text-anchor="middle" fill="rgba(255,255,255,0.78)">de l'émetteur</text>
+  <rect x="426" y="318" width="164" height="52" rx="8" fill="var(--color-surface-dark,#071b3b)"/>
+  <text x="508" y="341" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">Plateforme agréée</text>
+  <text x="508" y="358" font-size="11" text-anchor="middle" fill="rgba(255,255,255,0.78)">du destinataire</text>
+  <rect x="630" y="318" width="158" height="52" rx="8" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="709" y="341" font-size="12" font-weight="700" text-anchor="middle" fill="var(--color-fg,#071b3b)">Entreprise</text>
+  <text x="709" y="358" font-size="11" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">destinataire</text>
+  <line x1="182" y1="344" x2="216" y2="344" stroke="var(--color-accent,#005ffa)" stroke-width="2"/>
+  <line x1="386" y1="344" x2="420" y2="344" stroke="var(--color-accent,#005ffa)" stroke-width="2"/>
+  <line x1="590" y1="344" x2="624" y2="344" stroke="var(--color-accent,#005ffa)" stroke-width="2"/>
+  <rect x="290" y="268" width="232" height="30" rx="6" fill="var(--color-surface,#fff)" stroke="var(--color-accent,#005ffa)" stroke-dasharray="4 4"/>
+  <text x="406" y="288" font-size="11.5" text-anchor="middle" fill="var(--color-accent,#005ffa)">Annuaire : qui est sur quelle plateforme</text>
+  <line x1="330" y1="298" x2="304" y2="316" stroke="var(--color-accent,#005ffa)" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="482" y1="298" x2="508" y2="316" stroke="var(--color-accent,#005ffa)" stroke-width="1.5" stroke-dasharray="3 3"/>
+</svg>
+<figcaption>Les deux échéances, et le circuit par lequel une facture transite. L'annuaire est le maillon qui permet à un émetteur de savoir où adresser sa facture.</figcaption>
+</figure>
+
 ## Le point qui coince : un PDF n'est pas une facture électronique
 
 C'est la confusion la plus répandue, et la plus coûteuse à découvrir tard. Une facture papier scannée, un PDF ordinaire, un document envoyé par courriel : rien de tout cela ne sera conforme. Le fait qu'un fichier soit numérique ne le rend pas électronique au sens de la réforme.

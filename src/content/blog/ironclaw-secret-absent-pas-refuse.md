@@ -59,6 +59,46 @@ Les outils s'exécutent dans un bac à sable WebAssembly, avec trois limites ind
 
 Un bac à sable dont on n'a pas essayé de sortir est une case cochée. Trois témoins inverses, c'est une mesure.
 
+<figure>
+<svg viewBox="0 0 820 380" role="img" aria-label="Trois couches de confinement emboîtées autour de l'agent. La couche la plus interne est un bac à sable WebAssembly, qui limite les accès fichiers, la mémoire et le temps d'exécution ; il a été éprouvé par trois témoins inverses, dont une boucle infinie interrompue en environ 12,7 millisecondes. Vient ensuite la liste blanche applicative, qui refuse une cible non déclarée avant même le réseau. Vient enfin le pare-feu de la machine. À droite, le témoin du harnais : un tour neutre produit zéro connexion, une cible non déclarée zéro connexion, une cible déclarée une connexion, ce qui prouve que le compteur sait compter." xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:var(--font-sans,sans-serif)">
+  <rect x="0" y="0" width="820" height="380" fill="var(--color-surface-sunken,#fafbfc)" rx="10"/>
+  <text x="32" y="42" font-size="15" font-weight="700" fill="var(--color-fg,#071b3b)">Trois couches, chacune prouvée seule</text>
+  <rect x="32" y="66" width="470" height="286" rx="12" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)" stroke-width="1.5"/>
+  <text x="52" y="92" font-size="12.5" font-weight="700" fill="var(--color-fg-muted,#6b7280)">3. Pare-feu de la machine</text>
+  <text x="52" y="110" font-size="11" fill="var(--color-fg-muted,#6b7280)">dernier filet, indépendant du produit</text>
+  <rect x="64" y="126" width="406" height="204" rx="10" fill="var(--color-surface-sunken,#fafbfc)" stroke="var(--color-accent,#005ffa)" stroke-width="1.5"/>
+  <text x="84" y="152" font-size="12.5" font-weight="700" fill="var(--color-accent,#005ffa)">2. Liste blanche applicative</text>
+  <text x="84" y="170" font-size="11" fill="var(--color-fg,#071b3b)">refuse avant le réseau, garde anti-SSRF actif</text>
+  <text x="84" y="186" font-size="11" fill="var(--color-fg,#071b3b)">après résolution du nom</text>
+  <rect x="96" y="202" width="342" height="112" rx="10" fill="var(--color-surface-dark,#071b3b)"/>
+  <text x="116" y="228" font-size="12.5" font-weight="700" fill="#ffffff">1. Bac à sable WebAssembly</text>
+  <text x="116" y="248" font-size="11" fill="rgba(255,255,255,0.82)">accès fichiers refusés, remontée d'arborescence comprise</text>
+  <text x="116" y="266" font-size="11" fill="rgba(255,255,255,0.82)">mémoire plafonnée à la limite déclarée</text>
+  <text x="116" y="284" font-size="11" fill="rgba(255,255,255,0.82)">boucle infinie interrompue en 12,7 ms</text>
+  <text x="116" y="304" font-size="11" font-weight="700" fill="#6ba6ff">éprouvé par trois témoins inverses</text>
+  <text x="267" y="346" font-size="11.5" text-anchor="middle" fill="var(--color-fg-muted,#6b7280)">l'agent est au centre, chaque couche est franchissable seulement si la précédente cède</text>
+  <rect x="522" y="66" width="266" height="286" rx="12" fill="var(--color-surface,#fff)" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="544" y="94" font-size="12.5" font-weight="700" fill="var(--color-fg,#071b3b)">Le témoin du harnais</text>
+  <text x="544" y="114" font-size="11" fill="var(--color-fg-muted,#6b7280)">connexions comptées au pare-feu</text>
+  <line x1="544" y1="128" x2="766" y2="128" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="544" y="152" font-size="11.5" fill="var(--color-fg,#071b3b)">Tour neutre</text>
+  <text x="766" y="152" font-size="14" font-weight="700" text-anchor="end" fill="var(--color-fg-muted,#6b7280)">0</text>
+  <text x="544" y="170" font-size="10.5" fill="var(--color-fg-muted,#6b7280)">pas de bruit de fond</text>
+  <line x1="544" y1="186" x2="766" y2="186" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="544" y="210" font-size="11.5" fill="var(--color-fg,#071b3b)">Cible non déclarée</text>
+  <text x="766" y="210" font-size="14" font-weight="700" text-anchor="end" fill="var(--color-fg-muted,#6b7280)">0</text>
+  <text x="544" y="228" font-size="10.5" fill="var(--color-fg-muted,#6b7280)">n'a jamais atteint le pare-feu</text>
+  <line x1="544" y1="244" x2="766" y2="244" stroke="var(--color-border,#e5e7eb)"/>
+  <text x="544" y="268" font-size="11.5" font-weight="700" fill="var(--color-accent,#005ffa)">Cible déclarée</text>
+  <text x="766" y="268" font-size="14" font-weight="700" text-anchor="end" fill="var(--color-accent,#005ffa)">1</text>
+  <text x="544" y="286" font-size="10.5" fill="var(--color-accent,#005ffa)">le compteur sait compter</text>
+  <rect x="544" y="302" width="222" height="36" rx="8" fill="var(--color-surface-sunken,#fafbfc)"/>
+  <text x="655" y="318" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">sans cette dernière ligne, les deux</text>
+  <text x="655" y="332" font-size="10.5" text-anchor="middle" fill="var(--color-fg,#071b3b)">zéros ne prouveraient rien</text>
+</svg>
+<figcaption>Le dispositif est construit pour que le pare-feu ne puisse rien masquer : la cible refusée était elle aussi autorisée par lui.</figcaption>
+</figure>
+
 ## Rien ne s'installe, rien ne part
 
 Au premier démarrage, ce runtime n'installe **rien** et n'émet **aucun paquet**. Les trente-deux compétences qui apparaissent sont dépaquetées du binaire lui-même, ce que l'absence totale de trafic confirme. Un module de télémétrie existe, mais il est en adhésion volontaire, désactivé, sans destination configurée, et **aucune enveloppe n'a été émise**.
