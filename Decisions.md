@@ -244,10 +244,19 @@ arbitrage explicite du decideur, et la preuve qu'elle mord encore accompagne le 
 
 ## D12 — Backlog post-gel enregistre, rien d'engage
 
-Deux points portes au backlog par la revue, **aucune action entreprise** :
-elargir l'echantillon Lighthouse a une ou deux URL d'articles recents
-(`lighthouserc.cjs`), et integrer les trois visuels a l'article sur la migration de modele
-sous condition de conversion webp sous 150 Ko et de chargement differe.
+**Trois** points portes au backlog par la revue, **aucune action entreprise sur aucun** :
 
-Ils sont repris en section **D** du dossier de relecture, en tete de `REPORT.md`, pour ne
-pas dependre de ce seul fichier.
+1. **Elargir l'echantillon Lighthouse** de une ou deux URL d'articles recents, pour que le
+   seuil mobile porte aussi sur les pages longues. Fichier : `lighthouserc.cjs`.
+2. **Integrer les trois visuels** a l'article sur la migration de modele, sous condition de
+   conversion en webp sous 150 Ko et de chargement differe.
+3. **Nettoyer le commentaire d'en-tete de `GATE-articles.sh`**, orphelin depuis le retrait
+   de la famille « noms d'applications » (decision D11). Il decrit encore un perimetre
+   couvrant « les noms de produits et d'applications non ouverts au public », alors que
+   cette famille n'a plus aucune entree. **A traiter a la prochaine passe sur la porte**,
+   pas avant : c'est la que le fichier sera de toute facon rouvert.
+
+Les deux premiers sont repris en section **D** du dossier de relecture, en tete de
+`REPORT.md`. Le troisieme est ajoute ici a la demande de la revue, sur le principe qu'un
+backlog qui ne vit que dans une conversation meurt en silence, alors qu'une ligne dans le
+depot survit.
