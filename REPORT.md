@@ -1,5 +1,67 @@
 # REPORT — SITE-01 · Site vitrine HK CONSEILS
 
+---
+
+# ✅ MERGÉ EN PRODUCTION — 25 août 2026
+
+**Le chantier BLOG-VAGUE-2 est clos.** Les deux branches sont fusionnées dans `main`, le
+site est déployé, et le contenu est vérifié en production. Ce fichier est **le dernier
+commit autorisé** : le gel pré-dépôt BPI court du 28/08 au 11/09, aucun commit sur ce dépôt
+sans directive explicite pendant cette fenêtre.
+
+## Les deux merges
+
+| Étape | Branche | Commit de merge | Horodatage |
+|---|---|---|---|
+| PR #6 | `blog-02-cinq-articles` (B1) | `7196105139474ed16e03dfd8854606b84a9dcfcf` | 2026-08-25T16:55:01Z |
+| PR #7 | `blog-03-vague-2` (B2) | `2ed2d5331316fc37e92a5bc0ca51c1b7c24b9a97` | 2026-08-25T16:55:40Z |
+
+**`main` = `2ed2d5331316fc37e92a5bc0ca51c1b7c24b9a97`**, local et distant identiques.
+Base de départ : `50a40d7`. Les deux branches sont ancêtres de `main`, **zéro commit
+orphelin** de part et d'autre.
+
+CI de `main` lue verte sur les deux commits de merge : run `32874796075` pour B1
+(4 jobs), run `32874860690` pour B2 (4 jobs), Lighthouse compris dans les deux cas.
+
+## Production vérifiée, codes HTTP capturés
+
+Contrôles faits en **résolution forcée par 1.1.1.1**, jamais par le résolveur local : depuis
+cette machine, une réponse peut venir du DNS interne et ne rien prouver du chemin public.
+
+| URL | Code | Vérification |
+|---|---|---|
+| `https://hkconseils.fr/blog/` | **200** | **13 articles listés** |
+| `https://hkconseils.fr/blog/facture-electronique-septembre-2026/` | **200** | **4 liens officiels** présents dans le corps, et le bloc Factur-X rendu |
+| `https://hkconseils.fr/blog/hermes-poc-agent-ce-qui-nest-pas-annonce/` | **200** | **3 fenêtres de terminal** rendues, 1 schéma |
+| `https://hkconseils.fr/blog/agents-ia-on-premise-trois-architectures/` | **200** | article pilier servi |
+
+Les quatre liens officiels relevés dans le HTML servi :
+`economie.gouv.fr` pour le calendrier, l'annuaire et la liste des 101 plateformes,
+`impots.gouv.fr` pour les formats et la définition de la plateforme agréée.
+
+**Caviardage effectif en production** : `telegram` → **0 occurrence** dans la page servie,
+et **7 chevrons `<messagerie>`** à la place. Vérifié sur le HTML livré, pas sur la source.
+
+## Ce qui n'est PAS parti dans le merge
+
+`AUDIT-BLOG-01.md` reste **non suivi** : absent de `main` (0 occurrence dans l'arbre),
+toujours présent comme fichier non suivi dans la copie de travail. Témoin inverse du même
+contrôle : `REPORT.md`, lui, est bien suivi. C'était le point de vigilance de la décision
+D8, il est tenu.
+
+## État servi
+
+13 articles publiés, 6 brouillons homelab intacts et toujours hors publication. Sept
+schémas SVG, quinze blocs de code dont neuf en fenêtre de terminal, cinq exergues. Aucune
+image bitmap, aucune police externe, aucune ressource tierce, zéro JavaScript émis.
+
+## Ce qui reste au backlog post-gel
+
+Trois items, aucun engagé, détaillés en `Decisions.md` D12 : les trois visuels à convertir
+et légender, le commentaire d'en-tête orphelin de la porte de rédaction, et l'élargissement
+de l'échantillon Lighthouse — ce dernier étant **fait** depuis D17.
+
+
 > ## ⚠️ Circuit de merge en cours — BLOG-VAGUE-2 (25/08/2026)
 >
 > Deux branches attendent une relecture puis un merge **par Hemerson uniquement** :
