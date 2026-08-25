@@ -322,8 +322,14 @@ capture est un navigateur sur une autre machine. Exposer l'interface locale de l
 pour la capturer reviendrait a casser la contrainte de securite que le POC avait pour objet
 de verifier.
 
-**Alternative proposee, en attente d'accord** : un extrait de terminal reel, rejoue et
-colle en bloc de code. Du texte, donc relisible, ce que la condition (3) recherche.
+**Alternative RATIFIEE par Hemerson a la relecture du 26/08** : un extrait de terminal reel,
+rejoue et colle en bloc de code. Du texte, donc relisible, ce que la condition (3)
+recherche. Appliquee des la passe d'aeration, puis etendue et habillee en « fenetre de
+terminal » a la passe REV2 (decision D18).
+
+Cette ratification **ferme l'incoherence** qui existait entre un D16 note « en attente » et
+une passe d'aeration qui avait deja applique l'alternative. C'etait exactement le genre
+d'ecart entre le registre et le fait que ce registre existe pour eviter.
 
 ---
 
@@ -338,3 +344,61 @@ Le tri est **conserve** — un echantillon stable est une qualite pour comparer 
 avertissement si l'un d'eux manque au build. Eprouve par temoin inverse.
 
 Ceci **retire le premier item du backlog D12**, qui est desormais fait.
+
+---
+
+## D18 — Les pastilles de la fenetre de terminal restent dans la palette
+
+**Decision.** Le style « fenetre de terminal » ajoute au gabarit du blog utilise **trois
+disques blancs a faible opacite**, et non le rouge, le jaune et le vert d'usage.
+
+**Pourquoi.** La feuille de style du site porte une consigne explicite : « Palette canonique
+— ne pas introduire de nouvelle teinte ». Les trois couleurs habituelles en auraient ajoute
+trois d'un coup, pour un element purement decoratif.
+
+**Alternative ecartee** : les couleurs d'usage, plus immediatement reconnaissables. Ecartee
+parce que la metaphore fonctionne sans elles, et qu'une charte qui cede sur un detail
+decoratif ne tient plus sur le reste.
+
+**Portee.** Le style vit dans `src/layouts/BlogPost.astro`, donc dans le gabarit partage.
+C'est du CSS **additif** : il ne s'applique qu'aux figures portant la classe `terminal`, et
+ne change rien aux treize autres pages. Aucun JavaScript.
+
+---
+
+## D19 — Le compte « quatre nouvelles mentions obligatoires » est retire
+
+**Decision.** La phrase est reecrite sans le compte, sur ce que l'administration ecrit
+vraiment : les mentions doivent figurer dans des champs dedies, avec les exemples cites.
+
+**Pourquoi.** La verification exigee par R1 a montre que **ce compte ne figure sur aucune
+des pages sourcables**. Il venait d'une synthese de recherche, pas d'une lecture.
+
+**Alternative ecartee** : chercher une source ailleurs pour sauver le chiffre. Ecartee
+faute de temps utile avant la fenetre de merge, et parce que la phrase se tient sans lui.
+
+**Ce que ce troisieme cas dit.** Les deux precedents etaient le tri de l'echantillon
+Lighthouse annonce comme chronologique alors qu'il etait alphabetique, et une case de
+tableau qui rapportait une deduction comme une mesure. Trois fois, une formulation
+plausible a tenu lieu de verification. C'est le mecanisme meme que les articles de ce lot
+decrivent sous le nom de panne silencieuse.
+
+---
+
+## D20 — Deux marqueurs de plus que ceux proposes : « convention » et « hors produit »
+
+**Decision.** La qualification demandee en R3b n'utilise pas trois valeurs mais cinq.
+
+**Pourquoi.** « Natif » et « extensible » ne decrivaient pas deux cas reels. L'identite chez
+deux des trois plateformes est un **fichier que l'exploitant pose** : ce n'est pas un
+mecanisme du produit, et rien ne l'oblige — d'ou **convention**. Le cloisonnement reseau de
+ces deux-la vient du **pare-feu de la machine** et non du runtime — d'ou **hors produit**.
+Les forcer dans « natif » aurait ete faux, et les mettre en « non mesure » aurait efface une
+information dont on dispose.
+
+**Base.** La directive proposait les valeurs a titre d'exemple. L'ecart est signale ici
+plutot qu'applique en silence, et une legende l'explique dans l'article lui-meme.
+
+**Les trois dernieres lignes du tableau ne portent aucun marqueur** : ce sont des mesures
+d'empreinte, de processeur et de latence, pas des mecanismes. Les qualifier de natifs ou
+d'extensibles n'aurait rien voulu dire.

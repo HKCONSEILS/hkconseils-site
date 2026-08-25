@@ -10,6 +10,132 @@
 
 ---
 
+# REV2 — passe du 26/08, a lire avant le reste du dossier
+
+**Verdict CI du commit final `c819c58` : `success`.** Quatre jobs verts. Lighthouse :
+**11 URL, 100 en performance, 100 en accessibilite, 100 en bonnes pratiques, 100 en SEO**,
+mediane de trois passages. L'artefact `dist` passe de **229 143 o** a **233 750 o**, soit
+**4 607 octets** de plus : du contenu servi a bien change, comme attendu.
+
+## 1. Les quatre liens officiels, poses apres recuperation reelle
+
+| Lien pose sur | Source | Recuperation | Le contenu porte-t-il le fait ? |
+|---|---|---|---|
+| « toutes les entreprises assujetties a la TVA doivent pouvoir recevoir une facture electronique » | economie.gouv.fr, « Tout savoir sur la facturation electronique » | **403** en client simple, **200 au navigateur**, meme URL, titre conforme | oui : calendrier 2026 et 2027, emission GE et ETI, champ TVA |
+| « Ce qui est attendu, ce sont des formats structures » | impots.gouv.fr, « Je decouvre la facturation electronique » | **200**, 59 167 o | oui : UBL, CII, format mixte, « plateforme agreee », « immatriculee par l'Etat », non-conformite du PDF ordinaire |
+| « premiere liste de 101 plateformes agreees » | economie.gouv.fr, actualite dediee | **200 au navigateur**, meme URL | oui : le nombre 101 et le terme « plateformes agreees » |
+| « Ouvert depuis septembre 2025 » | economie.gouv.fr, actualite sur l'ouverture de l'annuaire | **200 au navigateur**, meme URL | oui : l'article est **date du 18/09/2025** et annonce l'ouverture ce jour-la |
+
+**Le 403 n'etait pas une page morte.** Les trois pages `economie.gouv.fr` refusent un client
+non-navigateur ; le corps renvoye dit « Just a moment... Enable JavaScript », c'est un
+pare-feu applicatif. Verifie au navigateur : les trois repondent **200**, aux **memes URL**,
+avec les titres attendus. **Aucune URL n'a bouge**, aucune substitution n'a ete necessaire.
+
+### Ce que la verification a corrige dans l'article
+
+**« Quatre nouvelles mentions obligatoires » ne figure sur aucune page sourcable.** Le
+compte venait d'une synthese de recherche, pas d'une lecture. La phrase est reecrite sur ce
+que l'administration ecrit vraiment : les mentions doivent figurer **dans des champs
+dedies**, avec les exemples qu'elle cite. **Le compte a disparu de l'article.**
+
+C'est la troisieme fois de ce chantier qu'une formulation plausible tenait lieu de
+verification. Les deux precedentes : le tri de l'echantillon Lighthouse annonce comme
+chronologique alors qu'il etait alphabetique, et la case « secrets accessibles » qui
+rapportait une deduction comme une mesure.
+
+## 2. Densite visuelle, avant et apres
+
+Relevee **depuis les commits eux-memes**, pas de memoire.
+
+| Article | Avant (`a28361f`) | Apres (`c819c58`) | Seuil |
+|---|---|---|---|
+| e-facture | 1 schema, 0 code, 1 exergue | 1, **1**, 1 | atteint |
+| OpenClaw | 1, 0, 1 | 1, **2**, 1 | atteint |
+| Hermes | 1, 2, 1 | 1, **3**, 1 | atteint |
+| IronClaw | 2, 2, 1 | 2, **3**, 1 | atteint |
+| pilier | 2, 0, 1 | 2, 0, 1 | **volontairement** sans extrait, par consigne |
+
+**Neuf extraits** portent desormais l'habillage « fenetre de terminal » : cadre, barre de
+titre, pastilles, police mono. **CSS pur, aucun JavaScript**, `dist/` reste sans fichier
+`.js`. Un arbitrage a signaler : les pastilles sont **blanches a faible opacite** et non
+rouge, jaune, vert — la charte interdit d'introduire une teinte nouvelle, et les trois
+couleurs d'usage en auraient ajoute trois.
+
+## 3. Les cinq extraits ajoutes
+
+| Article | Extrait | Source | Fait de l'article qu'il illustre |
+|---|---|---|---|
+| Hermes | journal du service : decouverte d'IP de repli par DNS-over-HTTPS, puis expirations | rejoue en lecture seule sur l'hote de POC | le runtime emet un trafic **non declare** ; la liste blanche le refuse |
+| IronClaw | `ss` sur la surface d'ecoute + ligne `wasm_limiter` avec ses valeurs | rejoue en lecture seule sur l'hote de POC | le bac a sable refuse une demande de memoire a la limite declaree ; une seule socket, sur la boucle locale |
+| OpenClaw | le dictionnaire de regles constantes, tel qu'il est ecrit | piece du chantier G | « les regles sont des constantes, le modele ne peut pas les modifier par une invite » |
+| OpenClaw | une ligne de verdict au format JSONL | piece du chantier G, **produite en validation le 22/08 et ecartee du journal reel** — dit dans l'article | la regle violee est **nommee**, pas resumee en refus generique |
+| e-facture | extrait Factur-X, entreprise **fictive** `EXEMPLE-SARL` | construit d'apres la documentation publique du format | « la facture devient une donnee » : champs nommes et types |
+
+**Assainissement** : identifiants d'hote remplaces par des chevrons, chemins reels remplaces
+par une designation entre chevrons, et pour les secrets **aucune valeur**, uniquement les
+droits, le proprietaire et le nombre de noms definis.
+
+**Controle anti-fuite sur les 15 blocs de code du blog**, cinq familles, temoin inverse a 1
+sur chacune :
+
+| Famille | Occurrences |
+|---|---|
+| adresse IP privee | **0** |
+| nom d'hote ou de service interne | **0** |
+| sous-domaine interne ou nom de client | **0** |
+| identifiant de VM ou de conteneur | **0** |
+| chaine ressemblant a une valeur de secret | **0** |
+
+## 4. Natif, extensible, convention, hors produit — ligne par ligne
+
+Deux valeurs ne suffisaient pas. L'identite chez deux des trois n'est **ni native ni
+extensible** : c'est un fichier que l'exploitant pose et que rien n'oblige, donc une
+**convention**. Et le cloisonnement reseau de ces deux-la vient du pare-feu de la machine,
+donc **hors produit**. Ces deux marqueurs ont ete ajoutes, et une legende les explique dans
+l'article.
+
+| Ligne du tableau | OpenClaw | Hermes | IronClaw | Source |
+|---|---|---|---|---|
+| Mecanisme d'identite | convention | convention | **natif** | tableau croise du rapport IronClaw, et sa section sur les quatre fichiers d'identite |
+| Qui ecrit l'identite | convention | convention | **natif** | idem |
+| Identite relisible | convention | convention | **natif** | idem |
+| Restriction d'outillage | natif | natif | natif | tableau croise, ligne « restriction de toolset » |
+| Secrets accessibles | non mesure | non mesure | **natif** | rapport IronClaw, test des secrets |
+| **Terminal accessible** | non mesure | **extensible** | natif, reglable par capacite | rapport Hermes : en ligne de commande, **c'est le jeu d'outils charge qui donne le terminal** |
+| Cloisonnement reseau | hors produit | hors produit | **natif + hors produit** | les deux rapports : pare-feu de la machine, plus une liste blanche applicative chez IronClaw |
+| Requetes detournees | non mesure | non mesure | **natif** | rapport IronClaw, garde actif par defaut |
+| Bac a sable d'outils | non mesure | non mesure | **natif** | rapport IronClaw, trois temoins inverses |
+| Installation au demarrage | non mesure | **natif** | **natif** | rapport Hermes (installation a chaque lancement), rapport IronClaw (aucune) |
+| Les trois dernieres lignes | *sans marqueur* | | | ce sont des **mesures**, pas des mecanismes |
+
+**Le cas qui justifie tout l'exercice** est celui du terminal. Chez l'agent Python, il n'est
+pas une propriete du produit : il apparait parce que le jeu d'outils charge en ligne de
+commande le fournit. Changer d'outillage change la reponse. La question « cet agent a-t-il
+acces au shell » est donc incomplete si l'on ne precise pas « avec quels outils charges ».
+
+## 5. Corrections de fond
+
+- **La prescription fausse est corrigee.** « Un POC doit etre mene sur le canal de
+  production » devient « sur un canal **identique** a celui de la production, une
+  pre-production » — mener un POC sur la production serait imprudent. L'idee conservee, et
+  qui reste vraie, est que le terminal ment par omission parce qu'il ne traverse pas la
+  meme chaine.
+- **Deux paragraphes de langage**, chacun adosse a un fait deja mesure dans son article :
+  pour Python, l'ecosysteme IA dominant contre l'installation de dependances a l'execution
+  et le pic a 209 % d'un coeur ; pour Rust, la surete memoire sans ramasse-miettes, le
+  binaire autonome (32 competences depaquetees, zero installation), l'affinite WebAssembly
+  et les 18 % d'un coeur, avec la contrepartie assumee d'un ecosysteme plus jeune et d'une
+  ligne de version fraiche.
+
+## 6. Porte de redaction
+
+Elle n'a **pas** ete rouverte par cette passe : le style « fenetre de terminal » vit dans le
+gabarit du blog, pas dans la porte. Le commentaire d'en-tete orphelin de `GATE-articles.sh`
+**reste donc au backlog**, conformement aux exclusions.
+
+
+---
+
 # DOSSIER DE RELECTURE — BLOG-VAGUE-2 (a lire en premier)
 
 ## A. Verdict CI, run final
