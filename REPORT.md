@@ -32,7 +32,8 @@ sur six passages chacune.
 | B2 `blog-03-vague-2` | `474b557` *(schémas)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
 | B2 `blog-03-vague-2` | `f0fd64c` | ✅ | ✅ | ✅ | ✅ |
 | B2 `blog-03-vague-2` | `ff8a909` *(rapport)* | ✅ | ✅ | ✅ | ✅ |
-| **B2 `blog-03-vague-2`** | **`a28361f`** *(aeration)* | *en cours a la redaction* | | | |
+| B2 `blog-03-vague-2` | `a28361f` *(aeration)* | ✅ | ✅ | ✅ | ✅ **11 URL, 100 partout** |
+| **B2 `blog-03-vague-2`** | **`b7db79e`** *(final)* | ✅ | ✅ | ✅ | ✅ |
 
 **Cette reserve est levee depuis `474b557`.** L'echantillon portait sur six URL et
 n'incluait aucune page nouvelle ; il en compte desormais **onze**, dont les cinq articles
@@ -1348,6 +1349,13 @@ H1 par page, RSS et sitemap bien formes, `html-validate` sur les deux perimetres
 Markdown du mode HTML brut et reinjecte un `<p>` au milieu du SVG. Le controle est pose sur
 les sept schemas, resultat zero.
 
-**CI** : le run de `a28361f` etait **en cours** au moment d'ecrire cette section. Contrairement
-aux commits de rapport, celui-ci **modifie le contenu servi** : l'artefact `dist` doit donc
-changer de taille, et c'est le signe qu'il faut lire. Verdict a consigner ici des qu'il tombe.
+**CI — ligne fermee.** Le run de `a28361f` est **vert** sur les quatre jobs, Lighthouse
+compris : **11 URL, 100 en performance, 100 en accessibilite, 100 en bonnes pratiques,
+100 en SEO**, mediane de trois passages. Les sept schemas, les quatre blocs de code et les
+cinq exergues ne coutent donc rien au budget.
+
+Le signe annonce est au rendez-vous : l'artefact `dist` passe de **226 016 o** a
+**229 143 o**, soit **3 127 octets** de plus. C'est bien du contenu servi qui a change,
+contrairement aux commits de rapport qui laissaient cette taille identique a l'octet.
+Le run suivant, `b7db79e`, qui ne porte que ce rapport, ressort a **229 143 o** : inchange,
+comme attendu.
