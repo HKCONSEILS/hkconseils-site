@@ -184,3 +184,70 @@ laissait le decideur sans le seul signal qu'il ne peut obtenir autrement, a deux
 la fermeture de la fenetre.
 
 **Retour arriere.** `gh pr close 7`, la branche reste intacte.
+
+---
+
+## D11 — `GATE-articles.sh` amendee : le nom de la plateforme sort de la famille bloquee
+
+**Decision d'Hemerson, revue du 2026-08-25.** Ce n'est pas une decision autonome : elle est
+consignee ici parce que c'est le registre des arbitrages qui touchent aux portes.
+
+`openclaw` est **retire** de la famille « noms d'applications » de
+`siteweb/articles/publications/md/GATE-articles.sh`. Justification donnee : **c'est le nom
+public de la plateforme, et sa publication etait deja actee par ailleurs** (section Agents,
+dossier BPI). Le blocage precedent n'existait que parce que la question n'avait pas ete
+posee ; elle l'est desormais, et elle est tranchee. Le slug
+`/blog/openclaw-plateforme-multi-agents-lecons/` est valide.
+
+**Ce qui a change, exactement.** Une seule ligne `scan` retiree sur quinze. Le controle de
+disparition le prouve : `diff` des seules lignes `scan` avant et apres, **une ligne
+supprimee, aucune modifiee**.
+
+**Pourquoi le scan est retire et non vide.** La famille n'avait que cette entree. Laisser
+`scan "..." '\b()\b'` aurait produit une alternation vide, qui **matche chaque ligne** et
+aurait transforme la porte en refus permanent. C'est le piege classique du motif qu'on
+croit desactiver en le vidant.
+
+**Preuve 1, la porte repasse au vert.** `./GATE-articles.sh` -> `GATE: OK — 10 articles +
+10 teasers analyses`, **code retour 0**, alors que les trois occurrences sont toujours dans
+les fichiers (titre et corps de l'article dedie, lien interne du comparatif).
+
+**Preuve 2, la porte mord toujours.** Un temoin positif par famille non touchee, ecrit
+dans `blog/` puis retire :
+
+| Temoin | Code retour | Motif declenche |
+|---|---|---|
+| nom d'hote interne | **1** | `nom d'hote ou de service interne` |
+| nom de client confidentiel | **1** | `nom de client ou de projet confidentiel` |
+| adresse IP privee | **1** | `adresse IP privee (RFC1918)` |
+| identifiant de conteneur | **1** | `identifiant de VM/conteneur, forme accolee` |
+| sous-domaine interne | **1** | `sous-domaine interne ou de client` |
+| tiret cadratin | **1** | `tiret cadratin (convention: aucun)` |
+
+Controle de disparition du temoin apres coup : fichier absent, **10 articles** dans
+`blog/`, porte rejouee a **0**. Une porte qui repasse au vert sans qu'on ait verifie
+qu'elle mord encore n'est plus une porte, c'est un `echo`.
+
+**Un residu signale, non corrige.** L'en-tete du script decrit encore son perimetre comme
+couvrant « les noms de produits et d'applications non ouverts au public ». La famille est
+desormais vide : ce commentaire ne decrit plus rien. Il n'a **pas** ete touche, la consigne
+etant de ne retirer que `openclaw` et rien d'autre. A nettoyer a la prochaine passe sur ce
+fichier.
+
+**Portee.** `scripts/check-leaks.sh`, la porte du depot, **n'a pas ete modifiee** : elle ne
+bloquait deja pas ce nom. Aucune autre porte, aucun workflow de CI, aucune configuration de
+validation n'a change. La decision D9 reste donc vraie sous sa forme utile : aucune porte
+n'a ete assouplie **par l'executant pour faire passer un contenu**, celle-ci l'a ete sur
+arbitrage explicite du decideur, et la preuve qu'elle mord encore accompagne le changement.
+
+---
+
+## D12 — Backlog post-gel enregistre, rien d'engage
+
+Deux points portes au backlog par la revue, **aucune action entreprise** :
+elargir l'echantillon Lighthouse a une ou deux URL d'articles recents
+(`lighthouserc.cjs`), et integrer les trois visuels a l'article sur la migration de modele
+sous condition de conversion webp sous 150 Ko et de chargement differe.
+
+Ils sont repris en section **D** du dossier de relecture, en tete de `REPORT.md`, pour ne
+pas dependre de ce seul fichier.
