@@ -1037,6 +1037,97 @@ navy (§3).
 Commit **`6d3df64`**, poussé le jour même. Les deux retouches sont de la copie et du
 gabarit : le retour arrière est un `git revert` sans effet de bord.
 
+## 11 sexies. CARTE-01 — page /carte, vCard et QR (06-07/09)
+
+Directive `~/openexam-pilotage/rapports/DIRECTIVE-CARTE-01.md`, mode AUTO. Gel pré-dépôt
+BPI levé pour ce seul périmètre par Hémerson.
+
+### Inconnues `[U]` résolues
+
+| Inconnue | Valeur | Source |
+|---|---|---|
+| §0 dépôt | `https://github.com/HKCONSEILS/hkconseils-site.git`, base `111dd6b` | `git remote get-url origin` |
+| §3.4 slug LinkedIn | `hemersonkoffi` | `public/index.html` — lien de contact **et** `sameAs` du JSON-LD |
+
+### Adaptations imposées par les conventions du dépôt (§3.1 les prévoit)
+
+| Directive | Réalité | Livré |
+|---|---|---|
+| `/carte/index.html` | `public/` sert des `.html` **à plat**, zéro `dossier/index.html` | `public/carte.html`, URL propre `/carte` |
+| `.vcf` « racine du dépôt » | la racine servie est `public/`, pas la racine git | `public/hemerson-koffi.vcf` |
+| `_headers` | **inexistant** | créé en `public/_headers` |
+| `assets/print/` | — | **hors `public/`** : le QR n'est pas servi, vérifié (`dist/assets` absent) |
+
+### Écart assumé sur le `<title>`
+
+§3.2 prescrit `HK Conseils — Carte de contact`. Livré : **`Carte de contact · HK CONSEILS`**.
+Motif : le tiret cadratin n'apparaît **nulle part** dans la copie servie (0 occurrence dans
+`public/*.html`) et les trois pages sœurs suivent le gabarit `X · HK CONSEILS`. L'écart se
+retire en une ligne si la squad préfère la lettre.
+
+### Piège rencontré à la génération du QR
+
+`segno.make(url, error="M")` a produit un QR en correction **Q**, pas M : segno relève le
+niveau de lui-même quand cela tient dans la même version (`boost_error=True` par défaut).
+L'AC6 exige M. Corrigé par `boost_error=False`, puis **vérifié** : version 3, correction M.
+
+### Tableau des portes
+
+Prévisualisation utilisée : `https://feat-carte-01.hkconseils-site.pages.dev`
+
+| Porte | Résultat | Sortie |
+|---|---|---|
+| G1 page 200 | ✅ | `code=200` |
+| G2 en-têtes vCard | ✅ | `content-type: text/vcard; charset=utf-8` · `content-disposition: attachment; filename="hemerson-koffi.vcf"` · `x-robots-tag: noindex, nofollow` — trois greps séparés, chacun en 0 |
+| G3 noindex `/carte` | ✅ | `x-robots-tag: noindex, nofollow`, `PIPESTATUS[1]=0` ; balise meta présente 1 fois |
+| G4 validité vCard | ✅ | `FN=Hemerson Koffi VERSION=3.0 TEL=+33602409263` · **CRLF 13/13 lignes**, aucun LF nu, aucun BOM |
+| G5 zéro JS / tiers | ✅ | 4 requêtes, **0 `Script`**, **0 hors origine** : document, fonte, feuille de style, favicon |
+| G6 Lighthouse 100 ×4 | ⛔ **ROUGE** | Performance 100 · Accessibilité 100 · Bonnes pratiques 100 · **SEO 54** — voir ci-dessous |
+| G7 exclusion sitemap | ✅ | `carte` = 0 occurrence, **témoin positif** `<loc>` = 17 |
+| G8 décodage QR | ✅ | `zbarimg --raw` → `https://hkconseils.fr/carte`, chaîne exacte. **Témoin inverse** : un QR encodant `/temoin` est bien décodé différemment, le harnais n'est pas aveugle |
+| G9 rien de collatéral | ✅ | hors liste blanche : vide. `AUDIT-BLOG-01.md` était non suivi **avant** la branche, laissé tel quel |
+
+Portes du dépôt, en plus : `check-jsonld` OK (8 nœuds, 7 Q/R), `check-leaks` OK (56 fichiers).
+CI `validate` run 34064604518 : **success**, 4 jobs sur 4.
+
+Versions : segno **1.6.1**, vobject **0.9.9**, Lighthouse **12.8.2**, Chrome for Testing
+**152.0.7977.82**, Node 22.23.2.
+
+### ⛔ G6 rouge : AC3 et AC5 sont mutuellement exclusifs
+
+Deux audits SEO échouent :
+
+```
+❌ is-crawlable      (poids 4,04/11,04) — « Page is blocked from indexing »
+❌ meta-description  (poids 1,00/11,04) — « Document does not have a meta description »
+                     poids perdu 5,04/11,04  ->  score 54
+```
+
+**`is-crawlable` échoue par construction.** L'AC3 **exige** `noindex` ; l'audit sanctionne
+exactement cela. Aucune correction ne peut le faire passer sans retirer le `noindex`, donc
+sans violer l'AC3. **Le plafond structurel du score SEO est 63/100**, atteignable en
+ajoutant une meta description.
+
+Une meta description sur une page `noindex` ne sera jamais affichée nulle part : l'ajouter
+ne servirait qu'à déplacer un chiffre. Le §3.2 ne la demande pas. **Je ne l'ai pas ajoutée**
+et je laisse l'arbitrage.
+
+**Condition d'arrêt §8-3 déclenchée. La PR n'est pas fusionnée.**
+
+### Point connexe : la CI ne mesurera jamais `/carte`
+
+`lighthouserc.cjs` porte une liste d'URL explicite. `/carte` n'y est pas, donc le job
+Lighthouse de la CI est vert **sans avoir mesuré la page**. C'est pourquoi G6 a été joué en
+CLI directe, comme la directive le prévoit — et pourquoi éditer `lighthouserc.cjs`
+n'était pas nécessaire, ce qui évite la condition d'arrêt §8-4.
+
+Contrepartie : aucune régression future sur `/carte` ne sera détectée par la CI. À porter
+au backlog post-gel.
+
+### Backlog proposé pour SUIVI_CENTRAL.md
+
+`P3 — CORTEX : remonter le compteur de requêtes Cloudflare Pages sur /carte (API GraphQL Analytics, token scoped Analytics:Read)`
+
 ## 12. Decisions Log
 
 | Réf. | Décision | Date | Portée |
