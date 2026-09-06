@@ -553,3 +553,38 @@ a:hover { color: var(--color-accent-hover); }
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* ---------- Carte de contact (CARTE-01) ---------------------------------- */
+/* Page atteinte au QR depuis la carte imprimée : colonne unique, bouton
+   pleine largeur sur mobile, aucun élément de navigation. Bloc scopé .carte,
+   aucun jeton nouveau — tout vient des variables déjà définies plus haut. */
+.carte { padding-block: var(--space-8); }
+.carte .wrap { max-width: 36rem; }
+.carte .wordmark { color: var(--color-fg); }
+.carte h1 {
+  margin-block: var(--space-4) 0;
+  font-size: var(--text-h2);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+}
+.carte-role { margin-block: var(--space-2) 0; font-weight: 600; color: var(--color-fg); }
+.carte-pitch { margin-block: var(--space-2) 0; color: var(--color-fg-muted); }
+.carte-cta { margin-block-start: var(--space-6); }
+.carte-liens {
+  margin-block: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.carte-pied {
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-small);
+  color: var(--color-fg-muted);
+}
+@media (max-width: 480px) {
+  .carte-cta { display: block; width: 100%; text-align: center; }
+}

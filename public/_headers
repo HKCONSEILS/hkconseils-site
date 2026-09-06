@@ -1,0 +1,19 @@
+# CARTE-01 — en-têtes de la carte de contact.
+# La page et la vCard sont volontairement hors index : la carte s'atteint au QR,
+# pas par la recherche. `noindex` par en-tête ET par balise (AC3) ; robots.txt
+# reste inchangé, un Disallow empêcherait justement le robot de lire le noindex.
+
+/carte
+  X-Robots-Tag: noindex, nofollow
+
+/carte/
+  X-Robots-Tag: noindex, nofollow
+
+/carte.html
+  X-Robots-Tag: noindex, nofollow
+
+/hemerson-koffi.vcf
+  Content-Type: text/vcard; charset=utf-8
+  Content-Disposition: attachment; filename="hemerson-koffi.vcf"
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: public, max-age=86400
