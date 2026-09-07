@@ -1039,7 +1039,7 @@ gabarit : le retour arrière est un `git revert` sans effet de bord.
 
 ## 11 sexies. CARTE-01 — page /carte, vCard et QR (06-07/09)
 
-Directive `~/openexam-pilotage/rapports/DIRECTIVE-CARTE-01.md`, mode AUTO. Gel pré-dépôt
+Directive CARTE-01 (hors dépôt), mode AUTO. Gel pré-dépôt
 BPI levé pour ce seul périmètre par Hémerson.
 
 ### Inconnues `[U]` résolues
@@ -1126,7 +1126,9 @@ au backlog post-gel.
 
 ### Backlog proposé pour SUIVI_CENTRAL.md
 
-`P3 — CORTEX : remonter le compteur de requêtes Cloudflare Pages sur /carte (API GraphQL Analytics, token scoped Analytics:Read)`
+`P3 — remonter le compteur de requêtes Cloudflare Pages sur /carte (API GraphQL Analytics, token scoped Analytics:Read)`.
+Le destinataire interne est nommé dans SUIVI_CENTRAL.md, hors de ce dépôt : la porte anti-fuite
+interdit ce nom ici, et elle a raison.
 
 ## 12. Decisions Log
 
