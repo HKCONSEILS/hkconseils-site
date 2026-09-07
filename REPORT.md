@@ -1082,7 +1082,7 @@ Prévisualisation utilisée : `https://feat-carte-01.hkconseils-site.pages.dev`
 | G3 noindex `/carte` | ✅ | `x-robots-tag: noindex, nofollow`, `PIPESTATUS[1]=0` ; balise meta présente 1 fois |
 | G4 validité vCard | ✅ | `FN=Hemerson Koffi VERSION=3.0 TEL=+33602409263` · **CRLF 13/13 lignes**, aucun LF nu, aucun BOM |
 | G5 zéro JS / tiers | ✅ | 4 requêtes, **0 `Script`**, **0 hors origine** : document, fonte, feuille de style, favicon |
-| G6 Lighthouse 100 ×4 | ⛔ **ROUGE** | Performance 100 · Accessibilité 100 · Bonnes pratiques 100 · **SEO 54** — voir ci-dessous |
+| G6 Lighthouse *(AC5 amendé, Erratum E1)* | ✅ | Performance **100** · Accessibilité **100** · Bonnes pratiques **100**. **Catégorie SEO non applicable**, voir ci-dessous |
 | G7 exclusion sitemap | ✅ | `carte` = 0 occurrence, **témoin positif** `<loc>` = 17 |
 | G8 décodage QR | ✅ | `zbarimg --raw` → `https://hkconseils.fr/carte`, chaîne exacte. **Témoin inverse** : un QR encodant `/temoin` est bien décodé différemment, le harnais n'est pas aveugle |
 | G9 rien de collatéral | ✅ | hors liste blanche : vide. `AUDIT-BLOG-01.md` était non suivi **avant** la branche, laissé tel quel |
@@ -1093,7 +1093,7 @@ CI `validate` run 34064604518 : **success**, 4 jobs sur 4.
 Versions : segno **1.6.1**, vobject **0.9.9**, Lighthouse **12.8.2**, Chrome for Testing
 **152.0.7977.82**, Node 22.23.2.
 
-### ⛔ G6 rouge : AC3 et AC5 sont mutuellement exclusifs
+### G6 : AC3 et AC5 étaient mutuellement exclusifs — résolu par l'Erratum E1
 
 Deux audits SEO échouent :
 
@@ -1112,7 +1112,56 @@ Une meta description sur une page `noindex` ne sera jamais affichée nulle part 
 ne servirait qu'à déplacer un chiffre. Le §3.2 ne la demande pas. **Je ne l'ai pas ajoutée**
 et je laisse l'arbitrage.
 
-**Condition d'arrêt §8-3 déclenchée. La PR n'est pas fusionnée.**
+**Résolu par l'Erratum E1 de la squad (06/09).** L'AC5 est amendé : « 100 sur Performance,
+Accessibilité et Bonnes pratiques ; catégorie SEO non applicable, la page est délibérément
+hors index par l'AC3 ». Le `<title>` livré est approuvé tel quel. La condition d'arrêt §8-3
+est levée et la PR a été fusionnée — merge commit **`b89d85c`**, 2026-09-06T23:52:21Z.
+
+### Portes réseau rejouées sur la production après fusion
+
+Résolution forcée `@1.1.1.1`, doctrine habituelle. Sorties verbatim :
+
+```
+date UTC : 2026-09-06T23:53:28Z   apex @1.1.1.1 -> 172.67.195.37
+
+### G1 — page 200 (production) ###
+$ code=$(curl -sS -o /dev/null --resolve hkconseils.fr:443:172.67.195.37 -w "%{http_code}" https://hkconseils.fr/carte)
+200
+G1 : [ "$code" = "200" ] -> exit 0
+
+### G2 — en-têtes de la vCard (production) ###
+$ curl -sSI --resolve ... https://hkconseils.fr/hemerson-koffi.vcf > hdr.txt
+content-type: text/vcard; charset=utf-8
+cache-control: public, max-age=86400
+content-disposition: attachment; filename="hemerson-koffi.vcf"
+x-robots-tag: noindex, nofollow
+$ grep -qi "^content-type: text/vcard" hdr.txt        ; echo $?
+0
+$ grep -qi "^content-disposition: attachment" hdr.txt ; echo $?
+0
+$ grep -qi "^x-robots-tag: noindex" hdr.txt           ; echo $?
+0
+
+### G3 — noindex sur /carte (production) ###
+$ curl -sSI --resolve ... https://hkconseils.fr/carte | grep -i "^x-robots-tag:" ; echo ${PIPESTATUS[1]}
+x-robots-tag: noindex, nofollow
+PIPESTATUS[1]=0
+$ curl -sS --resolve ... https://hkconseils.fr/carte | grep -c "name=\"robots\" content=\"noindex, nofollow\""
+1
+
+### complément — statut et intégrité de la vCard servie ###
+$ curl -sS -o /tmp/prod.vcf --resolve ... -w "%{http_code} %{size_download} octets\n" https://hkconseils.fr/hemerson-koffi.vcf
+200 372 octets
+$ cmp /tmp/prod.vcf public/hemerson-koffi.vcf ; echo $?
+0
+$ grep -c $'\r' /tmp/prod.vcf   (CRLF préservés à la livraison)
+13
+$ zbarimg décodage inchangé (QR non servi, contrôle dépôt) : rappel G8 vert
+```
+
+La vCard servie est **octet pour octet identique** à celle du dépôt (`cmp` en 0) et ses
+**13 CRLF sont préservés** à la livraison. C'était le risque réel sur ce format : Cloudflare
+ne réécrit pas les fins de ligne.
 
 ### Point connexe : la CI ne mesurera jamais `/carte`
 
