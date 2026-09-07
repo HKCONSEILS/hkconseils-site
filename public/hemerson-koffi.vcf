@@ -4,10 +4,12 @@ N:Koffi;Hemerson;;;
 FN:Hemerson Koffi
 ORG:HK Conseils
 TITLE:Fondateur · Architecte IA souveraine
-TEL;TYPE=CELL,VOICE:+33602409263
+TEL;TYPE=CELL,VOICE:+33614171598
 EMAIL;TYPE=INTERNET,WORK:contact@hkconseils.fr
 URL:https://hkconseils.fr
 item1.URL:https://www.linkedin.com/in/hemersonkoffi
 item1.X-ABLabel:LinkedIn
+item2.URL:https://wa.me/33614171598
+item2.X-ABLabel:WhatsApp
 ADR;TYPE=WORK:;;;Saint-Priest;;69800;France
 END:VCARD
