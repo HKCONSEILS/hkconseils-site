@@ -1,3 +1,77 @@
+# =============================================================================
+# _headers — en-têtes servis par Cloudflare Pages.
+#
+# FORME : aucun commentaire n'est écrit À L'INTÉRIEUR d'un bloc de règle. Un
+# `#` indenté sous un chemin n'est documenté nulle part chez Cloudflare ; s'il
+# était pris pour un en-tête malformé, la règle entière tomberait SANS ERREUR
+# et le site serait servi sans CSP en se croyant protégé. Toute la motivation
+# vit donc ici, au-dessus, et les blocs ne contiennent que des en-têtes.
+#
+# CUMUL : Pages applique TOUTES les règles qui correspondent à une requête. Un
+# même nom d'en-tête écrit dans deux blocs se cumulerait au lieu de se
+# remplacer. Les deux blocs ci-dessous sont disjoints — le bloc global ne
+# touche à aucun des quatre en-têtes de CARTE-01 — donc le `noindex` de la
+# carte survit intact.
+#
+# -----------------------------------------------------------------------------
+# AUDIT-VITRINE-01 — en-têtes de sécurité, tout le site (LOT-AUTONOME-01 §3.2)
+# -----------------------------------------------------------------------------
+# Constat du 18/09 AVANT correctif, lu sur la page servie, résolution publique
+# forcée (`@1.1.1.1` + `--resolve`), sur /, /blog/, un article et les deux pages
+# légales — jamais depuis le LAN :
+#   déjà servis  : X-Content-Type-Options, Referrer-Policy (source hors dépôt,
+#                  non tranchée : ni `_headers` ni balise ne les portait)
+#   ABSENTS      : Strict-Transport-Security, X-Frame-Options,
+#                  Permissions-Policy, Content-Security-Policy
+#   Mozilla Observatory : D, 35/100, 3 tests échoués sur 12.
+# Les deux en-têtes déjà présents sont réécrits ici à l'identique : le dépôt
+# porte la valeur au lieu de dépendre d'un réglage qu'il ne contrôle pas.
+#
+# Strict-Transport-Security — 1 an. `includeSubDomains` VOLONTAIREMENT ABSENT :
+#   les sous-domaines portent d'autres services, hors périmètre de ce lot, et
+#   l'inclusion reste imposée aux navigateurs qui l'ont vue pendant toute la
+#   durée du max-age. `preload` non, pour la même raison en pire.
+#
+# Permissions-Policy — aucune de ces API n'est utilisée : ni script, ni
+#   formulaire, ni média. La liste dit ce qui est refusé, elle ne prétend pas
+#   être exhaustive.
+#
+# X-Frame-Options ET frame-ancestors — le premier pour les agents anciens, le
+#   second pour la norme. Ils disent la même chose.
+#
+# CSP — chaque directive est adossée à un constat de ce lot, pas à une habitude :
+#   script-src 'none'         ZÉRO script exécutable sur les pages servies
+#                             (relevé sur /, /blog/ et un article). Le seul
+#                             <script> du site porte application/ld+json : le
+#                             navigateur ne le prépare pas comme un script, la
+#                             vérification CSP inline n'est donc jamais
+#                             atteinte. RECETTE OBLIGATOIRE sur la preview.
+#   style-src 'unsafe-inline' constaté, pas supposé. Shiki pose un attribut
+#                             style= par jeton coloré AU BUILD — 33 sur
+#                             l'article témoin, class="astro-code".
+#                             astro.config.mjs documente déjà la contrepartie.
+#                             Sans lui, les blocs de code perdent leur couleur,
+#                             en silence. Les pages de la vitrine, elles, n'ont
+#                             ni <style> ni style= : 0 sur les cinq.
+#   img-src ... data:         AUCUN data: URI sur le site aujourd'hui (vérifié,
+#                             pages servies et CSS). Conservé parce que la
+#                             directive le nomme et que le coût est nul.
+#   font-src 'self'           les deux WOFF2 sont auto-hébergés, aucun CDN.
+#   form-action 'none'        zéro <form> sur les pages servies.
+#   frame-src 'none'          zéro <iframe>, <object> ou <embed>.
+#
+# ROLLBACK : supprimer ce bloc `/*` et ces commentaires rend exactement l'état
+# du 07/09 — le fichier CARTE-01 seul, conservé ci-dessous sans une modification.
+# =============================================================================
+
+/*
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), usb=(), xr-spatial-tracking=()
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests
+
 # CARTE-01 — en-têtes de la carte de contact.
 # La page et la vCard sont volontairement hors index : la carte s'atteint au QR,
 # pas par la recherche. `noindex` par en-tête ET par balise (AC3) ; robots.txt

@@ -39,6 +39,9 @@ from pathlib import Path
 INDEX = Path(__file__).resolve().parent.parent / "public" / "index.html"
 FAQ_MINIMUM = 7
 AREA_SERVED_ATTENDU = 31
+GRAPH_NOEUDS_ATTENDUS = 8
+SAME_AS_MINIMUM = 3
+SAME_AS_SONDE = "linkedin.com/company"
 
 
 class Extractor(HTMLParser):
@@ -127,6 +130,14 @@ def main() -> int:
     for node in graph:
         by_type.setdefault(node.get("@type"), []).append(node)
 
+    # Le compte par type ne défend pas le graphe : un nœud d'un type non listé
+    # s'y ajouterait sans qu'aucune des attentes ci-dessous ne bouge. La
+    # directive porte sur le graphe entier, la porte doit donc le compter.
+    if len(graph) != GRAPH_NOEUDS_ATTENDUS:
+        errors.append(
+            f"@graph : {len(graph)} nœud(s), {GRAPH_NOEUDS_ATTENDUS} attendu(s)"
+        )
+
     expected = {
         "ProfessionalService": 1,
         "Person": 1,
@@ -190,6 +201,32 @@ def main() -> int:
     orga = next(
         (n for n in graph if n.get("@id") == "https://hkconseils.fr/#organisation"), None
     )
+
+    # LOT-AUTONOME-01 §2 — la page LinkedIn **entreprise** rejoint le profil
+    # personnel et GitHub dans le sameAs de l'organisation. Les deux conditions
+    # sont vérifiées séparément : un compte d'entrées ne dit pas lesquelles, et
+    # une sonde sans compte laisserait disparaître les deux autres en silence.
+    # La sonde vise `/company/` et non `linkedin.com` : le profil personnel
+    # contient déjà `linkedin.com`, il ferait passer la porte à lui seul.
+    if orga is None:
+        errors.append("nœud #organisation absent : sameAs non vérifiable")
+    else:
+        same_as = orga.get("sameAs")
+        if not isinstance(same_as, list):
+            errors.append(
+                f"sameAs : {type(same_as).__name__}, tableau attendu sur #organisation"
+            )
+        else:
+            if len(same_as) < SAME_AS_MINIMUM:
+                errors.append(
+                    f"sameAs : {len(same_as)} entrée(s), au moins {SAME_AS_MINIMUM} attendues"
+                )
+            if not any(SAME_AS_SONDE in u for u in same_as if isinstance(u, str)):
+                errors.append(
+                    f"sameAs : aucune entrée ne contient « {SAME_AS_SONDE} » "
+                    "(page LinkedIn entreprise)"
+                )
+
     if orga is not None and "areaServed" in orga:
         zone = orga["areaServed"]
         if not isinstance(zone, list):
