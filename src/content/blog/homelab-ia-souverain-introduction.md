@@ -5,7 +5,7 @@ pubDate: 2026-09-15
 originalDate: 2025-06-01
 originalDatePrecision: mois
 tags: ["homelab", "souveraineté", "série"]
-draft: true
+draft: false
 ---
 
 Le montage est terminé. Un serveur personnel dédié à l'intelligence artificielle, conçu pour expérimenter, entraîner des modèles et déployer des démonstrateurs sur du matériel que je contrôle entièrement.
